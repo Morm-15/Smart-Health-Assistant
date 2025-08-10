@@ -1,16 +1,21 @@
 // screens/Auth/RegisterScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
-    TextInput,
     TouchableOpacity,
     StyleSheet,
-    Alert
+    Alert,
+    Dimensions,
+    Keyboard,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth } from '../../firebase'; // مسار ملف Firebase
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { signUpUser, saveUserToFirestore } from '../../services/authService';
+import CustomInput from '../../components/CustomInput';
+import { validateRegisterFields } from '../../validations/authValidations';
+import { getFirebaseErrorMessage } from '../../validations/errorMessages';
+
+const { width } = Dimensions.get('window');
 
 const RegisterScreen = () => {
     const [firstName, setFirstName] = useState('');
@@ -21,64 +26,70 @@ const RegisterScreen = () => {
     const navigation = useNavigation();
 
     const handleRegister = async () => {
-        if (password !== confirmPassword) {
-            Alert.alert('خطأ', 'كلمة المرور وتأكيدها غير متطابقتين.');
+        // التحقق من المدخلات
+        const validationError = validateRegisterFields(firstName, lastName, email, password, confirmPassword);
+        if (validationError) {
+            Alert.alert('خطأ', validationError);
             return;
         }
 
+        Keyboard.dismiss();
+
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await sendEmailVerification(userCredential.user);
-            Alert.alert(
-                'تم',
-                'تم إنشاء حسابك بنجاح. الرجاء التحقق من بريدك الإلكتروني لتفعيل الحساب.'
-            );
-            navigation.goBack(); // العودة إلى شاشة تسجيل الدخول
+            const userCredential = await signUpUser(email, password);
+            await saveUserToFirestore(userCredential.user.uid, email, firstName, lastName);
+            Alert.alert('تم', 'تم إنشاء حسابك بنجاح. الرجاء التحقق من بريدك الإلكتروني لتفعيل الحساب.');
+            navigation.goBack();
         } catch (error: any) {
-            Alert.alert('خطأ', error.message);
+            Alert.alert('خطأ', getFirebaseErrorMessage(error.code));
         }
     };
+
+    // إعادة الحقول للوضع الافتراضي عند مغادرة الشاشة
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                setFirstName('');
+                setLastName('');
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+            };
+        }, [])
+    );
+
+    const isFormComplete = firstName && lastName && email && password && confirmPassword;
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>إنشاء حساب جديد</Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="الاسم الأول"
-                value={firstName}
-                onChangeText={setFirstName}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="اسم العائلة"
-                value={lastName}
-                onChangeText={setLastName}
-            />
-            <TextInput
-                style={styles.input}
+            <CustomInput placeholder="الاسم الأول" value={firstName} onChangeText={setFirstName} />
+            <CustomInput placeholder="اسم العائلة" value={lastName} onChangeText={setLastName} />
+            <CustomInput
                 placeholder="البريد الإلكتروني"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
-                autoCapitalize="none"
             />
-            <TextInput
-                style={styles.input}
+            <CustomInput
                 placeholder="كلمة السر"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
             />
-            <TextInput
-                style={styles.input}
+            <CustomInput
                 placeholder="تأكيد كلمة السر"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
             />
 
-            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <TouchableOpacity
+                style={[styles.registerButton, !isFormComplete && styles.disabledButton]}
+                onPress={handleRegister}
+                disabled={!isFormComplete}
+            >
                 <Text style={styles.registerButtonText}>إنشاء حساب</Text>
             </TouchableOpacity>
 
@@ -94,39 +105,34 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: width * 0.05,
         backgroundColor: '#fff',
     },
     title: {
-        fontSize: 24,
+        fontSize: width * 0.06,
         fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        width: '100%',
-        height: 50,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        marginBottom: 15,
-        textAlign: 'right',
+        marginBottom: width * 0.05,
     },
     registerButton: {
         width: '100%',
         backgroundColor: '#007AFF',
-        padding: 15,
+        padding: width * 0.04,
         borderRadius: 8,
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: width * 0.05,
+    },
+    disabledButton: {
+        backgroundColor: '#ccc',
     },
     registerButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+        fontSize: width * 0.045,
     },
     backToLogin: {
         color: '#007AFF',
-        marginTop: 10,
+        marginTop: width * 0.03,
+        fontSize: width * 0.04,
     },
 });
 
