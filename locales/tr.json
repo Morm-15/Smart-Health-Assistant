@@ -1,0 +1,22 @@
+{
+  "welcomeBack": "Tekrar hoşgeldiniz!",
+  "email": "E-posta",
+  "password": "Şifre",
+  "forgotPassword": "Şifremi Unuttum?",
+  "login": "Giriş Yap",
+  "createAccount": "Yeni Hesap Oluştur",
+  "error": "Hata",
+  "verifyEmailTitle": "Doğrulama Gerekiyor",
+  "verifyEmailMessage": "Giriş yapmadan önce lütfen e-postanızı doğrulayın.",
+  "resetPasswordTitle": "Şifreyi Sıfırla",
+  "enterEmail": "E-posta adresinizi girin",
+  "sendLink": "Bağlantıyı Gönder",
+  "success": "Başarılı",
+  "resetPasswordEmailSent": "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.",
+  "createNewAccount": "Yeni Hesap Oluştur",
+  "firstName": "Ad",
+  "lastName": "Soyad",
+  "confirmPassword": "Şifreyi Tekrar Girin",
+  "backToLogin": "Girişe Dön",
+  "accountCreatedMessage": "Hesabınız başarıyla oluşturuldu. Lütfen hesabınızı aktifleştirmek için e-postanızı kontrol edin."
+}

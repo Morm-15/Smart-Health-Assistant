@@ -1,39 +1,41 @@
-// screens/Auth/ForgotPasswordScreen.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Dimensions } from 'react-native';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 const ForgotPasswordScreen = () => {
     const [email, setEmail] = useState('');
     const navigation = useNavigation();
+    const { t } = useTranslation();
 
     const handleResetPassword = async () => {
         try {
             await sendPasswordResetEmail(auth, email);
-            Alert.alert('تم', 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.');
+            Alert.alert(t('success'), t('resetPasswordEmailSent'));
             navigation.goBack();
         } catch (error: any) {
-            Alert.alert('خطأ', error.message);
+            Alert.alert(t('error'), error.message);
         }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>إعادة تعيين كلمة المرور</Text>
+            <Text style={styles.title}>{t('resetPasswordTitle')}</Text>
             <TextInput
                 style={styles.input}
-                placeholder="أدخل بريدك الإلكتروني"
+                placeholder={t('enterEmail')}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                textAlign="right"
             />
             <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-                <Text style={styles.buttonText}>إرسال الرابط</Text>
+                <Text style={styles.buttonText}>{t('sendLink')}</Text>
             </TouchableOpacity>
         </View>
     );

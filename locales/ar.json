@@ -1,0 +1,22 @@
+{
+  "welcomeBack": "مرحباً بعودتك!",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة السر",
+  "forgotPassword": "هل نسيت كلمة السر؟",
+  "login": "تسجيل الدخول",
+  "createAccount": "إنشاء حساب جديد",
+  "error": "خطأ",
+  "verifyEmailTitle": "التحقق مطلوب",
+  "verifyEmailMessage": "الرجاء تأكيد بريدك الإلكتروني قبل تسجيل الدخول.",
+  "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+  "enterEmail": "أدخل بريدك الإلكتروني",
+  "sendLink": "إرسال الرابط",
+  "success": "تم",
+  "resetPasswordEmailSent": "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.",
+  "createNewAccount": "إنشاء حساب جديد",
+  "firstName": "الاسم الأول",
+  "lastName": "اسم العائلة",
+  "confirmPassword": "تأكيد كلمة السر",
+  "backToLogin": "العودة إلى تسجيل الدخول",
+  "accountCreatedMessage": "تم إنشاء حسابك بنجاح. الرجاء التحقق من بريدك الإلكتروني لتفعيل الحساب."
+}

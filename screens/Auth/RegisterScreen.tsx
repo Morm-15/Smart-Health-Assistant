@@ -1,4 +1,3 @@
-// screens/Auth/RegisterScreen.tsx
 import React, { useState, useCallback } from 'react';
 import {
     View,
@@ -14,6 +13,7 @@ import { signUpUser, saveUserToFirestore } from '../../services/authService';
 import CustomInput from '../../components/CustomInput';
 import { validateRegisterFields } from '../../validations/authValidations';
 import { getFirebaseErrorMessage } from '../../validations/errorMessages';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -24,12 +24,12 @@ const RegisterScreen = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const navigation = useNavigation();
+    const { t } = useTranslation();
 
     const handleRegister = async () => {
-        // التحقق من المدخلات
         const validationError = validateRegisterFields(firstName, lastName, email, password, confirmPassword);
         if (validationError) {
-            Alert.alert('خطأ', validationError);
+            Alert.alert(t('error'), validationError);
             return;
         }
 
@@ -38,14 +38,13 @@ const RegisterScreen = () => {
         try {
             const userCredential = await signUpUser(email, password);
             await saveUserToFirestore(userCredential.user.uid, email, firstName, lastName);
-            Alert.alert('تم', 'تم إنشاء حسابك بنجاح. الرجاء التحقق من بريدك الإلكتروني لتفعيل الحساب.');
+            Alert.alert(t('success'), t('accountCreatedMessage'));
             navigation.goBack();
         } catch (error: any) {
-            Alert.alert('خطأ', getFirebaseErrorMessage(error.code));
+            Alert.alert(t('error'), getFirebaseErrorMessage(error.code));
         }
     };
 
-    // إعادة الحقول للوضع الافتراضي عند مغادرة الشاشة
     useFocusEffect(
         useCallback(() => {
             return () => {
@@ -62,24 +61,24 @@ const RegisterScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>إنشاء حساب جديد</Text>
+            <Text style={styles.title}>{t('createNewAccount')}</Text>
 
-            <CustomInput placeholder="الاسم الأول" value={firstName} onChangeText={setFirstName} />
-            <CustomInput placeholder="اسم العائلة" value={lastName} onChangeText={setLastName} />
+            <CustomInput placeholder={t('firstName')} value={firstName} onChangeText={setFirstName} />
+            <CustomInput placeholder={t('lastName')} value={lastName} onChangeText={setLastName} />
             <CustomInput
-                placeholder="البريد الإلكتروني"
+                placeholder={t('email')}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
             />
             <CustomInput
-                placeholder="كلمة السر"
+                placeholder={t('password')}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
             />
             <CustomInput
-                placeholder="تأكيد كلمة السر"
+                placeholder={t('confirmPassword')}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
@@ -90,11 +89,11 @@ const RegisterScreen = () => {
                 onPress={handleRegister}
                 disabled={!isFormComplete}
             >
-                <Text style={styles.registerButtonText}>إنشاء حساب</Text>
+                <Text style={styles.registerButtonText}>{t('createAccount')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={styles.backToLogin}>العودة إلى تسجيل الدخول</Text>
+                <Text style={styles.backToLogin}>{t('backToLogin')}</Text>
             </TouchableOpacity>
         </View>
     );

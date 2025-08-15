@@ -7,15 +7,18 @@ import {
     Alert,
     Dimensions,
     Keyboard,
+    ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
+
 import { auth } from '../../firebase';
-import { saveUserToFirestore } from '../../services/authService';
 import { AuthStackParamList } from '../../navigation/types';
-import AppLogo from "../../components/AppLogo";
-import CustomInput from "../../components/CustomInput";
+import AppLogo from '../../components/AppLogo';
+import CustomInput from '../../components/CustomInput';
+import LanguagePicker from '../../components/LanguagePicker';
 import { validateLoginFields } from '../../validations/authValidations';
 import { getFirebaseErrorMessage } from '../../validations/errorMessages';
 
@@ -26,26 +29,32 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, '
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigation = useNavigation<LoginScreenNavigationProp>();
+    const { t } = useTranslation();
 
     const handleLogin = async () => {
         const validationError = validateLoginFields(email, password);
         if (validationError) {
-            Alert.alert('خطأ', validationError);
+            Alert.alert(t('error'), validationError);
             return;
         }
 
         Keyboard.dismiss();
+        setLoading(true);
 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             if (!userCredential.user.emailVerified) {
-                Alert.alert('تحقق', 'الرجاء تأكيد بريدك الإلكتروني قبل تسجيل الدخول.');
+                Alert.alert(t('verifyEmailTitle'), t('verifyEmailMessage'));
+                setLoading(false);
                 return;
             }
             navigation.navigate('Home');
         } catch (error: any) {
-            Alert.alert('خطأ', getFirebaseErrorMessage(error.code));
+            Alert.alert(t('error'), getFirebaseErrorMessage(error.code));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -61,38 +70,37 @@ const LoginScreen = () => {
     return (
         <View style={styles.container}>
             <AppLogo />
-            <Text style={styles.welcomeText}>مرحباً بعودتك!</Text>
+            <Text style={styles.welcomeText}>{t('welcomeBack')}</Text>
+
+            <LanguagePicker />
 
             <CustomInput
-                placeholder="البريد الإلكتروني"
+                placeholder={t('email')}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
             />
             <CustomInput
-                placeholder="كلمة السر"
+                placeholder={t('password')}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
             />
 
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-                <Text style={styles.forgotPassword}>هل نسيت كلمة السر؟</Text>
+                <Text style={styles.forgotPassword}>{t('forgotPassword')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={[
-                    styles.loginButton,
-                    (!email || !password) && { backgroundColor: '#ccc' }
-                ]}
+                style={[styles.loginButton, (!email || !password || loading) && { backgroundColor: '#ccc' }]}
                 onPress={handleLogin}
-                disabled={!email || !password}
+                disabled={!email || !password || loading}
             >
-                <Text style={styles.loginButtonText}>تسجيل الدخول</Text>
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>{t('login')}</Text>}
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.signUpText}>إنشاء حساب جديد</Text>
+                <Text style={styles.signUpText}>{t('createAccount')}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -114,7 +122,6 @@ const styles = StyleSheet.create({
     forgotPassword: {
         color: '#007AFF',
         marginBottom: width * 0.05,
-        textAlign: 'right',
         width: '100%',
     },
     loginButton: {

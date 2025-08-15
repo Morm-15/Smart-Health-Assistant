@@ -1,0 +1,22 @@
+{
+  "welcomeBack": "Welcome back!",
+  "email": "Email",
+  "password": "Password",
+  "forgotPassword": "Forgot Password?",
+  "login": "Login",
+  "createAccount": "Create New Account",
+  "error": "Error",
+  "verifyEmailTitle": "Verification Required",
+  "verifyEmailMessage": "Please verify your email before logging in.",
+  "resetPasswordTitle": "Reset Password",
+  "enterEmail": "Enter your email",
+  "sendLink": "Send Link",
+  "success": "Success",
+  "resetPasswordEmailSent": "A password reset link has been sent to your email.",
+  "createNewAccount": "Create New Account",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "confirmPassword": "Confirm Password",
+  "backToLogin": "Back to Login",
+  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account."
+}
