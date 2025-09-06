@@ -54,9 +54,7 @@ const HomeScreen = () => {
                     <FeatureCard
                         icon="chatbubble-ellipses-outline"
                         title="الدردشة مع الذكاء الاصطناعي"
-/*
-                        onPress={() => navigation.navigate('ChatAI')}
-*/
+                        onPress={() => navigation.navigate("ChatAI")}
                     />
                     <FeatureCard
                         icon="medkit-outline"

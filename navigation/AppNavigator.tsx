@@ -5,6 +5,7 @@ import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
 import HomeScreen from '../screens/HomeScreen';
+import ChatAI from "../screens/ChatAI";
 import { AuthStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -16,6 +17,7 @@ const AuthStack = () => {
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
             <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="ChatAI" component={ChatAI} />
         </Stack.Navigator>
     );
 };
