@@ -4,6 +4,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import BackButton from "../../components/BackButton";
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ const ForgotPasswordScreen = () => {
 
     return (
         <View style={styles.container}>
+            <BackButton/>
             <Text style={styles.title}>{t('resetPasswordTitle')}</Text>
             <TextInput
                 style={styles.input}

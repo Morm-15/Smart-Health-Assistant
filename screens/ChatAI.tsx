@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, TextInput, TouchableOpacity, Text, ScrollView, StyleSheet, Keyboard, Animated } from "react-native";
 import { sendToGemini } from "../services/geminiService";
+import BackButton from "../components/BackButton";
 
 const ChatAI = () => {
     const [input, setInput] = useState("");
@@ -39,6 +40,7 @@ const ChatAI = () => {
 
     return (
         <View style={styles.container}>
+            <BackButton/>
             <ScrollView ref={scrollViewRef} style={styles.chatBox}>
                 {messages.map((msg, idx) => (
                     <View

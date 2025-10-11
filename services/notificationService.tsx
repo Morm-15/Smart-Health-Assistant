@@ -44,30 +44,62 @@ export async function registerForPushNotificationsAsync() {
     }
 }
 
-// جدولة إشعار
+// جدولة إشعار (مرة واحدة / يومياً / أسبوعياً)
 export async function scheduleNotification(
     title: string,
     body: string,
     date: Date,
-    reminderType: 'notification' | 'alarm'
+    reminderType: 'notification' | 'alarm',
+    repeatType?: 'once' | 'daily' | 'weekly',
+    weekdays?: number[] // للأسبوعي: 1=الأحد, 2=الاثنين ... 7=السبت
 ) {
-    // إنشاء القناة أول مرة قبل جدولة الإشعار (Android)
     await createAndroidChannel();
 
-    // حساب الوقت بالثواني من الآن حتى التاريخ المحدد
-    const seconds = Math.max((date.getTime() - Date.now()) / 1000, 1);
+    let trigger: Notifications.NotificationTriggerInput;
 
+    if (repeatType === 'daily') {
+        trigger = {
+            hour: date.getHours(),
+            minute: date.getMinutes(),
+            repeats: true,
+            channelId: 'medication_reminders',
+        };
+    } else if (repeatType === 'weekly' && weekdays) {
+        // إنشاء إشعارات لكل يوم من أيام الأسبوع المحددة
+        for (const day of weekdays) {
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title,
+                    body,
+                    sound: reminderType === 'alarm' ? 'default' : undefined,
+                },
+                trigger: {
+                    weekday: day,
+                    hour: date.getHours(),
+                    minute: date.getMinutes(),
+                    repeats: true,
+                    channelId: 'medication_reminders',
+                },
+            });
+        }
+        return;
+    } else {
+        // إشعار لمرة واحدة فقط
+        const seconds = Math.max((date.getTime() - Date.now()) / 1000, 1);
+        trigger = {
+            seconds,
+            repeats: false,
+            channelId: 'medication_reminders',
+        };
+    }
+
+    // جدولة الإشعار
     await Notifications.scheduleNotificationAsync({
         content: {
             title,
             body,
             sound: reminderType === 'alarm' ? 'default' : undefined,
         },
-        trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-            seconds,
-            repeats: false,
-            channelId: 'medication_reminders', // ربط القناة على Android
-        },
+        trigger,
     });
 }

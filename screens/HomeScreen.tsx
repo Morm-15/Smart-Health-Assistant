@@ -57,15 +57,14 @@ const HomeScreen = () => {
                         onPress={() => navigation.navigate("ChatAI")}
                     />
                     <FeatureCard
-                        icon="medkit-outline"
-                        title="إدارة الأدوية"
-/*
-                        onPress={() => navigation.navigate('ManageMedications')}
-*/
-                    />
-                    <FeatureCard
                         icon="alarm-outline"
                         title="تذكير الأدوية"
+
+                        onPress={() => navigation.navigate('AddMedicationScreen')}
+                    />
+                    <FeatureCard
+                        icon="medkit-outline"
+                        title="إدارة الأدوية"
 /*
                         onPress={() => navigation.navigate('MedicationReminders')}
 */

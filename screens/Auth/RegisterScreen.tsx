@@ -14,6 +14,7 @@ import CustomInput from '../../components/CustomInput';
 import { validateRegisterFields } from '../../validations/authValidations';
 import { getFirebaseErrorMessage } from '../../validations/errorMessages';
 import { useTranslation } from 'react-i18next';
+import BackButton from "../../components/BackButton";
 
 const { width } = Dimensions.get('window');
 
@@ -61,6 +62,7 @@ const RegisterScreen = () => {
 
     return (
         <View style={styles.container}>
+            <BackButton/>
             <Text style={styles.title}>{t('createNewAccount')}</Text>
 
             <CustomInput placeholder={t('firstName')} value={firstName} onChangeText={setFirstName} />

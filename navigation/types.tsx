@@ -5,4 +5,5 @@ export type AuthStackParamList = {
     ForgotPassword: undefined;
     Home: undefined;
     ChatAI: undefined;
+    AddMedicationScreen: undefined;
 };
