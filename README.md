@@ -106,7 +106,6 @@ Kullanıcılar, etkilenen bölgenin bir resmini yükleyebilir ve model en olası
 - ضبط مواعيد التذكير  
 - استقبال **إشعارات الدفع** عبر **Firebase Cloud Messaging (FCM)**  
 
-> **ضع هنا الصورة / Insert Image Here / Görseli Buraya Ekleyin**
 
 ---
 
