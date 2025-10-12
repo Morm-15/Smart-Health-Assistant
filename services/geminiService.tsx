@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
 // التحقق من وجود API Key في متغير البيئة
-const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+//api
 
 if (!apiKey) {
     throw new Error("EXPO_PUBLIC_GEMINI_API_KEY is not defined in .env file.");
