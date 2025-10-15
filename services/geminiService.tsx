@@ -1,7 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 
 // التحقق من وجود API Key في متغير البيئة
-//api
+
+const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 if (!apiKey) {
     throw new Error("EXPO_PUBLIC_GEMINI_API_KEY is not defined in .env file.");
@@ -20,11 +21,11 @@ export const sendToGemini = async (prompt: string): Promise<string> => {
         // استخدام نموذج مدعوم مباشرة
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash", // اختر النموذج المدعوم على حسابك
-            contents: prompt,
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
         });
 
         // إعادة النص الناتج
-        return response.text||"لا يوجد رد من الذكاء الاصطناعي." ;
+        return response?.candidates?.[0]?.content?.parts?.[0]?.text || "لا يوجد رد من الذكاء الاصطناعي.";
     } catch (error) {
         console.error("❌ Error with Gemini API:", error);
         return "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.";
