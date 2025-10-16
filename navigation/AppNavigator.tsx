@@ -8,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ChatAI from "../screens/ChatAI";
 import AddMedicationScreen from "../screens/AddMedicationScreen";
 import { AuthStackParamList } from './types';
+import SkinDiseaseCameraScreen from "../screens/SkinDiseaseCameraScreen";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -20,6 +21,7 @@ const AuthStack = () => {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="ChatAI" component={ChatAI} />
             <Stack.Screen name="AddMedicationScreen" component={AddMedicationScreen} />
+            <Stack.Screen name="SkinDiseaseCamera" component={SkinDiseaseCameraScreen} />
         </Stack.Navigator>
     );
 };

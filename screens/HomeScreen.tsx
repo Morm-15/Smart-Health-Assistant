@@ -72,9 +72,7 @@ const HomeScreen = () => {
                     <FeatureCard
                         icon="camera-outline"
                         title="التقاط صور الأمراض الجلدية"
-/*
                         onPress={() => navigation.navigate('SkinDiseaseCamera')}
-*/
                     />
                 </View>
             </ScrollView>
