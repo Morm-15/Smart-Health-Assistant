@@ -1,55 +1,43 @@
-import React, { useState } from 'react';
-import { TextInput, StyleSheet, Dimensions } from 'react-native';
-import i18n from '../i18n';
+import React, { forwardRef } from 'react';
+import { TextInput, View, StyleSheet, TextInputProps } from 'react-native';
 
-const { width } = Dimensions.get('window');
-
-interface CustomInputProps {
-    placeholder: string;
+interface CustomInputProps extends TextInputProps {
     value: string;
     onChangeText: (text: string) => void;
+    placeholder: string;
     secureTextEntry?: boolean;
-    keyboardType?: any;
 }
 
-const CustomInput: React.FC<CustomInputProps> = ({
-                                                     placeholder,
-                                                     value,
-                                                     onChangeText,
-                                                     secureTextEntry = false,
-                                                     keyboardType = 'default',
-                                                 }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const isRTL = i18n.dir() === 'rtl';
-
-    return (
-        <TextInput
-            style={[styles.input, isFocused && styles.inputFocused]}
-            placeholder={placeholder}
-            value={value}
-            onChangeText={onChangeText}
-            secureTextEntry={secureTextEntry}
-            keyboardType={keyboardType}
-            textAlign={isRTL ? 'right' : 'left'}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-        />
-    );
-};
+const CustomInput = forwardRef<TextInput, CustomInputProps>(
+    ({ value, onChangeText, placeholder, secureTextEntry = false, ...rest }, ref) => {
+        return (
+            <View style={styles.container}>
+                <TextInput
+                    ref={ref}
+                    style={styles.input}
+                    value={value}
+                    onChangeText={onChangeText}
+                    placeholder={placeholder}
+                    secureTextEntry={secureTextEntry}
+                    {...rest} // <-- هذا يسمح بتمرير returnKeyType, onSubmitEditing وغيرها
+                />
+            </View>
+        );
+    }
+);
 
 const styles = StyleSheet.create({
-    input: {
+    container: {
         width: '100%',
-        height: width * 0.13,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: width * 0.04,
-        marginBottom: width * 0.05,
+        marginBottom: 10,
     },
-    inputFocused: {
-        borderColor: '#007AFF', // لون أزرق عند التركيز
-        borderWidth: 2,
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 12,
+        fontSize: 16,
+        width: '100%',
     },
 });
 
