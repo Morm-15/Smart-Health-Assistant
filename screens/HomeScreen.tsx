@@ -6,6 +6,7 @@ import { AuthStackParamList } from '../navigation/types';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import Header from '../components/Header';
 import FeatureCard from '../components/FeatureCard';
 import Footer from '../components/Footer';
@@ -17,6 +18,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'H
 const HomeScreen = () => {
     const navigation = useNavigation<HomeScreenNavigationProp>();
     const { t } = useTranslation();
+    const { colors, isDarkMode } = useTheme();
     const [userName, setUserName] = useState<string>('');
 
     useEffect(() => {
@@ -40,10 +42,10 @@ const HomeScreen = () => {
     }, [t]);
 
     return (
-        <View style={styles.page}>
-            <StatusBar barStyle="dark-content" backgroundColor="#f4f9ff" />
+        <View style={[styles.page, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={colors.background} />
 
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
                 <View style={{ height: 20 }} />
                 <Header
                     userName={userName}
@@ -54,20 +56,24 @@ const HomeScreen = () => {
                     <FeatureCard
                         icon="chatbubble-ellipses-outline"
                         title={t('home.chatWithAI')}
+                        color="#3B82F6"
                         onPress={() => navigation.navigate("ChatAI")}
                     />
                     <FeatureCard
                         icon="alarm-outline"
                         title={t('home.medicationReminder')}
+                        color="#F59E0B"
                         onPress={() => navigation.navigate('AddMedicationScreen')}
                     />
                     <FeatureCard
                         icon="medkit-outline"
                         title={t('home.manageMedications')}
+                        color="#10B981"
                     />
                     <FeatureCard
                         icon="camera-outline"
                         title={t('home.skinDiseaseDetection')}
+                        color="#8B5CF6"
                         onPress={() => navigation.navigate('SkinDiseaseCamera')}
                     />
                 </View>
@@ -84,18 +90,18 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
     page: {
         flex: 1,
-        backgroundColor: '#f4f9ff',
     },
     container: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingBottom: 20,
-        minHeight: height - 80, // تعبئة الشاشة مع ترك مساحة للفوتر
+        flexGrow: 1,
     },
     cardsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        marginTop: 25,
+        marginTop: 20,
+        paddingHorizontal: 4,
     },
 });
 

@@ -17,10 +17,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { addMedication } from '../services/medicationService';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import BackButton from '../components/BackButton';
 
 const AddMedicationScreen = ({ navigation }: any) => {
     const { t } = useTranslation();
+    const { colors } = useTheme();
     const [medName, setMedName] = useState('');
     const [stomachStatus, setStomachStatus] = useState('doesntMatter');
     const [reminderType, setReminderType] = useState('notification');
@@ -69,76 +71,76 @@ const AddMedicationScreen = ({ navigation }: any) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <BackButton  />
-            <Text style={styles.title}>{t('medication.addTitle')}</Text>
+            <Text style={[styles.title, { color: colors.primary }]}>{t('medication.addTitle')}</Text>
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>{t('medication.medicineName')}</Text>
-                    <MaterialCommunityIcons name="pill" size={20} color="#3b82f6" />
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.medicineName')}</Text>
+                    <MaterialCommunityIcons name="pill" size={20} color={colors.primary} />
                 </View>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                     value={medName}
                     onChangeText={setMedName}
                     placeholder={t('medication.enterMedicineName')}
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.textSecondary}
                 />
             </View>
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>{t('medication.stomachStatus')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.stomachStatus')}</Text>
                     <MaterialCommunityIcons name="stomach" size={20} color="#f59e42" />
                 </View>
-                <TouchableOpacity style={styles.pickerButton} onPress={() => setShowStomachPicker(true)}>
+                <TouchableOpacity style={[styles.pickerButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowStomachPicker(true)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
                         {renderOptionIcon(stomachOptions.find(o => o.value === stomachStatus)!.icon, 18)}
-                        <Text style={styles.pickerText}>{stomachOptions.find(o => o.value === stomachStatus)!.label}</Text>
-                        <Ionicons name="chevron-down" size={18} color="#666" style={{ marginLeft: 6 }} />
+                        <Text style={[styles.pickerText, { color: colors.text }]}>{stomachOptions.find(o => o.value === stomachStatus)!.label}</Text>
+                        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} style={{ marginLeft: 6 }} />
                     </View>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>{t('medication.reminderType')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.reminderType')}</Text>
                     <Ionicons name="notifications-outline" size={20} color="#10b981" />
                 </View>
-                <TouchableOpacity style={styles.pickerButton} onPress={() => setShowReminderPicker(true)}>
+                <TouchableOpacity style={[styles.pickerButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowReminderPicker(true)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
                         {renderOptionIcon(reminderTypeOptions.find(o => o.value === reminderType)!.icon, 18)}
-                        <Text style={styles.pickerText}>
+                        <Text style={[styles.pickerText, { color: colors.text }]}>
                             {reminderTypeOptions.find(o => o.value === reminderType)!.label}
                         </Text>
-                        <Ionicons name="chevron-down" size={18} color="#666" style={{ marginLeft: 6 }} />
+                        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} style={{ marginLeft: 6 }} />
                     </View>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>{t('medication.doseAmount')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.doseAmount')}</Text>
                     <FontAwesome5 name="syringe" size={18} color="#ef4444" />
                 </View>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                     value={doseAmount}
                     onChangeText={setDoseAmount}
                     placeholder={t('medication.enterDoseAmount')}
                     keyboardType="numeric"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.textSecondary}
                 />
             </View>
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>{t('medication.reminderTime')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.reminderTime')}</Text>
                     <Ionicons name="time-outline" size={20} color="#6366f1" />
                 </View>
-                <TouchableOpacity style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
-                    <Text style={styles.timeText}>
+                <TouchableOpacity style={[styles.timeButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowTimePicker(true)}>
+                    <Text style={[styles.timeText, { color: colors.text }]}>
                         {reminderTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                     <Ionicons name="chevron-down" size={18} color="#6366f1" />
@@ -158,7 +160,7 @@ const AddMedicationScreen = ({ navigation }: any) => {
             {Platform.OS === 'ios' && (
                 <Modal visible={showTimePicker} transparent animationType="fade">
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
+                        <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                             <DateTimePicker
                                 value={reminderTime}
                                 mode="time"
@@ -181,8 +183,8 @@ const AddMedicationScreen = ({ navigation }: any) => {
 
             <Modal visible={showStomachPicker} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalListContainer]}>
-                        <Text style={styles.modalTitle}>{t('medication.stomachStatus')}</Text>
+                    <View style={[styles.modalListContainer, { backgroundColor: colors.surface }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>{t('medication.stomachStatus')}</Text>
                         <FlatList
                             data={stomachOptions}
                             keyExtractor={(item) => item.value}
@@ -194,11 +196,11 @@ const AddMedicationScreen = ({ navigation }: any) => {
                                     }}
                                     style={({ pressed }) => [
                                         styles.optionRow,
-                                        pressed ? { backgroundColor: '#f3f4f6' } : undefined,
+                                        pressed ? { backgroundColor: colors.border } : undefined,
                                     ]}
                                 >
                                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <Text style={styles.optionLabel}>{item.label}</Text>
+                                        <Text style={[styles.optionLabel, { color: colors.text }]}>{item.label}</Text>
                                         <View style={{ width: 10 }} />
                                         {renderOptionIcon(item.icon, 20)}
                                     </View>
@@ -212,8 +214,8 @@ const AddMedicationScreen = ({ navigation }: any) => {
 
             <Modal visible={showReminderPicker} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalListContainer]}>
-                        <Text style={styles.modalTitle}>{t('medication.reminderType')}</Text>
+                    <View style={[styles.modalListContainer, { backgroundColor: colors.surface }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>{t('medication.reminderType')}</Text>
                         <FlatList
                             data={reminderTypeOptions}
                             keyExtractor={(item) => item.value}
@@ -225,11 +227,11 @@ const AddMedicationScreen = ({ navigation }: any) => {
                                     }}
                                     style={({ pressed }) => [
                                         styles.optionRow,
-                                        pressed ? { backgroundColor: '#f3f4f6' } : undefined,
+                                        pressed ? { backgroundColor: colors.border } : undefined,
                                     ]}
                                 >
                                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <Text style={styles.optionLabel}>{item.label}</Text>
+                                        <Text style={[styles.optionLabel, { color: colors.text }]}>{item.label}</Text>
                                         <View style={{ width: 10 }} />
                                         {renderOptionIcon(item.icon, 20)}
                                     </View>

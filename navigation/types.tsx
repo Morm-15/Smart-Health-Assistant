@@ -8,4 +8,6 @@ export type AuthStackParamList = {
     AddMedicationScreen: undefined;
     SkinDiseaseCamera: undefined;
     Settings: undefined;
+    EditProfile: undefined;
+    ChangePassword: undefined;
 };

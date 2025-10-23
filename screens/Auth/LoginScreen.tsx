@@ -58,7 +58,7 @@ const LoginScreen = () => {
                 setLoading(false);
                 return;
             }
-            navigation.navigate('Home');
+            // التنقل سيحدث تلقائياً عند تغيير حالة المستخدم
         } catch (error: any) {
             Alert.alert(t('error'), getFirebaseErrorMessage(error.code));
         } finally {

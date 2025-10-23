@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface HeaderProps {
     userName: string;
@@ -8,17 +9,25 @@ interface HeaderProps {
     onSettingsPress?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userName, onProfilePress, onSettingsPress }) => {
+const Header: React.FC<HeaderProps> = ({ userName, onSettingsPress }) => {
+    const { colors, isDarkMode } = useTheme();
+
     return (
-        <View style={styles.header}>
-            <Image source={{ uri: 'https://yourdomain.com/your-logo.png' }} style={styles.logo} />
-            <Text style={styles.welcomeText}>مرحبًا، {userName}!</Text>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.userInfo}>
+                <View style={[styles.avatarCircle, { backgroundColor: isDarkMode ? '#667eea' : '#007acc' }]}>
+                    <Ionicons name="person" size={28} color="#fff" />
+                </View>
+                <Text style={[styles.welcomeText, { color: colors.text }]}>
+                    مرحباً، {userName}! 👋
+                </Text>
+            </View>
             <View style={styles.headerIcons}>
-                <TouchableOpacity style={styles.iconButton} onPress={onProfilePress}>
-                    <Ionicons name="person-circle-outline" size={30} color="#007acc" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton} onPress={onSettingsPress}>
-                    <Ionicons name="settings-outline" size={28} color="#007acc" />
+                <TouchableOpacity
+                    style={[styles.iconButton, { backgroundColor: isDarkMode ? 'rgba(102, 126, 234, 0.15)' : '#f0f9ff' }]}
+                    onPress={onSettingsPress}
+                >
+                    <Ionicons name="settings-outline" size={24} color={isDarkMode ? '#667eea' : '#007acc'} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -29,33 +38,44 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 30,
-        backgroundColor: '#ffffff',
-        padding: 10,
-        borderRadius: 12,
+        justifyContent: 'space-between',
+        marginBottom: 25,
+        padding: 16,
+        borderRadius: 16,
         shadowColor: '#000',
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.08,
         shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 8,
-        elevation: 3,
+        shadowRadius: 10,
+        elevation: 4,
+        borderWidth: 1,
     },
-    logo: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
-        marginRight: 10,
+    userInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    avatarCircle: {
+        width: 45,
+        height: 45,
+        borderRadius: 22.5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
     },
     welcomeText: {
+        fontSize: 18,
+        fontWeight: '700',
         flex: 1,
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#007acc',
     },
     headerIcons: {
         flexDirection: 'row',
     },
     iconButton: {
-        marginLeft: 10,
+        width: 45,
+        height: 45,
+        borderRadius: 22.5,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
 

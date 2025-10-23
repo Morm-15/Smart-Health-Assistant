@@ -18,7 +18,6 @@
   "lastName": "Soyad",
   "confirmPassword": "Şifreyi Tekrar Girin",
   "backToLogin": "Girişe Dön",
-
   "accountCreatedMessage": "Hesabınız başarıyla oluşturuldu. Lütfen hesabınızı aktifleştirmek için e-postanızı kontrol edin.",
 
   "home": {
@@ -95,8 +94,12 @@
     "turkish": "Türkçe",
     "notifications": "Bildirimler",
     "enableNotifications": "Bildirimleri Etkinleştir",
+    "notificationEnabled": "Bildirimler etkinleştirildi",
+    "notificationDisabled": "Bildirimler devre dışı bırakıldı",
     "theme": "Tema",
     "darkMode": "Karanlık Mod",
+    "darkModeEnabled": "Karanlık mod etkinleştirildi",
+    "darkModeDisabled": "Karanlık mod devre dışı bırakıldı",
     "account": "Hesap",
     "editProfile": "Profili Düzenle",
     "changePassword": "Şifre Değiştir",
@@ -104,10 +107,50 @@
     "about": "Hakkında",
     "version": "Sürüm",
     "privacyPolicy": "Gizlilik Politikası",
+    "privacyPolicyTitle": "Gizlilik Politikası",
+    "privacyPolicyMessage": "Gizliliğinize saygı duyuyor ve kişisel verilerinizi koruyoruz. Tüm tıbbi bilgiler güvenli bir şekilde saklanır ve üçüncü taraflarla paylaşılmaz.",
     "termsOfService": "Hizmet Şartları",
+    "termsOfServiceTitle": "Hizmet Şartları",
+    "termsOfServiceMessage": "Bu uygulamayı kullanarak şartlarımızı ve koşullarımızı kabul etmiş olursunuz. Uygulama sadece eğitim ve sağlık yardımı amaçlıdır ve profesyonel tıbbi tavsiyenin yerini almaz.",
     "logoutConfirm": "Çıkış yapmak istediğinizden emin misiniz?",
     "yes": "Evet",
     "no": "Hayır"
+  },
+
+  "profile": {
+    "title": "Profili Düzenle",
+    "loadingData": "Veriler yükleniyor...",
+    "errorLoading": "Veriler yüklenirken bir hata oluştu",
+    "emailReadOnly": "E-posta düzenlenemez",
+    "profileUpdated": "Profil başarıyla güncellendi",
+    "errorSaving": "Kaydedilirken bir hata oluştu",
+    "enterFullName": "Lütfen tam adınızı girin"
+  },
+
+  "changePassword": {
+    "title": "Şifre Değiştir",
+    "currentPassword": "Mevcut Şifre",
+    "enterCurrentPassword": "Mevcut şifrenizi girin",
+    "newPassword": "Yeni Şifre",
+    "enterNewPassword": "Yeni şifrenizi girin",
+    "confirmNewPassword": "Yeni Şifreyi Onayla",
+    "reenterNewPassword": "Yeni şifrenizi tekrar girin",
+    "minLength": "En az 6 karakter olmalıdır",
+    "securityTips": "💡 Güvenlik İpuçları:",
+    "tip1": "• En az 8 karakter kullanın",
+    "tip2": "• Harf, rakam ve sembolleri karıştırın",
+    "tip3": "• Açık kişisel bilgilerden kaçının",
+    "tip4": "• Şifreyi düzenli olarak değiştirin",
+    "changeButton": "Şifreyi Değiştir",
+    "allFieldsRequired": "Lütfen tüm alanları doldurun",
+    "passwordTooShort": "Yeni şifre en az 6 karakter olmalıdır",
+    "passwordMismatch": "Yeni şifre ve onayı eşleşmiyor",
+    "passwordSameAsCurrent": "Yeni şifre mevcut şifreden farklı olmalıdır",
+    "passwordChanged": "Şifre başarıyla değiştirildi",
+    "wrongPassword": "Mevcut şifre yanlış",
+    "weakPassword": "Yeni şifre çok zayıf",
+    "recentLoginRequired": "Lütfen tekrar giriş yapın ve deneyin",
+    "errorChangingPassword": "Şifre değiştirilirken bir hata oluştu"
   },
 
   "common": {

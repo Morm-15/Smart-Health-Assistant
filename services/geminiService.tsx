@@ -26,8 +26,22 @@ export const sendToGemini = async (prompt: string): Promise<string> => {
 
         // إعادة النص الناتج
         return response?.candidates?.[0]?.content?.parts?.[0]?.text || "لا يوجد رد من الذكاء الاصطناعي.";
-    } catch (error) {
+    } catch (error: any) {
         console.error("❌ Error with Gemini API:", error);
-        return "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.";
+
+        // معالجة أخطاء محددة
+        if (error?.message?.includes("429") || error?.message?.includes("Quota exceeded")) {
+            return "⚠️ عذراً، تم تجاوز حد الاستخدام المجاني لخدمة الذكاء الاصطناعي.\n\nيمكنك:\n1. الانتظار قليلاً والمحاولة لاحقاً\n2. التحقق من حساب Google Cloud الخاص بك\n3. ترقية حسابك للحصول على حصة أكبر";
+        }
+
+        if (error?.message?.includes("API key")) {
+            return "⚠️ خطأ في مفتاح API. يرجى التحقق من إعدادات المفتاح.";
+        }
+
+        if (error?.message?.includes("network") || error?.message?.includes("timeout")) {
+            return "⚠️ خطأ في الاتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مرة أخرى.";
+        }
+
+        return "⚠️ حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. يرجى المحاولة لاحقاً.";
     }
 };
