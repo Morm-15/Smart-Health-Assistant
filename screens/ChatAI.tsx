@@ -1,39 +1,37 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, TextInput, TouchableOpacity, Text, ScrollView, StyleSheet, Keyboard, Animated } from "react-native";
+import { View, TextInput, TouchableOpacity, Text, ScrollView, StyleSheet, Keyboard } from "react-native";
 import { sendToGemini } from "../services/geminiService";
+import { useTranslation } from 'react-i18next';
 import BackButton from "../components/BackButton";
 
 const ChatAI = () => {
+    const { t } = useTranslation();
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
-    const [isTyping, setIsTyping] = useState(false); // مؤشر الكتابة
+    const [isTyping, setIsTyping] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
 
     const handleSend = async () => {
         if (!input.trim()) return;
 
-        // إضافة رسالة المستخدم
         setMessages((prev) => [...prev, { role: "user", text: input }]);
 
         const prompt = input;
         setInput("");
-        setIsTyping(true); // تفعيل مؤشر الكتابة
+        setIsTyping(true);
 
         try {
             const reply = await sendToGemini(prompt);
-
-            // إضافة رد AI
             setMessages((prev) => [...prev, { role: "ai", text: reply }]);
         } catch (error) {
-            setMessages((prev) => [...prev, { role: "ai", text: "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي." }]);
+            setMessages((prev) => [...prev, { role: "ai", text: t('chat.errorMessage') }]);
         } finally {
-            setIsTyping(false); // إخفاء مؤشر الكتابة
+            setIsTyping(false);
         }
 
         Keyboard.dismiss();
     };
 
-    // Scroll تلقائي عند وصول رسالة جديدة أو تغيير مؤشر الكتابة
     useEffect(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
     }, [messages, isTyping]);
@@ -51,15 +49,14 @@ const ChatAI = () => {
                         ]}
                     >
                         <Text style={[styles.bubbleText, msg.role === "ai" && { color: "#000" }]}>
-                            {msg.role === "user" ? "👤" : "🤖"} {msg.text}
+                            {msg.role === "user" ? t('chat.userPrefix') : t('chat.aiPrefix')} {msg.text}
                         </Text>
                     </View>
                 ))}
 
-                {/* مؤشر الكتابة */}
                 {isTyping && (
                     <View style={[styles.bubble, styles.aiBubble]}>
-                        <Text style={[styles.bubbleText, { color: "#000" }]}>🤖 ...</Text>
+                        <Text style={[styles.bubbleText, { color: "#000" }]}>{t('chat.aiPrefix')} {t('chat.typing')}</Text>
                     </View>
                 )}
             </ScrollView>
@@ -67,14 +64,14 @@ const ChatAI = () => {
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
-                    placeholder="اكتب رسالتك..."
+                    placeholder={t('chat.inputPlaceholder')}
                     value={input}
                     onChangeText={setInput}
-                    onSubmitEditing={handleSend} // إرسال عند Enter
+                    onSubmitEditing={handleSend}
                     returnKeyType="send"
                 />
                 <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                    <Text style={styles.sendButtonText}>إرسال</Text>
+                    <Text style={styles.sendButtonText}>{t('chat.send')}</Text>
                 </TouchableOpacity>
             </View>
         </View>

@@ -18,5 +18,107 @@
   "lastName": "Last Name",
   "confirmPassword": "Confirm Password",
   "backToLogin": "Back to Login",
-  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account."
+  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account.",
+
+  "home": {
+    "greeting": "Hello",
+    "welcome": "Welcome to your Smart Health Assistant",
+    "chatWithAI": "Chat with AI",
+    "medicationReminder": "Medication Reminder",
+    "manageMedications": "Manage Medications",
+    "skinDiseaseDetection": "Skin Disease Detection",
+    "profile": "Profile",
+    "settings": "Settings",
+    "errorFetchingUser": "An error occurred while fetching user data"
+  },
+
+  "chat": {
+    "title": "Chat with AI",
+    "inputPlaceholder": "Type your message...",
+    "send": "Send",
+    "typing": "...",
+    "errorMessage": "An error occurred while connecting to AI.",
+    "userPrefix": "👤",
+    "aiPrefix": "🤖"
+  },
+
+  "medication": {
+    "addTitle": "Add New Medication",
+    "medicineName": "Medicine Name",
+    "enterMedicineName": "Enter medicine name",
+    "stomachStatus": "Stomach Status",
+    "stomachEmpty": "Empty",
+    "stomachFull": "Full",
+    "stomachDoesntMatter": "Doesn't Matter",
+    "reminderType": "Reminder Type",
+    "notification": "Notification",
+    "alarm": "Alarm",
+    "both": "Both",
+    "doseAmount": "Dose Amount",
+    "enterDoseAmount": "Enter dose amount",
+    "reminderTime": "Reminder Time",
+    "selectTime": "Select Time",
+    "addMedication": "Add Medication",
+    "warning": "Warning",
+    "fillAllFields": "Please fill in all required fields",
+    "successTitle": "Success",
+    "successMessage": "Medication added successfully",
+    "errorTitle": "Error",
+    "errorMessage": "An error occurred while adding medication"
+  },
+
+  "camera": {
+    "loading": "Loading camera...",
+    "requestingPermission": "Requesting camera permission...",
+    "permissionRequired": "Camera Permission Required",
+    "permissionMessage": "We need camera access to capture images",
+    "cancel": "Cancel",
+    "allow": "Allow",
+    "requestPermission": "Request Permission",
+    "captureError": "Error",
+    "captureErrorMessage": "Failed to capture image",
+    "instruction": "Point the camera at the affected area\nand press the button to take a picture",
+    "retake": "Retake",
+    "confirm": "Confirm",
+    "analyzing": "Analyzing Image",
+    "analyzingMessage": "AI model for image analysis will be added soon",
+    "ok": "OK"
+  },
+
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "arabic": "العربية",
+    "english": "English",
+    "turkish": "Türkçe",
+    "notifications": "Notifications",
+    "enableNotifications": "Enable Notifications",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "account": "Account",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "logout": "Logout",
+    "about": "About",
+    "version": "Version",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "logoutConfirm": "Are you sure you want to logout?",
+    "yes": "Yes",
+    "no": "No"
+  },
+
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "close": "Close"
+  }
 }

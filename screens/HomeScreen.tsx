@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/types';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import FeatureCard from '../components/FeatureCard';
 import Footer from '../components/Footer';
@@ -15,6 +16,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'H
 
 const HomeScreen = () => {
     const navigation = useNavigation<HomeScreenNavigationProp>();
+    const { t } = useTranslation();
     const [userName, setUserName] = useState<string>('');
 
     useEffect(() => {
@@ -26,62 +28,54 @@ const HomeScreen = () => {
                     const userDoc = await getDoc(docRef);
                     if (userDoc.exists()) {
                         const data = userDoc.data();
-                        setUserName(data.firstName || 'المستخدم');
+                        setUserName(data.firstName || t('home.greeting'));
                     }
                 }
             } catch {
-                Alert.alert('خطأ', 'حدث خطأ أثناء جلب بيانات المستخدم');
+                Alert.alert(t('error'), t('home.errorFetchingUser'));
             }
         };
 
         fetchUserName();
-    }, []);
+    }, [t]);
 
     return (
         <View style={styles.page}>
             <StatusBar barStyle="dark-content" backgroundColor="#f4f9ff" />
 
-            {/* المحتوى */}
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={{ height: 20 }} />
                 <Header
                     userName={userName}
-              /*      onProfilePress={() => navigation.navigate('Profile')}
-                    onSettingsPress={() => navigation.navigate('Settings')}*/
+                    onSettingsPress={() => navigation.navigate('Settings' as any)}
                 />
 
                 <View style={styles.cardsContainer}>
                     <FeatureCard
                         icon="chatbubble-ellipses-outline"
-                        title="الدردشة مع الذكاء الاصطناعي"
+                        title={t('home.chatWithAI')}
                         onPress={() => navigation.navigate("ChatAI")}
                     />
                     <FeatureCard
                         icon="alarm-outline"
-                        title="تذكير الأدوية"
-
+                        title={t('home.medicationReminder')}
                         onPress={() => navigation.navigate('AddMedicationScreen')}
                     />
                     <FeatureCard
                         icon="medkit-outline"
-                        title="إدارة الأدوية"
-/*
-                        onPress={() => navigation.navigate('MedicationReminders')}
-*/
+                        title={t('home.manageMedications')}
                     />
                     <FeatureCard
                         icon="camera-outline"
-                        title="التقاط صور الأمراض الجلدية"
+                        title={t('home.skinDiseaseDetection')}
                         onPress={() => navigation.navigate('SkinDiseaseCamera')}
                     />
                 </View>
             </ScrollView>
 
-            {/* الفوتر */}
             <Footer
                 onHomePress={() => navigation.navigate('Home')}
-               /* onProfilePress={() => navigation.navigate('Profile')}
-                onSettingsPress={() => navigation.navigate('Settings')}*/
+                onSettingsPress={() => navigation.navigate('Settings' as any)}
             />
         </View>
     );

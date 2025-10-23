@@ -18,5 +18,108 @@
   "lastName": "Soyad",
   "confirmPassword": "Şifreyi Tekrar Girin",
   "backToLogin": "Girişe Dön",
-  "accountCreatedMessage": "Hesabınız başarıyla oluşturuldu. Lütfen hesabınızı aktifleştirmek için e-postanızı kontrol edin."
+
+  "accountCreatedMessage": "Hesabınız başarıyla oluşturuldu. Lütfen hesabınızı aktifleştirmek için e-postanızı kontrol edin.",
+
+  "home": {
+    "greeting": "Merhaba",
+    "welcome": "Akıllı Sağlık Asistanınıza Hoş Geldiniz",
+    "chatWithAI": "Yapay Zeka ile Sohbet",
+    "medicationReminder": "İlaç Hatırlatıcı",
+    "manageMedications": "İlaçları Yönet",
+    "skinDiseaseDetection": "Cilt Hastalığı Tespiti",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "errorFetchingUser": "Kullanıcı verileri alınırken bir hata oluştu"
+  },
+
+  "chat": {
+    "title": "Yapay Zeka ile Sohbet",
+    "inputPlaceholder": "Mesajınızı yazın...",
+    "send": "Gönder",
+    "typing": "...",
+    "errorMessage": "Yapay zeka ile bağlantı kurulurken bir hata oluştu.",
+    "userPrefix": "👤",
+    "aiPrefix": "🤖"
+  },
+
+  "medication": {
+    "addTitle": "Yeni İlaç Ekle",
+    "medicineName": "İlaç Adı",
+    "enterMedicineName": "İlaç adını girin",
+    "stomachStatus": "Mide Durumu",
+    "stomachEmpty": "Boş",
+    "stomachFull": "Dolu",
+    "stomachDoesntMatter": "Önemli Değil",
+    "reminderType": "Hatırlatıcı Türü",
+    "notification": "Bildirim",
+    "alarm": "Alarm",
+    "both": "Her İkisi",
+    "doseAmount": "Doz Miktarı",
+    "enterDoseAmount": "Doz miktarını girin",
+    "reminderTime": "Hatırlatma Zamanı",
+    "selectTime": "Zaman Seç",
+    "addMedication": "İlaç Ekle",
+    "warning": "Uyarı",
+    "fillAllFields": "Lütfen tüm gerekli alanları doldurun",
+    "successTitle": "Başarılı",
+    "successMessage": "İlaç başarıyla eklendi",
+    "errorTitle": "Hata",
+    "errorMessage": "İlaç eklenirken bir hata oluştu"
+  },
+
+  "camera": {
+    "loading": "Kamera yükleniyor...",
+    "requestingPermission": "Kamera izni isteniyor...",
+    "permissionRequired": "Kamera İzni Gerekli",
+    "permissionMessage": "Fotoğraf çekmek için kamera erişimine ihtiyacımız var",
+    "cancel": "İptal",
+    "allow": "İzin Ver",
+    "requestPermission": "İzin İste",
+    "captureError": "Hata",
+    "captureErrorMessage": "Fotoğraf çekme başarısız",
+    "instruction": "Kamerayı etkilenen bölgeye doğrultun\nve fotoğraf çekmek için düğmeye basın",
+    "retake": "Tekrar Çek",
+    "confirm": "Onayla",
+    "analyzing": "Görüntü Analizi",
+    "analyzingMessage": "Görüntü analizi için yapay zeka modeli yakında eklenecek",
+    "ok": "Tamam"
+  },
+
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "selectLanguage": "Dil Seç",
+    "arabic": "العربية",
+    "english": "English",
+    "turkish": "Türkçe",
+    "notifications": "Bildirimler",
+    "enableNotifications": "Bildirimleri Etkinleştir",
+    "theme": "Tema",
+    "darkMode": "Karanlık Mod",
+    "account": "Hesap",
+    "editProfile": "Profili Düzenle",
+    "changePassword": "Şifre Değiştir",
+    "logout": "Çıkış Yap",
+    "about": "Hakkında",
+    "version": "Sürüm",
+    "privacyPolicy": "Gizlilik Politikası",
+    "termsOfService": "Hizmet Şartları",
+    "logoutConfirm": "Çıkış yapmak istediğinizden emin misiniz?",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "back": "Geri",
+    "next": "İleri",
+    "done": "Tamam",
+    "loading": "Yükleniyor...",
+    "retry": "Tekrar Dene",
+    "close": "Kapat"
+  }
 }
