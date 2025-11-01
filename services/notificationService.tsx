@@ -23,16 +23,18 @@ export async function createAndroidChannel() {
                 sound: 'default',
                 enableVibrate: true,
             });
+            console.log('✅ تم إنشاء قناة الإشعارات بنجاح');
         } catch (error) {
-            console.log('Error creating notification channel:', error);
+            console.log('⚠️ خطأ في إنشاء قناة الإشعارات:', error);
         }
     }
 }
 
-// طلب الإذن من المستخدم للإشعارات
+// طلب الإذن من المستخدم للإشعارات المحلية فقط
 export async function registerForPushNotificationsAsync() {
     try {
-        // في Expo Go، نحتاج فقط للأذونات الأساسية
+        console.log('📱 جاري طلب أذونات الإشعارات المحلية...');
+
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
 
@@ -53,116 +55,188 @@ export async function registerForPushNotificationsAsync() {
         // إنشاء قناة الإشعارات لأندرويد
         await createAndroidChannel();
 
-        console.log('✅ تم تفعيل الإشعارات بنجاح');
+        console.log('✅ تم تفعيل الإشعارات المحلية بنجاح');
         return true;
     } catch (error) {
-        console.log('Error requesting permissions:', error);
+        console.log('⚠️ خطأ في طلب أذونات الإشعارات:', error);
         return false;
     }
 }
 
-// جدولة إشعار (يعمل مع Expo Go)
+// جدولة إشعار محلي (يعمل مع Expo Go)
 export async function scheduleNotification(
     title: string,
     body: string,
     date: Date,
-    reminderType: 'notification' | 'alarm' | 'both',
+    reminderType: 'notification' | 'alarm' | 'both' = 'notification',
     repeatType: 'once' | 'daily' | 'weekly' = 'once',
     weekdays?: number[]
 ) {
     try {
+        // التأكد من إنشاء القناة أولاً
         await createAndroidChannel();
 
         const now = new Date();
+        const targetTime = new Date(date);
+
+        console.log(`📅 جدولة إشعار: ${title}`);
+        console.log(`⏰ الوقت المستهدف: ${targetTime.toLocaleString('ar-SA')}`);
+        console.log(`🔁 نوع التكرار: ${repeatType}`);
 
         if (repeatType === 'daily') {
-            // تكرار يومي
-            const targetTime = new Date(date);
-            if (targetTime <= now) {
-                targetTime.setDate(targetTime.getDate() + 1);
-            }
-
+            // تكرار يومي - استخدام CalendarTrigger
             const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
                     title,
                     body,
                     sound: true,
+                    priority: Notifications.AndroidNotificationPriority.MAX,
                     data: { type: 'medication_reminder' },
                 },
                 trigger: {
-                    hour: date.getHours(),
-                    minute: date.getMinutes(),
+                    channelId: 'medication_reminders',
+                    hour: targetTime.getHours(),
+                    minute: targetTime.getMinutes(),
                     repeats: true,
-                } as any,
+                },
             });
 
             console.log(`✅ تم جدولة الإشعار اليومي: ${notificationId}`);
             return notificationId;
-        } else if (repeatType === 'weekly' && weekdays) {
+
+        } else if (repeatType === 'weekly' && weekdays && weekdays.length > 0) {
             // تكرار أسبوعي
             const notificationIds: string[] = [];
+
             for (const day of weekdays) {
                 const notificationId = await Notifications.scheduleNotificationAsync({
                     content: {
                         title,
                         body,
                         sound: true,
+                        priority: Notifications.AndroidNotificationPriority.MAX,
+                        data: { type: 'medication_reminder' },
                     },
                     trigger: {
+                        channelId: 'medication_reminders',
                         weekday: day,
-                        hour: date.getHours(),
-                        minute: date.getMinutes(),
+                        hour: targetTime.getHours(),
+                        minute: targetTime.getMinutes(),
                         repeats: true,
-                    } as any,
+                    },
                 });
                 notificationIds.push(notificationId);
             }
+
             console.log(`✅ تم جدولة ${weekdays.length} إشعار أسبوعي`);
             return notificationIds;
+
         } else {
             // إشعار لمرة واحدة
-            const targetTime = new Date(date);
-
             if (targetTime <= now) {
+                // إذا كان الوقت قد مضى، جدوله لليوم التالي
                 targetTime.setDate(targetTime.getDate() + 1);
+                console.log(`⏭️ الوقت مضى، تم التأجيل لـ: ${targetTime.toLocaleString('ar-SA')}`);
             }
 
-            const seconds = Math.max((targetTime.getTime() - now.getTime()) / 1000, 5);
+            const secondsUntilTrigger = Math.max(
+                Math.floor((targetTime.getTime() - now.getTime()) / 1000),
+                1
+            );
 
             const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
                     title,
                     body,
                     sound: true,
+                    priority: Notifications.AndroidNotificationPriority.MAX,
                     data: { type: 'medication_reminder' },
                 },
                 trigger: {
-                    seconds,
-                } as any,
+                    channelId: 'medication_reminders',
+                    seconds: secondsUntilTrigger,
+                },
             });
 
-            console.log(`✅ تم جدولة الإشعار: ${notificationId}`);
+            console.log(`✅ تم جدولة الإشعار لمرة واحدة: ${notificationId}`);
+            console.log(`⏱️ سيظهر بعد ${secondsUntilTrigger} ثانية`);
             return notificationId;
         }
     } catch (error) {
         console.error('❌ خطأ في جدولة الإشعار:', error);
         Alert.alert(
-            'تنبيه',
-            'للإشعارات الكاملة، يرجى استخدام Development Build بدلاً من Expo Go. الإشعارات المحلية فقط متاحة في Expo Go.'
+            'خطأ في الإشعارات',
+            'حدث خطأ أثناء جدولة التذكير. يرجى المحاولة مرة أخرى.'
         );
         throw error;
     }
 }
 
+// إلغاء إشعار معين
+export async function cancelNotification(notificationId: string | string[]) {
+    try {
+        if (Array.isArray(notificationId)) {
+            for (const id of notificationId) {
+                await Notifications.cancelScheduledNotificationAsync(id);
+            }
+            console.log(`✅ تم إلغاء ${notificationId.length} إشعار`);
+        } else {
+            await Notifications.cancelScheduledNotificationAsync(notificationId);
+            console.log(`✅ تم إلغاء الإشعار: ${notificationId}`);
+        }
+    } catch (error) {
+        console.error('❌ خطأ في إلغاء الإشعار:', error);
+    }
+}
+
 // إلغاء جميع الإشعارات المجدولة
 export async function cancelAllScheduledNotifications() {
-    await Notifications.cancelAllScheduledNotificationsAsync();
-    console.log('✅ تم إلغاء جميع الإشعارات المجدولة');
+    try {
+        await Notifications.cancelAllScheduledNotificationsAsync();
+        console.log('✅ تم إلغاء جميع الإشعارات المجدولة');
+    } catch (error) {
+        console.error('❌ خطأ في إلغاء الإشعارات:', error);
+    }
 }
 
 // الحصول على جميع الإشعارات المجدولة
 export async function getAllScheduledNotifications() {
-    const notifications = await Notifications.getAllScheduledNotificationsAsync();
-    console.log(`📋 عدد الإشعارات المجدولة: ${notifications.length}`);
-    return notifications;
+    try {
+        const notifications = await Notifications.getAllScheduledNotificationsAsync();
+        console.log(`📋 عدد الإشعارات المجدولة: ${notifications.length}`);
+
+        notifications.forEach((notification, index) => {
+            console.log(`${index + 1}. ${notification.content.title} - ID: ${notification.identifier}`);
+        });
+
+        return notifications;
+    } catch (error) {
+        console.error('❌ خطأ في جلب الإشعارات:', error);
+        return [];
+    }
+}
+
+// إرسال إشعار فوري للاختبار
+export async function sendTestNotification() {
+    try {
+        await createAndroidChannel();
+
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: '🔔 إشعار تجريبي',
+                body: 'الإشعارات تعمل بشكل صحيح!',
+                sound: true,
+                priority: Notifications.AndroidNotificationPriority.MAX,
+                data: { type: 'test' },
+            },
+            trigger: {
+                channelId: 'medication_reminders',
+                seconds: 2,
+            },
+        });
+
+        console.log('✅ تم إرسال إشعار تجريبي');
+    } catch (error) {
+        console.error('❌ خطأ في إرسال الإشعار التجريبي:', error);
+    }
 }

@@ -16,6 +16,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
 import BackButton from '../components/BackButton';
+import { getFirestoreErrorMessage } from '../validations/errorMessages';
 
 const EditProfileScreen = () => {
     const navigation = useNavigation();
@@ -44,9 +45,9 @@ const EditProfileScreen = () => {
                     setLastName(data.lastName || '');
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error loading user data:', error);
-            Alert.alert(t('error'), t('profile.errorLoading'));
+            Alert.alert(t('error'), getFirestoreErrorMessage(error.code || 'unknown'));
         } finally {
             setLoading(false);
         }
@@ -71,9 +72,9 @@ const EditProfileScreen = () => {
                     { text: t('common.done'), onPress: () => navigation.goBack() }
                 ]);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating profile:', error);
-            Alert.alert(t('error'), t('profile.errorSaving'));
+            Alert.alert(t('error'), getFirestoreErrorMessage(error.code || 'unknown'));
         } finally {
             setSaving(false);
         }

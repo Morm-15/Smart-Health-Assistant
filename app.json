@@ -29,8 +29,10 @@
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+        "WRITE_EXTERNAL_STORAGE",
+        "POST_NOTIFICATIONS"
+      ],
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/logo.png"
@@ -42,7 +44,21 @@
         {
           "cameraPermission": "نحتاج للوصول للكاميرا لالتقاط صور الأمراض الجلدية"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo.png",
+          "color": "#ffffff",
+          "defaultChannel": "medication_reminders"
+        }
       ]
-    ]
+    ],
+    "notification": {
+      "icon": "./assets/logo.png",
+      "color": "#3B82F6",
+      "androidMode": "default",
+      "androidCollapsedTitle": "تذكيرات الأدوية"
+    }
   }
 }

@@ -15,6 +15,7 @@ import { validateRegisterFields } from '../../validations/authValidations';
 import { getFirebaseErrorMessage } from '../../validations/errorMessages';
 import { useTranslation } from 'react-i18next';
 import BackButton from "../../components/BackButton";
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,8 @@ const RegisterScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+    const [isConfirmPasswordHidden, setIsConfirmPasswordHidden] = useState(true);
     const navigation = useNavigation();
     const { t } = useTranslation();
 
@@ -73,18 +76,40 @@ const RegisterScreen = () => {
                 onChangeText={setEmail}
                 keyboardType="email-address"
             />
-            <CustomInput
-                placeholder={t('password')}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
-            <CustomInput
-                placeholder={t('confirmPassword')}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-            />
+
+            {/* Password field with eye icon */}
+            <View style={styles.passwordContainer}>
+                <CustomInput
+                    placeholder={t('password')}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={isPasswordHidden}
+                />
+                <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setIsPasswordHidden(prev => !prev)}
+                    accessibilityLabel={isPasswordHidden ? 'Show password' : 'Hide password'}
+                >
+                    <Ionicons name={isPasswordHidden ? 'eye-off' : 'eye'} size={24} color="#666" />
+                </TouchableOpacity>
+            </View>
+
+            {/* Confirm Password field with eye icon */}
+            <View style={styles.passwordContainer}>
+                <CustomInput
+                    placeholder={t('confirmPassword')}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={isConfirmPasswordHidden}
+                />
+                <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setIsConfirmPasswordHidden(prev => !prev)}
+                    accessibilityLabel={isConfirmPasswordHidden ? 'Show password' : 'Hide password'}
+                >
+                    <Ionicons name={isConfirmPasswordHidden ? 'eye-off' : 'eye'} size={24} color="#666" />
+                </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
                 style={[styles.registerButton, !isFormComplete && styles.disabledButton]}
@@ -134,6 +159,21 @@ const styles = StyleSheet.create({
         color: '#007AFF',
         marginTop: width * 0.03,
         fontSize: width * 0.04,
+    },
+    passwordContainer: {
+        width: '100%',
+        justifyContent: 'center',
+        position: 'relative',
+        marginBottom: width * 0.02,
+    },
+    eyeButton: {
+        position: 'absolute',
+        right: 15,
+        alignSelf: 'center',
+        zIndex: 2,
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 
