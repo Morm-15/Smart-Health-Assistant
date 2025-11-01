@@ -1,5 +1,5 @@
 // AddMedicationScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addMedication } from '../services/medicationService';
+import { registerForPushNotificationsAsync } from '../services/notificationService';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -31,6 +32,11 @@ const AddMedicationScreen = ({ navigation }: any) => {
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [showStomachPicker, setShowStomachPicker] = useState(false);
     const [showReminderPicker, setShowReminderPicker] = useState(false);
+
+    // طلب أذونات الإشعارات عند تحميل الشاشة
+    useEffect(() => {
+        registerForPushNotificationsAsync();
+    }, []);
 
     const stomachOptions = [
         { label: t('medication.stomachDoesntMatter'), value: 'doesntMatter', icon: { name: 'circle-outline', lib: 'MaterialCommunityIcons', color: '#9CA3AF' } },

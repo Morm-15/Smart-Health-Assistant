@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+import { Alert, Platform } from 'react-native';
 
 // إعداد شكل ظهور الإشعارات
 Notifications.setNotificationHandler({
@@ -12,94 +12,157 @@ Notifications.setNotificationHandler({
     }),
 });
 
-// إنشاء قناة إشعارات على Android (مرة واحدة فقط)
+// إنشاء قناة إشعارات على Android
 export async function createAndroidChannel() {
-    if (Device.osName === 'Android') {
-        await Notifications.setNotificationChannelAsync('medication_reminders', {
-            name: 'Medication Reminders',
-            importance: Notifications.AndroidImportance.HIGH,
-            sound: 'default', // أو اسم ملف صوتي موجود في assets
-        });
+    if (Platform.OS === 'android') {
+        try {
+            await Notifications.setNotificationChannelAsync('medication_reminders', {
+                name: 'تذكيرات الأدوية',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                sound: 'default',
+                enableVibrate: true,
+            });
+        } catch (error) {
+            console.log('Error creating notification channel:', error);
+        }
     }
 }
 
 // طلب الإذن من المستخدم للإشعارات
 export async function registerForPushNotificationsAsync() {
-    if (!Device.isDevice) {
-        alert('Push notifications only work on physical devices.');
-        return;
-    }
+    try {
+        // في Expo Go، نحتاج فقط للأذونات الأساسية
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
 
-    if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-    }
+        if (finalStatus !== 'granted') {
+            Alert.alert(
+                'تنبيه',
+                'لم يتم منح إذن الإشعارات. لن تتمكن من استلام تذكيرات الأدوية.',
+                [{ text: 'حسناً' }]
+            );
+            return false;
+        }
 
-    if (finalStatus !== 'granted') {
-        alert('Permission for notifications not granted!');
-        return;
+        // إنشاء قناة الإشعارات لأندرويد
+        await createAndroidChannel();
+
+        console.log('✅ تم تفعيل الإشعارات بنجاح');
+        return true;
+    } catch (error) {
+        console.log('Error requesting permissions:', error);
+        return false;
     }
 }
 
-// جدولة إشعار (مرة واحدة / يومياً / أسبوعياً)
+// جدولة إشعار (يعمل مع Expo Go)
 export async function scheduleNotification(
     title: string,
     body: string,
     date: Date,
-    reminderType: 'notification' | 'alarm',
-    repeatType?: 'once' | 'daily' | 'weekly',
-    weekdays?: number[] // للأسبوعي: 1=الأحد, 2=الاثنين ... 7=السبت
+    reminderType: 'notification' | 'alarm' | 'both',
+    repeatType: 'once' | 'daily' | 'weekly' = 'once',
+    weekdays?: number[]
 ) {
-    await createAndroidChannel();
+    try {
+        await createAndroidChannel();
 
-    let trigger: Notifications.NotificationTriggerInput;
+        const now = new Date();
 
-    if (repeatType === 'daily') {
-        trigger = {
-            hour: date.getHours(),
-            minute: date.getMinutes(),
-            repeats: true,
-            channelId: 'medication_reminders',
-        };
-    } else if (repeatType === 'weekly' && weekdays) {
-        // إنشاء إشعارات لكل يوم من أيام الأسبوع المحددة
-        for (const day of weekdays) {
-            await Notifications.scheduleNotificationAsync({
+        if (repeatType === 'daily') {
+            // تكرار يومي
+            const targetTime = new Date(date);
+            if (targetTime <= now) {
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
+
+            const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
                     title,
                     body,
-                    sound: reminderType === 'alarm' ? 'default' : undefined,
+                    sound: true,
+                    data: { type: 'medication_reminder' },
                 },
                 trigger: {
-                    weekday: day,
                     hour: date.getHours(),
                     minute: date.getMinutes(),
                     repeats: true,
-                    channelId: 'medication_reminders',
-                },
+                } as any,
             });
-        }
-        return;
-    } else {
-        // إشعار لمرة واحدة فقط
-        const seconds = Math.max((date.getTime() - Date.now()) / 1000, 1);
-        trigger = {
-            seconds,
-            repeats: false,
-            channelId: 'medication_reminders',
-        };
-    }
 
-    // جدولة الإشعار
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title,
-            body,
-            sound: reminderType === 'alarm' ? 'default' : undefined,
-        },
-        trigger,
-    });
+            console.log(`✅ تم جدولة الإشعار اليومي: ${notificationId}`);
+            return notificationId;
+        } else if (repeatType === 'weekly' && weekdays) {
+            // تكرار أسبوعي
+            const notificationIds: string[] = [];
+            for (const day of weekdays) {
+                const notificationId = await Notifications.scheduleNotificationAsync({
+                    content: {
+                        title,
+                        body,
+                        sound: true,
+                    },
+                    trigger: {
+                        weekday: day,
+                        hour: date.getHours(),
+                        minute: date.getMinutes(),
+                        repeats: true,
+                    } as any,
+                });
+                notificationIds.push(notificationId);
+            }
+            console.log(`✅ تم جدولة ${weekdays.length} إشعار أسبوعي`);
+            return notificationIds;
+        } else {
+            // إشعار لمرة واحدة
+            const targetTime = new Date(date);
+
+            if (targetTime <= now) {
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
+
+            const seconds = Math.max((targetTime.getTime() - now.getTime()) / 1000, 5);
+
+            const notificationId = await Notifications.scheduleNotificationAsync({
+                content: {
+                    title,
+                    body,
+                    sound: true,
+                    data: { type: 'medication_reminder' },
+                },
+                trigger: {
+                    seconds,
+                } as any,
+            });
+
+            console.log(`✅ تم جدولة الإشعار: ${notificationId}`);
+            return notificationId;
+        }
+    } catch (error) {
+        console.error('❌ خطأ في جدولة الإشعار:', error);
+        Alert.alert(
+            'تنبيه',
+            'للإشعارات الكاملة، يرجى استخدام Development Build بدلاً من Expo Go. الإشعارات المحلية فقط متاحة في Expo Go.'
+        );
+        throw error;
+    }
+}
+
+// إلغاء جميع الإشعارات المجدولة
+export async function cancelAllScheduledNotifications() {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    console.log('✅ تم إلغاء جميع الإشعارات المجدولة');
+}
+
+// الحصول على جميع الإشعارات المجدولة
+export async function getAllScheduledNotifications() {
+    const notifications = await Notifications.getAllScheduledNotificationsAsync();
+    console.log(`📋 عدد الإشعارات المجدولة: ${notifications.length}`);
+    return notifications;
 }

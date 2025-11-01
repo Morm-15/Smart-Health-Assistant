@@ -16,6 +16,7 @@ import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from '../contexts/ThemeContext';
 import BackButton from '../components/BackButton';
+import * as Notifications from 'expo-notifications';
 
 const SettingsScreen = () => {
     const navigation = useNavigation<any>();
@@ -128,6 +129,32 @@ const SettingsScreen = () => {
         );
     };
 
+    // اختبار الإشعارات
+    const handleTestNotification = async () => {
+        try {
+            // إرسال إشعار فوري للاختبار
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: '✅ اختبار الإشعارات',
+                    body: 'الإشعارات تعمل بنجاح! 🎉',
+                    sound: true,
+                    priority: Notifications.AndroidNotificationPriority.MAX,
+                },
+                trigger: {
+                    seconds: 2,
+                },
+            });
+
+            Alert.alert(
+                'تم الإرسال',
+                'سيظهر إشعار اختبار خلال ثانيتين',
+                [{ text: 'حسناً' }]
+            );
+        } catch (error) {
+            Alert.alert('خطأ', 'فشل إرسال الإشعار. تأكد من منح الأذونات.');
+        }
+    };
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <BackButton />
@@ -177,6 +204,15 @@ const SettingsScreen = () => {
                             thumbColor="#fff"
                         />
                     </View>
+
+                    {/* زر اختبار الإشعارات */}
+                    <TouchableOpacity
+                        style={[styles.testButton, { backgroundColor: '#10B981' }]}
+                        onPress={handleTestNotification}
+                    >
+                        <Ionicons name="notifications-circle" size={24} color="#fff" />
+                        <Text style={styles.testButtonText}>اختبر الإشعارات الآن</Text>
+                    </TouchableOpacity>
                 </View>
 
                 {/* Theme Section */}
@@ -355,6 +391,25 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+        marginLeft: 10,
+    },
+    testButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 15,
+        borderRadius: 12,
+        marginTop: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
+    },
+    testButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
         marginLeft: 10,
     },
 });

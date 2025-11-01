@@ -1,5 +1,6 @@
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { scheduleNotification } from './notificationService';
 
 export interface Medication {
     medName: string;         // اسم الدواء
@@ -32,5 +33,18 @@ export const addMedication = async (
     };
 
     const docRef = await addDoc(collection(db, 'medications'), newMed);
+
+    // جدولة الإشعار
+    const stomachText = stomachStatus === 'empty' ? ' على معدة فارغة' :
+                       stomachStatus === 'full' ? ' على معدة ممتلئة' : '';
+
+    await scheduleNotification(
+        `⏰ تذكير بالدواء: ${medName}`,
+        `حان وقت تناول ${doseAmount} من ${medName}${stomachText}`,
+        reminderTime,
+        reminderType as 'notification' | 'alarm',
+        'daily' // تكرار يومي
+    );
+
     return docRef.id;
 };
