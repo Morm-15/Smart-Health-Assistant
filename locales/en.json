@@ -111,12 +111,24 @@
     "requestPermission": "Request Permission",
     "captureError": "Error",
     "captureErrorMessage": "Failed to capture image",
-    "instruction": "Point the camera at the affected area\nand press the button to take a picture",
+    "instruction": "Point the camera at the affected area",
     "retake": "Retake",
     "confirm": "Confirm",
-    "analyzing": "Analyzing Image",
-    "analyzingMessage": "AI model for image analysis will be added soon",
-    "ok": "OK"
+    "analyzing": "Analyzing...",
+    "analyzingMessage": "Please wait while we analyze the image",
+    "ok": "OK",
+    "resultTitle": "Scan Result",
+    "detected": "Detected",
+    "confidence": "Confidence"
+  },
+
+  "diseases": {
+    "acne": "Acne",
+    "carcinoma": "Carcinoma",
+    "eczema": "Eczema",
+    "keratosis": "Keratosis",
+    "milia": "Milia",
+    "rosacea": "Rosacea"
   },
 
   "settings": {

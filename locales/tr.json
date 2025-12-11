@@ -111,12 +111,24 @@
     "requestPermission": "İzin İste",
     "captureError": "Hata",
     "captureErrorMessage": "Fotoğraf çekme başarısız",
-    "instruction": "Kamerayı etkilenen bölgeye doğrultun\nve fotoğraf çekmek için düğmeye basın",
+    "instruction": "Kamerayı etkilenen bölgeye doğrultun",
     "retake": "Tekrar Çek",
     "confirm": "Onayla",
-    "analyzing": "Görüntü Analizi",
-    "analyzingMessage": "Görüntü analizi için yapay zeka modeli yakında eklenecek",
-    "ok": "Tamam"
+    "analyzing": "Analiz Ediliyor...",
+    "analyzingMessage": "Lütfen görüntüyü analiz ederken bekleyin",
+    "ok": "Tamam",
+    "resultTitle": "Tarama Sonucu",
+    "detected": "Tespit Edilen",
+    "confidence": "Güven Oranı"
+  },
+
+  "diseases": {
+    "acne": "Akne (Acne)",
+    "carcinoma": "Karsinom (Carcinoma)",
+    "eczema": "Egzama (Eczema)",
+    "keratosis": "Keratoz (Keratosis)",
+    "milia": "Milia",
+    "rosacea": "Gül Hastalığı (Rosacea)"
   },
 
   "settings": {

@@ -111,12 +111,24 @@
     "requestPermission": "طلب الإذن",
     "captureError": "خطأ",
     "captureErrorMessage": "فشل التقاط الصورة",
-    "instruction": "قم بتوجيه الكاميرا نحو المنطقة المصابة\nواضغط على الزر لالتقاط الصورة",
-    "retake": "إعادة التقاط",
+    "instruction": "قم بتوجيه الكاميرا نحو المنطقة المصابة",
+    "retake": "إعادة",
     "confirm": "تأكيد",
-    "analyzing": "تحليل الصورة",
-    "analyzingMessage": "سيتم إضافة نموذج الذكاء الاصطناعي لتحليل الصورة قريباً",
-    "ok": "حسناً"
+    "analyzing": "جاري التحليل...",
+    "analyzingMessage": "يرجى الانتظار بينما نقوم بتحليل الصورة",
+    "ok": "حسناً",
+    "resultTitle": "نتيجة الفحص",
+    "detected": "تم رصد",
+    "confidence": "نسبة التأكد"
+  },
+
+  "diseases": {
+    "acne": "حب الشباب (Acne)",
+    "carcinoma": "سرطان الخلايا (Carcinoma)",
+    "eczema": "إكزيما (Eczema)",
+    "keratosis": "التقرن (Keratosis)",
+    "milia": "ميليا (Milia)",
+    "rosacea": "الوردية (Rosacea)"
   },
 
   "settings": {
