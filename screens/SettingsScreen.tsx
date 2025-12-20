@@ -8,6 +8,7 @@ import {
     Alert,
     Switch,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,7 +17,6 @@ import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from '../contexts/ThemeContext';
 import BackButton from '../components/BackButton';
-import * as Notifications from 'expo-notifications';
 
 const SettingsScreen = () => {
     const navigation = useNavigation<any>();
@@ -33,7 +33,7 @@ const SettingsScreen = () => {
             const notifications = await AsyncStorage.getItem('notificationsEnabled');
             if (notifications !== null) setNotificationsEnabled(JSON.parse(notifications));
         } catch (error) {
-            console.error('Error loading settings:', error);
+            // Silent fail
         }
     };
 
@@ -129,35 +129,9 @@ const SettingsScreen = () => {
         );
     };
 
-    // اختبار الإشعارات
-    const handleTestNotification = async () => {
-        try {
-            // إرسال إشعار فوري للاختبار
-            await Notifications.scheduleNotificationAsync({
-                content: {
-                    title: '✅ اختبار الإشعارات',
-                    body: 'الإشعارات تعمل بنجاح! 🎉',
-                    sound: true,
-                    priority: Notifications.AndroidNotificationPriority.MAX,
-                },
-                trigger: {
-                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-                    seconds: 2,
-                },
-            });
-
-            Alert.alert(
-                'تم الإرسال',
-                'سيظهر إشعار اختبار خلال ثانيتين',
-                [{ text: 'حسناً' }]
-            );
-        } catch (error) {
-            Alert.alert('خطأ', 'فشل إرسال الإشعار. تأكد من منح الأذونات.');
-        }
-    };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
             <BackButton />
             <Text style={[styles.title, { color: colors.text }]}>{t('settings.title')}</Text>
 
@@ -205,15 +179,6 @@ const SettingsScreen = () => {
                             thumbColor="#fff"
                         />
                     </View>
-
-                    {/* زر اختبار الإشعارات */}
-                    <TouchableOpacity
-                        style={[styles.testButton, { backgroundColor: '#10B981' }]}
-                        onPress={handleTestNotification}
-                    >
-                        <Ionicons name="notifications-circle" size={24} color="#fff" />
-                        <Text style={styles.testButtonText}>اختبر الإشعارات الآن</Text>
-                    </TouchableOpacity>
                 </View>
 
                 {/* Theme Section */}
@@ -316,7 +281,7 @@ const SettingsScreen = () => {
 
                 <View style={{ height: 40 }} />
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 

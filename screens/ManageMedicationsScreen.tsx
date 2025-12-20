@@ -8,6 +8,7 @@ import {
     Alert,
     ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -165,7 +166,7 @@ const ManageMedicationsScreen = ({ navigation }: any) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
             <BackButton />
             <Text style={[styles.title, { color: colors.primary }]}>
                 {t('home.manageMedications')}
@@ -207,7 +208,7 @@ const ManageMedicationsScreen = ({ navigation }: any) => {
                     <Ionicons name="add" size={30} color="#fff" />
                 </TouchableOpacity>
             )}
-        </View>
+        </SafeAreaView>
     );
 };
 

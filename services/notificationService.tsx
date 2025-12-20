@@ -179,13 +179,11 @@ export async function cancelNotification(notificationId: string | string[]) {
             for (const id of notificationId) {
                 await Notifications.cancelScheduledNotificationAsync(id);
             }
-            console.log(`✅ تم إلغاء ${notificationId.length} إشعار`);
         } else {
             await Notifications.cancelScheduledNotificationAsync(notificationId);
-            console.log(`✅ تم إلغاء الإشعار: ${notificationId}`);
         }
     } catch (error) {
-        console.error('❌ خطأ في إلغاء الإشعار:', error);
+        // Silent fail
     }
 }
 
@@ -193,9 +191,8 @@ export async function cancelNotification(notificationId: string | string[]) {
 export async function cancelAllScheduledNotifications() {
     try {
         await Notifications.cancelAllScheduledNotificationsAsync();
-        console.log('✅ تم إلغاء جميع الإشعارات المجدولة');
     } catch (error) {
-        console.error('❌ خطأ في إلغاء الإشعارات:', error);
+        // Silent fail
     }
 }
 
@@ -203,15 +200,8 @@ export async function cancelAllScheduledNotifications() {
 export async function getAllScheduledNotifications() {
     try {
         const notifications = await Notifications.getAllScheduledNotificationsAsync();
-        console.log(`📋 عدد الإشعارات المجدولة: ${notifications.length}`);
-
-        notifications.forEach((notification, index) => {
-            console.log(`${index + 1}. ${notification.content.title} - ID: ${notification.identifier}`);
-        });
-
         return notifications;
     } catch (error) {
-        console.error('❌ خطأ في جلب الإشعارات:', error);
         return [];
     }
 }
