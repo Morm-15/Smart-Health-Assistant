@@ -6,5 +6,9 @@ export type AuthStackParamList = {
     Home: undefined;
     ChatAI: undefined;
     AddMedicationScreen: undefined;
+    ManageMedicationsScreen: undefined;
     SkinDiseaseCamera: undefined;
+    Settings: undefined;
+    EditProfile: undefined;
+    ChangePassword: undefined;
 };

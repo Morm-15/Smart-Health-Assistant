@@ -5,6 +5,7 @@ import { auth } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import BackButton from "../../components/BackButton";
+import { getFirebaseErrorMessage } from '../../validations/errorMessages';
 
 const { width } = Dimensions.get('window');
 
@@ -14,12 +15,18 @@ const ForgotPasswordScreen = () => {
     const { t } = useTranslation();
 
     const handleResetPassword = async () => {
+        if (!email.trim()) {
+            Alert.alert(t('error'), t('errors.missingEmail'));
+            return;
+        }
+
         try {
             await sendPasswordResetEmail(auth, email);
             Alert.alert(t('success'), t('resetPasswordEmailSent'));
             navigation.goBack();
         } catch (error: any) {
-            Alert.alert(t('error'), error.message);
+            console.error('Reset password error:', error);
+            Alert.alert(t('error'), getFirebaseErrorMessage(error.code));
         }
     };
 

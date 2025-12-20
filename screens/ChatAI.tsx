@@ -1,135 +1,272 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, TextInput, TouchableOpacity, Text, ScrollView, StyleSheet, Keyboard, Animated } from "react-native";
+import { View, TextInput, TouchableOpacity, Text, ScrollView, StyleSheet, Keyboard, StatusBar } from "react-native";
 import { sendToGemini } from "../services/geminiService";
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from "../components/BackButton";
 
 const ChatAI = () => {
+    const { t } = useTranslation();
+    const { colors, isDarkMode } = useTheme();
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
-    const [isTyping, setIsTyping] = useState(false); // مؤشر الكتابة
+    const [isTyping, setIsTyping] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
 
     const handleSend = async () => {
         if (!input.trim()) return;
 
-        // إضافة رسالة المستخدم
         setMessages((prev) => [...prev, { role: "user", text: input }]);
 
         const prompt = input;
         setInput("");
-        setIsTyping(true); // تفعيل مؤشر الكتابة
+        setIsTyping(true);
 
         try {
             const reply = await sendToGemini(prompt);
-
-            // إضافة رد AI
             setMessages((prev) => [...prev, { role: "ai", text: reply }]);
         } catch (error) {
-            setMessages((prev) => [...prev, { role: "ai", text: "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي." }]);
+            setMessages((prev) => [...prev, { role: "ai", text: t('chat.errorMessage') }]);
         } finally {
-            setIsTyping(false); // إخفاء مؤشر الكتابة
+            setIsTyping(false);
         }
 
         Keyboard.dismiss();
     };
 
-    // Scroll تلقائي عند وصول رسالة جديدة أو تغيير مؤشر الكتابة
     useEffect(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
     }, [messages, isTyping]);
 
     return (
-        <View style={styles.container}>
-            <BackButton/>
-            <ScrollView ref={scrollViewRef} style={styles.chatBox}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+
+            {/* Header with gradient */}
+            <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+                <BackButton/>
+                <View style={styles.headerContent}>
+                    <View style={[styles.aiAvatar, { backgroundColor: isDarkMode ? '#667eea' : '#007AFF' }]}>
+                        <Text style={styles.aiAvatarText}>🤖</Text>
+                    </View>
+                    <View style={styles.headerTextContainer}>
+                        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('chat.title')}</Text>
+                        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+                            {isTyping ? 'يكتب...' : 'متصل الآن'}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+
+            {/* Messages Area with improved padding */}
+            <ScrollView
+                ref={scrollViewRef}
+                style={styles.chatBox}
+                contentContainerStyle={styles.chatBoxContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {messages.length === 0 && (
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyStateEmoji}>💬</Text>
+                        <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+                            ابدأ محادثة مع الذكاء الاصطناعي
+                        </Text>
+                    </View>
+                )}
+
                 {messages.map((msg, idx) => (
                     <View
                         key={idx}
                         style={[
                             styles.bubble,
-                            msg.role === "user" ? styles.userBubble : styles.aiBubble,
+                            msg.role === "user" ? styles.userBubble : [styles.aiBubble, { backgroundColor: colors.surface }],
                         ]}
                     >
-                        <Text style={[styles.bubbleText, msg.role === "ai" && { color: "#000" }]}>
-                            {msg.role === "user" ? "👤" : "🤖"} {msg.text}
+                        <Text style={[styles.bubbleText, msg.role === "ai" && { color: colors.text }]}>
+                            {msg.text}
+                        </Text>
+                        <Text style={[styles.timeStamp, msg.role === "user" ? styles.userTimeStamp : { color: colors.textSecondary }]}>
+                            {new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
                         </Text>
                     </View>
                 ))}
 
-                {/* مؤشر الكتابة */}
                 {isTyping && (
-                    <View style={[styles.bubble, styles.aiBubble]}>
-                        <Text style={[styles.bubbleText, { color: "#000" }]}>🤖 ...</Text>
+                    <View style={[styles.bubble, styles.aiBubble, { backgroundColor: colors.surface }]}>
+                        <View style={styles.typingIndicator}>
+                            <View style={[styles.typingDot, { backgroundColor: colors.primary }]} />
+                            <View style={[styles.typingDot, { backgroundColor: colors.primary }]} />
+                            <View style={[styles.typingDot, { backgroundColor: colors.primary }]} />
+                        </View>
                     </View>
                 )}
+                <View style={{ height: 20 }} />
             </ScrollView>
 
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="اكتب رسالتك..."
-                    value={input}
-                    onChangeText={setInput}
-                    onSubmitEditing={handleSend} // إرسال عند Enter
-                    returnKeyType="send"
-                />
-                <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                    <Text style={styles.sendButtonText}>إرسال</Text>
-                </TouchableOpacity>
+            {/* Modern Input Container */}
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+                <View style={[styles.inputContainer, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                    <TextInput
+                        style={[styles.input, { color: colors.text }]}
+                        placeholder={t('chat.inputPlaceholder')}
+                        placeholderTextColor={colors.textSecondary}
+                        value={input}
+                        onChangeText={setInput}
+                        onSubmitEditing={handleSend}
+                        returnKeyType="send"
+                        multiline
+                        maxLength={500}
+                    />
+                    <TouchableOpacity
+                        style={[styles.sendButton, { opacity: input.trim() ? 1 : 0.5 }]}
+                        onPress={handleSend}
+                        disabled={!input.trim()}
+                    >
+                        <Ionicons name="send" size={22} color="#fff" />
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#f0f0f0", padding: 10 },
-    chatBox: { flex: 1 },
+    container: {
+        flex: 1,
+    },
+    header: {
+        paddingTop: 50,
+        paddingBottom: 15,
+        paddingHorizontal: 16,
+        borderBottomWidth: 1,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 3,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 50,
+    },
+    aiAvatar: {
+        width: 45,
+        height: 45,
+        borderRadius: 22.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    aiAvatarText: {
+        fontSize: 24,
+    },
+    headerTextContainer: {
+        marginLeft: 12,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
+    headerSubtitle: {
+        fontSize: 13,
+        marginTop: 2,
+    },
+    chatBox: {
+        flex: 1,
+    },
+    chatBoxContent: {
+        padding: 16,
+    },
+    emptyState: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 100,
+    },
+    emptyStateEmoji: {
+        fontSize: 60,
+        marginBottom: 12,
+    },
+    emptyStateText: {
+        fontSize: 16,
+        textAlign: 'center',
+    },
     bubble: {
-        marginBottom: 10,
-        padding: 10,
-        borderRadius: 12,
+        marginBottom: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 20,
         maxWidth: "80%",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.5,
-        elevation: 2,
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 1,
     },
     userBubble: {
         alignSelf: "flex-end",
-        backgroundColor: "#0084ff",
+        backgroundColor: "#007AFF",
+        borderBottomRightRadius: 4,
     },
     aiBubble: {
         alignSelf: "flex-start",
-        backgroundColor: "#e5e5ea",
+        borderBottomLeftRadius: 4,
     },
     bubbleText: {
         color: "#fff",
+        fontSize: 15,
+        lineHeight: 22,
+    },
+    timeStamp: {
+        fontSize: 11,
+        marginTop: 4,
+        opacity: 0.7,
+    },
+    userTimeStamp: {
+        color: '#fff',
+        textAlign: 'right',
+    },
+    typingIndicator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    typingDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        opacity: 0.6,
+    },
+    inputWrapper: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        paddingBottom: 16,
+        borderTopWidth: 1,
     },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        paddingVertical: 5,
-        paddingHorizontal: 5,
-        backgroundColor: "#fff",
-        borderRadius: 20,
+        paddingHorizontal: 12,
+        borderRadius: 25,
+        borderWidth: 1,
+        minHeight: 50,
     },
     input: {
         flex: 1,
-        paddingHorizontal: 15,
+        paddingHorizontal: 12,
         paddingVertical: 10,
         fontSize: 16,
+        maxHeight: 100,
     },
     sendButton: {
-        backgroundColor: "#0084ff",
+        width: 40,
+        height: 40,
+        backgroundColor: "#007AFF",
         borderRadius: 20,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        marginLeft: 5,
-    },
-    sendButtonText: {
-        color: "#fff",
-        fontWeight: "bold",
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
     },
 });
 

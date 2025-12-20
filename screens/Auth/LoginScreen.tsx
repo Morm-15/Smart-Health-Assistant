@@ -58,7 +58,7 @@ const LoginScreen = () => {
                 setLoading(false);
                 return;
             }
-            navigation.navigate('Home');
+            // التنقل سيحدث تلقائياً عند تغيير حالة المستخدم
         } catch (error: any) {
             Alert.alert(t('error'), getFirebaseErrorMessage(error.code));
         } finally {
@@ -199,11 +199,12 @@ const styles = StyleSheet.create({
     },
     eyeButton: {
         position: 'absolute',
-        right: 12,
-        top: '50%',
-        transform: [{ translateY: -12 }], // يُوسط الأيقونة عمودياً داخل الحقل
+        right: 15,
+        alignSelf: 'center',
         zIndex: 2,
-        padding: 6,
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

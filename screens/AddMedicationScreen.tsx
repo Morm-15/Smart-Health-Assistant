@@ -1,5 +1,5 @@
 // AddMedicationScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -14,155 +14,187 @@ import {
     Pressable,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { addMedication } from '../services/medicationService';
+import { addMedication, updateMedication, checkMedicationExists } from '../services/medicationService';
+import { registerForPushNotificationsAsync } from '../services/notificationService';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import BackButton from '../components/BackButton';
 
-const stomachOptions = [
-    { label: 'لا يهم', value: 'لا يهم', icon: { name: 'circle-outline', lib: 'MaterialCommunityIcons', color: '#9CA3AF' } },
-    { label: 'فارغة', value: 'فارغة', icon: { name: 'food-apple-outline', lib: 'MaterialCommunityIcons', color: '#f59e42' } },
-    { label: 'ممتلئة', value: 'ممتلئة', icon: { name: 'food-drumstick-outline', lib: 'MaterialCommunityIcons', color: '#34d399' } },
-];
+const AddMedicationScreen = ({ navigation, route }: any) => {
+    const { t } = useTranslation();
+    const { colors } = useTheme();
+    const { medication, isEdit } = route.params || {};
 
-const reminderTypeOptions = [
-    { label: 'إشعار', value: 'notification', icon: { name: 'notifications-outline', lib: 'Ionicons', color: '#10b981' } },
-    { label: 'صوت', value: 'alarm', icon: { name: 'alarm-outline', lib: 'Ionicons', color: '#f97316' } },
-    { label: 'كلاهما', value: 'both', icon: { name: 'volume-high', lib: 'Ionicons', color: '#6366f1' } },
-];
-
-const renderOptionIcon = (icon: { name: string; lib: string; color?: string }, size = 20) => {
-    const color = icon.color ?? '#333';
-    if (icon.lib === 'Ionicons') return <Ionicons name={icon.name as any} size={size} color={color} />;
-    if (icon.lib === 'FontAwesome5') return <FontAwesome5 name={icon.name as any} size={size} color={color} />;
-    // default to MaterialCommunityIcons
-    return <MaterialCommunityIcons name={icon.name as any} size={size} color={color} />;
-};
-
-const AddMedicationScreen = ({ navigation }: any) => {
-    const [medName, setMedName] = useState('');
-    const [stomachStatus, setStomachStatus] = useState('لا يهم');
-    const [reminderType, setReminderType] = useState('notification');
-    const [doseAmount, setDoseAmount] = useState('');
-    const [reminderTime, setReminderTime] = useState(new Date());
+    const [medName, setMedName] = useState(medication?.medName || '');
+    const [stomachStatus, setStomachStatus] = useState(medication?.stomachStatus || 'doesntMatter');
+    const [reminderType, setReminderType] = useState(medication?.reminderType || 'notification');
+    const [doseAmount, setDoseAmount] = useState(medication?.doseAmount?.toString() || '');
+    const [reminderTime, setReminderTime] = useState(
+        medication?.reminderTime?.toDate ? medication.reminderTime.toDate() :
+        medication?.reminderTime ? new Date(medication.reminderTime) :
+        new Date()
+    );
     const [showTimePicker, setShowTimePicker] = useState(false);
-
-    // custom pickers
     const [showStomachPicker, setShowStomachPicker] = useState(false);
     const [showReminderPicker, setShowReminderPicker] = useState(false);
+
+    // طلب أذونات الإشعارات عند تحميل الشاشة
+    useEffect(() => {
+        registerForPushNotificationsAsync();
+    }, []);
+
+    const stomachOptions = [
+        { label: t('medication.stomachDoesntMatter'), value: 'doesntMatter', icon: { name: 'circle-outline', lib: 'MaterialCommunityIcons', color: '#9CA3AF' } },
+        { label: t('medication.stomachEmpty'), value: 'empty', icon: { name: 'food-apple-outline', lib: 'MaterialCommunityIcons', color: '#f59e42' } },
+        { label: t('medication.stomachFull'), value: 'full', icon: { name: 'food-drumstick-outline', lib: 'MaterialCommunityIcons', color: '#34d399' } },
+    ];
+
+    const reminderTypeOptions = [
+        { label: t('medication.notification'), value: 'notification', icon: { name: 'notifications-outline', lib: 'Ionicons', color: '#10b981' } },
+        { label: t('medication.alarm'), value: 'alarm', icon: { name: 'alarm-outline', lib: 'Ionicons', color: '#f97316' } },
+        { label: t('medication.both'), value: 'both', icon: { name: 'volume-high', lib: 'Ionicons', color: '#6366f1' } },
+    ];
+
+    const renderOptionIcon = (icon: { name: string; lib: string; color?: string }, size = 20) => {
+        const color = icon.color ?? '#333';
+        if (icon.lib === 'Ionicons') return <Ionicons name={icon.name as any} size={size} color={color} />;
+        if (icon.lib === 'FontAwesome5') return <FontAwesome5 name={icon.name as any} size={size} color={color} />;
+        return <MaterialCommunityIcons name={icon.name as any} size={size} color={color} />;
+    };
 
     const handleAddMedication = async () => {
         try {
             if (!medName || !doseAmount) {
-                Alert.alert('تنبيه', 'يرجى إدخال جميع الحقول المطلوبة');
+                Alert.alert(t('medication.warning'), t('medication.fillAllFields'));
                 return;
             }
-            await addMedication(medName, stomachStatus, reminderType, Number(doseAmount), reminderTime);
-            Alert.alert('تم', 'تمت إضافة الدواء بنجاح');
+
+            if (isEdit && medication?.id) {
+                // تحديث دواء موجود
+                // التحقق من عدم وجود دواء آخر بنفس الاسم (باستثناء الدواء الحالي)
+                const exists = await checkMedicationExists(medName, medication.id);
+                if (exists) {
+                    Alert.alert(
+                        t('medication.warningTitle'),
+                        t('medication.medicationExists', { medName }),
+                        [{ text: t('medication.ok'), style: 'default' }]
+                    );
+                    return;
+                }
+
+                await updateMedication(
+                    medication.id,
+                    medName,
+                    stomachStatus,
+                    reminderType,
+                    Number(doseAmount),
+                    reminderTime
+                );
+                Alert.alert(t('medication.successTitle'), t('medication.updateSuccess'));
+            } else {
+                // إضافة دواء جديد
+                await addMedication(medName, stomachStatus, reminderType, Number(doseAmount), reminderTime);
+                Alert.alert(t('medication.successTitle'), t('medication.successMessage'));
+            }
             navigation.goBack();
-        } catch (error) {
-            Alert.alert('خطأ', 'حدث خطأ أثناء إضافة الدواء');
+        } catch (error: any) {
+            if (error.message === 'MEDICATION_EXISTS') {
+                Alert.alert(
+                    t('medication.warningTitle'),
+                    t('medication.medicationExists', { medName }),
+                    [{ text: t('medication.ok'), style: 'default' }]
+                );
+            } else {
+                Alert.alert(t('medication.errorTitle'), t('medication.errorMessage'));
+            }
         }
     };
 
-    // Time picker change handler for Android (dialog) and iOS (modal spinner)
     const onChangeTimeAndroid = (_event: any, selectedDate?: Date) => {
-        // On Android the event has type 'set' when user confirms, 'dismissed' when cancelled.
         setShowTimePicker(false);
         if (selectedDate) setReminderTime(selectedDate);
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <BackButton  />
-            <Text style={styles.title}>إضافة دواء جديد</Text>
+            <Text style={[styles.title, { color: colors.primary }]}>
+                {isEdit ? t('medication.editTitle') : t('medication.addTitle')}
+            </Text>
 
-            {/* اسم الدواء */}
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>اسم الدواء</Text>
-                    <MaterialCommunityIcons name="pill" size={20} color="#3b82f6" />
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.medicineName')}</Text>
+                    <MaterialCommunityIcons name="pill" size={20} color={colors.primary} />
                 </View>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                     value={medName}
                     onChangeText={setMedName}
-                    placeholder="أدخل اسم الدواء"
-                    placeholderTextColor="#999"
+                    placeholder={t('medication.enterMedicineName')}
+                    placeholderTextColor={colors.textSecondary}
                 />
             </View>
 
-            {/* حالة المعدة (custom picker with icons) */}
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>حالة المعدة</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.stomachStatus')}</Text>
                     <MaterialCommunityIcons name="stomach" size={20} color="#f59e42" />
                 </View>
-                <TouchableOpacity style={styles.pickerButton} onPress={() => setShowStomachPicker(true)}>
+                <TouchableOpacity style={[styles.pickerButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowStomachPicker(true)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        {/* show selected icon */}
                         {renderOptionIcon(stomachOptions.find(o => o.value === stomachStatus)!.icon, 18)}
-                        <Text style={styles.pickerText}>{stomachStatus}</Text>
-                        <Ionicons name="chevron-down" size={18} color="#666" style={{ marginLeft: 6 }} />
+                        <Text style={[styles.pickerText, { color: colors.text }]}>{stomachOptions.find(o => o.value === stomachStatus)!.label}</Text>
+                        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} style={{ marginLeft: 6 }} />
                     </View>
                 </TouchableOpacity>
             </View>
 
-            {/* نوع التذكير (custom picker with icons) */}
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>نوع التذكير</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.reminderType')}</Text>
                     <Ionicons name="notifications-outline" size={20} color="#10b981" />
                 </View>
-                <TouchableOpacity style={styles.pickerButton} onPress={() => setShowReminderPicker(true)}>
+                <TouchableOpacity style={[styles.pickerButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowReminderPicker(true)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
                         {renderOptionIcon(reminderTypeOptions.find(o => o.value === reminderType)!.icon, 18)}
-                        <Text style={styles.pickerText}>
+                        <Text style={[styles.pickerText, { color: colors.text }]}>
                             {reminderTypeOptions.find(o => o.value === reminderType)!.label}
                         </Text>
-                        <Ionicons name="chevron-down" size={18} color="#666" style={{ marginLeft: 6 }} />
+                        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} style={{ marginLeft: 6 }} />
                     </View>
                 </TouchableOpacity>
             </View>
 
-            {/* كمية الجرعة */}
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>كمية الجرعة</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.doseAmount')}</Text>
                     <FontAwesome5 name="syringe" size={18} color="#ef4444" />
                 </View>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                     value={doseAmount}
                     onChangeText={setDoseAmount}
-                    placeholder="أدخل كمية الجرعة"
+                    placeholder={t('medication.enterDoseAmount')}
                     keyboardType="numeric"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.textSecondary}
                 />
             </View>
 
-            {/* وقت التذكير */}
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.label}>وقت التذكير</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.reminderTime')}</Text>
                     <Ionicons name="time-outline" size={20} color="#6366f1" />
                 </View>
-
-                <TouchableOpacity
-                    style={styles.timeButton}
-                    onPress={() => {
-                        // On Android we show native dialog by rendering DateTimePicker inline (no modal).
-                        // On iOS we show a custom modal with spinner to match UI.
-                        setShowTimePicker(true);
-                    }}
-                >
-                    <Text style={styles.timeText}>
+                <TouchableOpacity style={[styles.timeButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowTimePicker(true)}>
+                    <Text style={[styles.timeText, { color: colors.text }]}>
                         {reminderTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                     <Ionicons name="chevron-down" size={18} color="#6366f1" />
                 </TouchableOpacity>
             </View>
 
-            {/* Android: render native DateTimePicker (dialog style) when showTimePicker true */}
             {showTimePicker && Platform.OS === 'android' && (
                 <DateTimePicker
                     value={reminderTime}
@@ -173,11 +205,10 @@ const AddMedicationScreen = ({ navigation }: any) => {
                 />
             )}
 
-            {/* iOS: modal spinner */}
             {Platform.OS === 'ios' && (
                 <Modal visible={showTimePicker} transparent animationType="fade">
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
+                        <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                             <DateTimePicker
                                 value={reminderTime}
                                 mode="time"
@@ -188,21 +219,24 @@ const AddMedicationScreen = ({ navigation }: any) => {
                                 }}
                                 style={{ width: '100%' }}
                             />
-                            <Button title="تم" onPress={() => setShowTimePicker(false)} color="#6366f1" />
+                            <Button title={t('common.done')} onPress={() => setShowTimePicker(false)} color="#6366f1" />
                         </View>
                     </View>
                 </Modal>
             )}
 
             <View style={{ marginTop: 30 }}>
-                <Button title="إضافة الدواء" color="#3b82f6" onPress={handleAddMedication} />
+                <Button
+                    title={isEdit ? t('medication.updateMedication') : t('medication.addMedication')}
+                    color="#3b82f6"
+                    onPress={handleAddMedication}
+                />
             </View>
 
-            {/* Stomach Picker Modal */}
             <Modal visible={showStomachPicker} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalListContainer]}>
-                        <Text style={styles.modalTitle}>اختر حالة المعدة</Text>
+                    <View style={[styles.modalListContainer, { backgroundColor: colors.surface }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>{t('medication.stomachStatus')}</Text>
                         <FlatList
                             data={stomachOptions}
                             keyExtractor={(item) => item.value}
@@ -214,27 +248,26 @@ const AddMedicationScreen = ({ navigation }: any) => {
                                     }}
                                     style={({ pressed }) => [
                                         styles.optionRow,
-                                        pressed ? { backgroundColor: '#f3f4f6' } : undefined,
+                                        pressed ? { backgroundColor: colors.border } : undefined,
                                     ]}
                                 >
                                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <Text style={styles.optionLabel}>{item.label}</Text>
+                                        <Text style={[styles.optionLabel, { color: colors.text }]}>{item.label}</Text>
                                         <View style={{ width: 10 }} />
                                         {renderOptionIcon(item.icon, 20)}
                                     </View>
                                 </Pressable>
                             )}
                         />
-                        <Button title="إلغاء" onPress={() => setShowStomachPicker(false)} color="#ef4444" />
+                        <Button title={t('common.cancel')} onPress={() => setShowStomachPicker(false)} color="#ef4444" />
                     </View>
                 </View>
             </Modal>
 
-            {/* Reminder Type Picker Modal */}
             <Modal visible={showReminderPicker} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalListContainer]}>
-                        <Text style={styles.modalTitle}>اختر نوع التذكير</Text>
+                    <View style={[styles.modalListContainer, { backgroundColor: colors.surface }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>{t('medication.reminderType')}</Text>
                         <FlatList
                             data={reminderTypeOptions}
                             keyExtractor={(item) => item.value}
@@ -246,18 +279,18 @@ const AddMedicationScreen = ({ navigation }: any) => {
                                     }}
                                     style={({ pressed }) => [
                                         styles.optionRow,
-                                        pressed ? { backgroundColor: '#f3f4f6' } : undefined,
+                                        pressed ? { backgroundColor: colors.border } : undefined,
                                     ]}
                                 >
                                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <Text style={styles.optionLabel}>{item.label}</Text>
+                                        <Text style={[styles.optionLabel, { color: colors.text }]}>{item.label}</Text>
                                         <View style={{ width: 10 }} />
                                         {renderOptionIcon(item.icon, 20)}
                                     </View>
                                 </Pressable>
                             )}
                         />
-                        <Button title="إلغاء" onPress={() => setShowReminderPicker(false)} color="#ef4444" />
+                        <Button title={t('common.cancel')} onPress={() => setShowReminderPicker(false)} color="#ef4444" />
                     </View>
                 </View>
             </Modal>
@@ -372,3 +405,4 @@ const styles = StyleSheet.create({
 });
 
 export default AddMedicationScreen;
+
