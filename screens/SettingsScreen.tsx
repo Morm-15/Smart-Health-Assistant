@@ -141,6 +141,7 @@ const SettingsScreen = () => {
                     priority: Notifications.AndroidNotificationPriority.MAX,
                 },
                 trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
                     seconds: 2,
                 },
             });

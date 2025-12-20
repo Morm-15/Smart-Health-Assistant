@@ -9,6 +9,7 @@ import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ChatAI from "../screens/ChatAI";
 import AddMedicationScreen from "../screens/AddMedicationScreen";
+import ManageMedicationsScreen from "../screens/ManageMedicationsScreen";
 import SkinDiseaseCameraScreen from "../screens/SkinDiseaseCameraScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import EditProfileScreen from "../screens/EditProfileScreen";
@@ -48,6 +49,7 @@ const AppNavigator = () => {
                         <Stack.Screen name="Home" component={HomeScreen} />
                         <Stack.Screen name="ChatAI" component={ChatAI} />
                         <Stack.Screen name="AddMedicationScreen" component={AddMedicationScreen} />
+                        <Stack.Screen name="ManageMedicationsScreen" component={ManageMedicationsScreen} />
                         <Stack.Screen name="SkinDiseaseCamera" component={SkinDiseaseCameraScreen} />
                         <Stack.Screen name="Settings" component={SettingsScreen} />
                         <Stack.Screen name="EditProfile" component={EditProfileScreen} />

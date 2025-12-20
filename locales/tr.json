@@ -78,6 +78,7 @@
 
   "medication": {
     "addTitle": "Yeni İlaç Ekle",
+    "editTitle": "İlacı Düzenle",
     "medicineName": "İlaç Adı",
     "enterMedicineName": "İlaç adını girin",
     "stomachStatus": "Mide Durumu",
@@ -93,12 +94,27 @@
     "reminderTime": "Hatırlatma Zamanı",
     "selectTime": "Zaman Seç",
     "addMedication": "İlaç Ekle",
+    "updateMedication": "İlacı Güncelle",
     "warning": "Uyarı",
+    "warningTitle": "⚠️ Uyarı",
     "fillAllFields": "Lütfen tüm gerekli alanları doldurun",
-    "successTitle": "Başarılı",
+    "successTitle": "✅ Başarılı",
     "successMessage": "İlaç başarıyla eklendi",
-    "errorTitle": "Hata",
-    "errorMessage": "İlaç eklenirken bir hata oluştu"
+    "updateSuccess": "İlaç başarıyla güncellendi",
+    "errorTitle": "❌ Hata",
+    "errorMessage": "İlaç eklenirken bir hata oluştu",
+    "noMedications": "Henüz hiç ilaç eklenmedi",
+    "addNewMedication": "Yeni İlaç Ekle",
+    "deleteTitle": "🗑️ İlacı Sil",
+    "deleteConfirmation": "{{medName}} silmek istediğinizden emin misiniz?",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "deleteSuccess": "İlaç başarıyla silindi",
+    "errorDeletingMedication": "İlaç silinirken bir hata oluştu",
+    "errorLoadingMedications": "İlaçlar yüklenirken bir hata oluştu",
+    "dose": "Doz",
+    "medicationExists": "⚠️ Üzgünüz, \"{{medName}}\" ilacı listenizde zaten mevcut!\n\nAynı ilacı iki kez ekleyemezsiniz. Lütfen farklı bir isim seçin veya mevcut ilacı düzenleyin.",
+    "ok": "Tamam"
   },
 
   "camera": {

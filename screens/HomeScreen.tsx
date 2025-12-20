@@ -69,6 +69,7 @@ const HomeScreen = () => {
                         icon="medkit-outline"
                         title={t('home.manageMedications')}
                         color="#10B981"
+                        onPress={() => navigation.navigate('ManageMedicationsScreen')}
                     />
                     <FeatureCard
                         icon="camera-outline"

@@ -14,21 +14,27 @@ import {
     Pressable,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { addMedication } from '../services/medicationService';
+import { addMedication, updateMedication, checkMedicationExists } from '../services/medicationService';
 import { registerForPushNotificationsAsync } from '../services/notificationService';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import BackButton from '../components/BackButton';
 
-const AddMedicationScreen = ({ navigation }: any) => {
+const AddMedicationScreen = ({ navigation, route }: any) => {
     const { t } = useTranslation();
     const { colors } = useTheme();
-    const [medName, setMedName] = useState('');
-    const [stomachStatus, setStomachStatus] = useState('doesntMatter');
-    const [reminderType, setReminderType] = useState('notification');
-    const [doseAmount, setDoseAmount] = useState('');
-    const [reminderTime, setReminderTime] = useState(new Date());
+    const { medication, isEdit } = route.params || {};
+
+    const [medName, setMedName] = useState(medication?.medName || '');
+    const [stomachStatus, setStomachStatus] = useState(medication?.stomachStatus || 'doesntMatter');
+    const [reminderType, setReminderType] = useState(medication?.reminderType || 'notification');
+    const [doseAmount, setDoseAmount] = useState(medication?.doseAmount?.toString() || '');
+    const [reminderTime, setReminderTime] = useState(
+        medication?.reminderTime?.toDate ? medication.reminderTime.toDate() :
+        medication?.reminderTime ? new Date(medication.reminderTime) :
+        new Date()
+    );
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [showStomachPicker, setShowStomachPicker] = useState(false);
     const [showReminderPicker, setShowReminderPicker] = useState(false);
@@ -63,11 +69,45 @@ const AddMedicationScreen = ({ navigation }: any) => {
                 Alert.alert(t('medication.warning'), t('medication.fillAllFields'));
                 return;
             }
-            await addMedication(medName, stomachStatus, reminderType, Number(doseAmount), reminderTime);
-            Alert.alert(t('medication.successTitle'), t('medication.successMessage'));
+
+            if (isEdit && medication?.id) {
+                // تحديث دواء موجود
+                // التحقق من عدم وجود دواء آخر بنفس الاسم (باستثناء الدواء الحالي)
+                const exists = await checkMedicationExists(medName, medication.id);
+                if (exists) {
+                    Alert.alert(
+                        t('medication.warningTitle'),
+                        t('medication.medicationExists', { medName }),
+                        [{ text: t('medication.ok'), style: 'default' }]
+                    );
+                    return;
+                }
+
+                await updateMedication(
+                    medication.id,
+                    medName,
+                    stomachStatus,
+                    reminderType,
+                    Number(doseAmount),
+                    reminderTime
+                );
+                Alert.alert(t('medication.successTitle'), t('medication.updateSuccess'));
+            } else {
+                // إضافة دواء جديد
+                await addMedication(medName, stomachStatus, reminderType, Number(doseAmount), reminderTime);
+                Alert.alert(t('medication.successTitle'), t('medication.successMessage'));
+            }
             navigation.goBack();
-        } catch (error) {
-            Alert.alert(t('medication.errorTitle'), t('medication.errorMessage'));
+        } catch (error: any) {
+            if (error.message === 'MEDICATION_EXISTS') {
+                Alert.alert(
+                    t('medication.warningTitle'),
+                    t('medication.medicationExists', { medName }),
+                    [{ text: t('medication.ok'), style: 'default' }]
+                );
+            } else {
+                Alert.alert(t('medication.errorTitle'), t('medication.errorMessage'));
+            }
         }
     };
 
@@ -79,7 +119,9 @@ const AddMedicationScreen = ({ navigation }: any) => {
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <BackButton  />
-            <Text style={[styles.title, { color: colors.primary }]}>{t('medication.addTitle')}</Text>
+            <Text style={[styles.title, { color: colors.primary }]}>
+                {isEdit ? t('medication.editTitle') : t('medication.addTitle')}
+            </Text>
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
@@ -184,7 +226,11 @@ const AddMedicationScreen = ({ navigation }: any) => {
             )}
 
             <View style={{ marginTop: 30 }}>
-                <Button title={t('medication.addMedication')} color="#3b82f6" onPress={handleAddMedication} />
+                <Button
+                    title={isEdit ? t('medication.updateMedication') : t('medication.addMedication')}
+                    color="#3b82f6"
+                    onPress={handleAddMedication}
+                />
             </View>
 
             <Modal visible={showStomachPicker} transparent animationType="fade">
@@ -359,3 +405,4 @@ const styles = StyleSheet.create({
 });
 
 export default AddMedicationScreen;
+

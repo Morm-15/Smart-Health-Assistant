@@ -78,6 +78,7 @@
 
   "medication": {
     "addTitle": "Add New Medication",
+    "editTitle": "Edit Medication",
     "medicineName": "Medicine Name",
     "enterMedicineName": "Enter medicine name",
     "stomachStatus": "Stomach Status",
@@ -93,12 +94,27 @@
     "reminderTime": "Reminder Time",
     "selectTime": "Select Time",
     "addMedication": "Add Medication",
+    "updateMedication": "Update Medication",
     "warning": "Warning",
+    "warningTitle": "⚠️ Warning",
     "fillAllFields": "Please fill in all required fields",
-    "successTitle": "Success",
+    "successTitle": "✅ Success",
     "successMessage": "Medication added successfully",
-    "errorTitle": "Error",
-    "errorMessage": "An error occurred while adding medication"
+    "updateSuccess": "Medication updated successfully",
+    "errorTitle": "❌ Error",
+    "errorMessage": "An error occurred while adding medication",
+    "noMedications": "No medications added yet",
+    "addNewMedication": "Add New Medication",
+    "deleteTitle": "🗑️ Delete Medication",
+    "deleteConfirmation": "Are you sure you want to delete {{medName}}?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteSuccess": "Medication deleted successfully",
+    "errorDeletingMedication": "An error occurred while deleting medication",
+    "errorLoadingMedications": "An error occurred while loading medications",
+    "dose": "Dose",
+    "medicationExists": "⚠️ Sorry, the medication \"{{medName}}\" already exists in your list!\n\nYou cannot add the same medication twice. Please choose a different name or edit the existing medication.",
+    "ok": "OK"
   },
 
   "camera": {
