@@ -13,6 +13,7 @@ import {
     FlatList,
     Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addMedication, updateMedication, checkMedicationExists } from '../services/medicationService';
 import { registerForPushNotificationsAsync } from '../services/notificationService';
@@ -117,7 +118,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
             <BackButton  />
             <Text style={[styles.title, { color: colors.primary }]}>
                 {isEdit ? t('medication.editTitle') : t('medication.addTitle')}
@@ -294,7 +295,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 };
 

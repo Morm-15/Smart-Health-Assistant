@@ -66,7 +66,6 @@ export const getFirebaseErrorMessage = (code: string): string => {
 
         // خطأ افتراضي
         default:
-            console.warn('Unhandled Firebase error code:', code);
             return i18n.t('errors.defaultError');
     }
 };
