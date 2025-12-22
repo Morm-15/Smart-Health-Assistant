@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Alert, View, StatusBar, Dimensions } from 'react-native';
+import { ScrollView, StyleSheet, Alert, View, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/types';
@@ -11,7 +12,6 @@ import Header from '../components/Header';
 import FeatureCard from '../components/FeatureCard';
 import Footer from '../components/Footer';
 
-const { height } = Dimensions.get('window');
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Home'>;
 
@@ -42,11 +42,14 @@ const HomeScreen = () => {
     }, [t]);
 
     return (
-        <View style={[styles.page, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={colors.background} />
+        <SafeAreaView style={[styles.page, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+            <StatusBar
+                barStyle={isDarkMode ? "light-content" : "dark-content"}
+                backgroundColor={colors.background}
+                translucent={false}
+            />
 
             <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-                <View style={{ height: 20 }} />
                 <Header
                     userName={userName}
                     onSettingsPress={() => navigation.navigate('Settings' as any)}
@@ -84,7 +87,7 @@ const HomeScreen = () => {
                 onHomePress={() => navigation.navigate('Home')}
                 onSettingsPress={() => navigation.navigate('Settings' as any)}
             />
-        </View>
+        </SafeAreaView>
     );
 };
 

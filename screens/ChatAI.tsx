@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, TextInput, TouchableOpacity, Text, ScrollView, StyleSheet, Keyboard, StatusBar } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { sendToGemini } from "../services/geminiService";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -40,8 +41,12 @@ const ChatAI = () => {
     }, [messages, isTyping]);
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+            <StatusBar
+                barStyle={isDarkMode ? "light-content" : "dark-content"}
+                backgroundColor={colors.background}
+                translucent={false}
+            />
 
             {/* Header with gradient */}
             <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -53,7 +58,7 @@ const ChatAI = () => {
                     <View style={styles.headerTextContainer}>
                         <Text style={[styles.headerTitle, { color: colors.text }]}>{t('chat.title')}</Text>
                         <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                            {isTyping ? 'يكتب...' : 'متصل الآن'}
+                            {isTyping ? t('chat.typing_indicator') : t('chat.connected')}
                         </Text>
                     </View>
                 </View>
@@ -70,7 +75,10 @@ const ChatAI = () => {
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyStateEmoji}>💬</Text>
                         <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                            ابدأ محادثة مع الذكاء الاصطناعي
+                            {t('chat.startConversation')}
+                        </Text>
+                        <Text style={[styles.emptyStateText, { color: colors.textSecondary, fontSize: 14, marginTop: 8 }]}>
+                            {t('chat.medicalAssistant')}
                         </Text>
                     </View>
                 )}
@@ -127,7 +135,7 @@ const ChatAI = () => {
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -136,7 +144,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        paddingTop: 50,
         paddingBottom: 15,
         paddingHorizontal: 16,
         borderBottomWidth: 1,

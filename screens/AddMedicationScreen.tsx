@@ -1,5 +1,5 @@
 // AddMedicationScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -13,9 +13,9 @@ import {
     FlatList,
     Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addMedication, updateMedication, checkMedicationExists } from '../services/medicationService';
-import { registerForPushNotificationsAsync } from '../services/notificationService';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -24,7 +24,8 @@ import BackButton from '../components/BackButton';
 const AddMedicationScreen = ({ navigation, route }: any) => {
     const { t } = useTranslation();
     const { colors } = useTheme();
-    const { medication, isEdit } = route.params || {};
+    const medication = route?.params?.medication;
+    const isEdit = route?.params?.isEdit || false;
 
     const [medName, setMedName] = useState(medication?.medName || '');
     const [stomachStatus, setStomachStatus] = useState(medication?.stomachStatus || 'doesntMatter');
@@ -39,10 +40,6 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
     const [showStomachPicker, setShowStomachPicker] = useState(false);
     const [showReminderPicker, setShowReminderPicker] = useState(false);
 
-    // طلب أذونات الإشعارات عند تحميل الشاشة
-    useEffect(() => {
-        registerForPushNotificationsAsync();
-    }, []);
 
     const stomachOptions = [
         { label: t('medication.stomachDoesntMatter'), value: 'doesntMatter', icon: { name: 'circle-outline', lib: 'MaterialCommunityIcons', color: '#9CA3AF' } },
@@ -117,7 +114,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
             <BackButton  />
             <Text style={[styles.title, { color: colors.primary }]}>
                 {isEdit ? t('medication.editTitle') : t('medication.addTitle')}
@@ -294,7 +291,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 };
 

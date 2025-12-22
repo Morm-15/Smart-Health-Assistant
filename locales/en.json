@@ -71,9 +71,20 @@
     "inputPlaceholder": "Type your message...",
     "send": "Send",
     "typing": "...",
-    "errorMessage": "An error occurred while connecting to AI.",
+    "errorMessage": "⚠️ An error occurred while connecting to AI.",
     "userPrefix": "👤",
-    "aiPrefix": "🤖"
+    "aiPrefix": "🤖",
+    "apiKeyMissing": "⚠️ API key is not available. Please add EXPO_PUBLIC_GEMINI_API_KEY in .env file",
+    "emptyPrompt": "⚠️ Please type a message before sending.",
+    "noResponse": "⚠️ No response received from AI. Please try again.",
+    "invalidApiKey": "⚠️ Invalid API key. Please check your settings.",
+    "quotaExceeded": "⚠️ Service usage limit exceeded. Please try again later.",
+    "networkError": "⚠️ Internet connection error. Please check your connection and try again.",
+    "timeout": "⚠️ Connection timeout. Please try again.",
+    "connected": "Online now",
+    "typing_indicator": "Typing...",
+    "startConversation": "Start a conversation with AI",
+    "medicalAssistant": "Your Smart Medical Assistant"
   },
 
   "medication": {

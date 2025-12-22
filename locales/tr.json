@@ -71,9 +71,20 @@
     "inputPlaceholder": "Mesajınızı yazın...",
     "send": "Gönder",
     "typing": "...",
-    "errorMessage": "Yapay zeka ile bağlantı kurulurken bir hata oluştu.",
+    "errorMessage": "⚠️ Yapay zeka ile bağlantı kurulurken bir hata oluştu.",
     "userPrefix": "👤",
-    "aiPrefix": "🤖"
+    "aiPrefix": "🤖",
+    "apiKeyMissing": "⚠️ API anahtarı mevcut değil. Lütfen .env dosyasına EXPO_PUBLIC_GEMINI_API_KEY ekleyin",
+    "emptyPrompt": "⚠️ Lütfen göndermeden önce bir mesaj yazın.",
+    "noResponse": "⚠️ Yapay zekadan yanıt alınamadı. Lütfen tekrar deneyin.",
+    "invalidApiKey": "⚠️ Geçersiz API anahtarı. Lütfen ayarlarınızı kontrol edin.",
+    "quotaExceeded": "⚠️ Hizmet kullanım sınırı aşıldı. Lütfen daha sonra tekrar deneyin.",
+    "networkError": "⚠️ İnternet bağlantı hatası. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
+    "timeout": "⚠️ Bağlantı zaman aşımına uğradı. Lütfen tekrar deneyin.",
+    "connected": "Şimdi çevrimiçi",
+    "typing_indicator": "Yazıyor...",
+    "startConversation": "Yapay zeka ile sohbet başlat",
+    "medicalAssistant": "Akıllı Tıbbi Asistanınız"
   },
 
   "medication": {
