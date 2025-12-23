@@ -1,174 +1,153 @@
-# 🤖 Smart Health Assistant  
+# 🏥 Smart Health Assistant
+### AI-Powered Multilingual Mobile Health Application
 
-### 🚧 Status: In Progress  
-> A React Native application designed to assist users in identifying skin diseases and managing personal health.
+Smart Health Assistant is an **AI-powered, multilingual mobile health application** built with **React Native and Expo**.  
+The app helps users manage medications, interact with an AI health assistant, and perform **preliminary skin condition analysis** using on-device machine learning.
 
-### 🚧 Durum: Geliştiriliyor  
-> Kullanıcılara cilt hastalıklarını tanımlamada ve kişisel sağlık yönetiminde yardımcı olmak için tasarlanmış bir React Native uygulaması.
-
-### 🚧 الحالة: قيد التطوير  
-> تطبيق موبايل مصمم لمساعدة المستخدمين في التعرف على الأمراض الجلدية وإدارة صحتهم الشخصية.
+The application supports **Arabic (RTL)**, **English**, and **Turkish**, and focuses on combining modern mobile development with practical AI integration.
 
 ---
 
-## 🧠 Overview / Genel Bakış / نظرة عامة
+## 🎯 Project Motivation
 
-**English:**  
-Smart Health Assistant is a mobile application built with **React Native** that helps users detect common **skin diseases** using a trained AI model and manage their medications efficiently.  
-It also integrates with **Google Gemini AI API** to provide intelligent chat-based health support and suggestions.
+Managing daily health tasks such as medication schedules, early symptom awareness, and accessing basic health guidance can be challenging.
 
-**Türkçe:**  
-Smart Health Assistant, **React Native** ile geliştirilmiş bir mobil uygulamadır. Kullanıcılara, eğitilmiş bir yapay zeka modeli kullanarak yaygın **cilt hastalıklarını** tespit etmelerinde ve ilaçlarını verimli şekilde yönetmelerinde yardımcı olur.  
-Ayrıca, **Google Gemini AI API** ile entegre çalışarak akıllı sohbet tabanlı sağlık desteği ve öneriler sunar.
+This project aims to:
+- Simplify **personal health management**
+- Demonstrate **real-world AI integration** in mobile apps
+- Provide a clean, scalable, and multilingual mobile architecture
 
-**العربية:**  
-تطبيق Smart Health Assistant هو تطبيق موبايل مبني باستخدام **React Native** يساعد المستخدمين على الكشف عن **الأمراض الجلدية** الشائعة باستخدام نموذج ذكاء اصطناعي مدرب وإدارة أدويتهم بكفاءة.  
-كما يتكامل مع **Google Gemini AI API** لتقديم دعم صحي ذكي عبر المحادثة واقتراحات مفيدة.
+> ⚠️ This application is **not a medical product** and is intended for **educational and demonstration purposes only**.
 
 ---
 
-## 🧬 AI Model (Skin Disease Detection) / Yapay Zeka Modeli (Cilt Hastalığı Tespiti) / نموذج الذكاء الاصطناعي (كشف الأمراض الجلدية)
+## ✨ Key Features
 
-**English:**  
-The AI model is trained to detect the following skin conditions:  
-- Acne  
-- Rosacea  
-- Milia  
-- Keratosis  
-- Eczema  
-- Carcinoma  
+### 🤖 AI Health Chat
+- AI-powered chat using **Google Gemini AI**
+- Health-related questions and explanations
+- Responses adapted to the selected language
+- Clean and user-friendly chat interface
 
-Users can upload an image of the affected area, and the model will analyze and return the most likely condition.  
+### 💊 Medication Management
+- Add, edit, and delete medications
+- Schedule reminders (daily / custom)
+- Automatic notifications using Expo Notifications
+- Dosage instructions (empty stomach / full stomach)
+- Duplicate medication prevention
 
+### 📸 Skin Disease Detection (AI)
+- Capture images via camera or gallery
+- Image analysis using an on-device **TensorFlow.js model**
+- Preliminary classification of possible skin conditions
+- AI-generated guidance and recommendations
 
-**Türkçe:**  
-Yapay zeka modeli, aşağıdaki cilt hastalıklarını tespit edecek şekilde eğitilmiştir:  
-- Akne  
-- Rozasea  
-- Milia  
-- Keratoz  
-- Egzama  
-- Karsinom  
+### 🔐 Authentication & User Management
+- Secure authentication with **Firebase Authentication**
+- Login, registration, password reset
+- User profile management
+- Clear and descriptive error handling
 
-Kullanıcılar, etkilenen bölgenin bir resmini yükleyebilir ve model en olası durumu analiz ederek geri döndürür.  
+### 🌍 Multilingual & Accessibility
+- Arabic (Full RTL support)
+- English
+- Turkish
+- Full localization using `i18next`
 
-
-**العربية:**  
-تم تدريب نموذج الذكاء الاصطناعي لاكتشاف الحالات الجلدية التالية:  
-- حب الشباب  
-- الحمامى الوردية (Rosacea)  
-- الميلية  
-- التقرن (Keratosis)  
-- الأكزيما  
-- السرطان الجلدي (Carcinoma)  
-
-يمكن للمستخدمين تحميل صورة للمنطقة المصابة، وسيقوم النموذج بتحليلها وإرجاع الحالة الأكثر احتمالاً.  
-
-
----
-
-## 💬 Chat with AI / Yapay Zeka ile Sohbet / الدردشة مع الذكاء الاصطناعي
-
-**English:**  
-- Chat feature powered by **Google Gemini API**  
-- Allows users to ask health-related questions  
-- Provides insights and possible guidance (non-diagnostic)  
-
-**Türkçe:**  
-- Sohbet özelliği **Google Gemini API** ile güçlendirilmiştir  
-- Kullanıcıların sağlık ile ilgili sorular sormasına olanak sağlar  
-- Bilgi ve olası rehberlik sunar (tanısal değildir)  
-
-**العربية:**  
-- ميزة الدردشة مدعومة بواسطة **Google Gemini API**  
-- تتيح للمستخدمين طرح أسئلة صحية  
-- توفر رؤى وإرشادات محتملة (غير تشخيصية)
- 
-<img width="404" height="905" alt="Screenshot 2025-10-12 121545" src="https://github.com/user-attachments/assets/444d25b5-658b-496e-b18a-3091cd255150" />
-
+### ⚙️ App Settings
+- Dark / Light mode
+- Notification control
+- Language switching
+- Profile editing
 
 ---
 
-## 💊 Medicine Management / İlaç Yönetimi / إدارة الأدوية
+## 🧠 Model Training – Skin Disease Classifier
 
-**English:**  
-- Add, edit, or delete medications  
-- Set reminder times  
-- Receive **push notifications** via **Firebase Cloud Messaging (FCM)**  
+The **Skin Disease Detection** feature is powered by a custom-trained image classification model.
 
-**Türkçe:**  
-- İlaç ekleme, düzenleme veya silme  
-- Hatırlatıcı saatlerini ayarlama  
-- **Firebase Cloud Messaging (FCM)** üzerinden bildirim alma  
+### Dataset
+- Source: Publicly available skin-condition image datasets
+- Multiple skin condition categories
+- Dataset split into training, validation, and testing sets
 
-**العربية:**  
-- إضافة أو تعديل أو حذف الأدوية  
-- ضبط مواعيد التذكير  
-- استقبال **إشعارات الدفع** عبر **Firebase Cloud Messaging (FCM)**  
+### Preprocessing
+- Image resizing to a fixed input size
+- Pixel normalization
+- Data augmentation:
+  - Rotation
+  - Horizontal flipping
+  - Zoom and brightness variations  
+These steps help improve generalization and reduce overfitting.
 
+### Model Architecture
+- CNN-based image classification model
+- Optimized for **mobile deployment**
+- Trained using TensorFlow/Keras
+- Loss function: categorical cross-entropy
+- Optimizer: Adam
 
----
+### Evaluation
+- Model evaluated using validation accuracy and loss
+- Focus on balancing performance and lightweight execution
+- Designed for **educational and demonstrational accuracy**, not clinical use
 
-## 🌐 Multi-language Support / Çok Dilli Destek / دعم متعدد اللغات
+### Mobile Deployment
+- Trained model converted to **TensorFlow.js format**
+- Loaded directly inside the React Native app
+- Runs **on-device**, without sending images to external servers
+- Model files stored under `assets/model/`
 
-**English:**  
-Supports multiple languages for a better user experience and accessibility.  
-
-**Türkçe:**  
-Daha iyi kullanıcı deneyimi ve erişilebilirlik için birden fazla dili destekler.  
-
-**العربية:**  
-يدعم التطبيق عدة لغات لتحسين تجربة المستخدم وسهولة الوصول.  
-
-<img width="399" height="906" alt="Screenshot 2025-10-12 121159" src="https://github.com/user-attachments/assets/fcb9511a-dae2-4032-bfdd-bea864460e46" />
-
----
-
-## 🔐 Authentication / Kimlik Doğrulama / المصادقة
-
-**English:**  
-- Sign up and Sign in using **Firebase Authentication**  
-- Secure storage of user data  
-- Personalized experience  
-
-**Türkçe:**  
-- **Firebase Authentication** ile kayıt olma ve giriş yapma  
-- Kullanıcı verilerinin güvenli şekilde saklanması  
-- Kişiselleştirilmiş deneyim  
-
-**العربية:**  
-- التسجيل وتسجيل الدخول باستخدام **Firebase Authentication**  
-- تخزين بيانات المستخدم بشكل آمن  
-- تجربة شخصية للمستخدم  
-
-<img width="396" height="903" alt="Screenshot 2025-10-12 121234" src="https://github.com/user-attachments/assets/c60fa8c2-d843-4746-9ec6-3c6e23751061" />
+### Limitations
+- Results may vary depending on lighting, camera quality, and skin tone
+- Provides **initial guidance only**, not medical diagnosis
 
 ---
 
-## 🧱 Technologies Used / Kullanılan Teknolojiler / التقنيات المستخدمة
+## 🛠️ Tech Stack
 
-| Category / Kategori / الفئة | Tools / Libraries / الأدوات |
-|-----------------------------|----------------------------|
-| Frontend | React Native, TypeScript |
-| Backend | Firebase (Auth, Firestore, FCM) |
-| AI | Python (TensorFlow or Keras for model training) |
-| API | Google Gemini AI |
-| Other / Diğer / أخرى | Expo, React Navigation, i18next |
+### Frontend
+- React Native
+- Expo
+- TypeScript
+- React Navigation
+- React Hook Form
+- i18next
 
+### Backend & Services
+- Firebase Authentication
+- Firebase Firestore
+- Google Gemini AI
+- TensorFlow.js
+
+### Additional Libraries
+- Expo Camera
+- Expo Notifications
+- AsyncStorage
+- Yup (Form validation)
 
 ---
 
-## 📸 Screenshots / Ekran Görüntüleri / لقطات الشاشة
+## 🧩 High-Level Architecture
 
-<img width="399" height="906" alt="Screenshot 2025-10-12 121159" src="https://github.com/user-attachments/assets/f36dba22-d593-4a05-ab84-7c5dae57c45d" />
+1. User authenticates via Firebase
+2. User data and medications stored securely in Firestore
+3. AI chat requests handled via Gemini API
+4. Image classification runs locally using TensorFlow.js
+5. Notifications scheduled and managed via Expo
 
-<img width="396" height="903" alt="Screenshot 2025-10-12 121234" src="https://github.com/user-attachments/assets/f966deaf-a818-4868-858e-c2dfc852d0a9" />
+---
 
-<img width="411" height="897" alt="Screenshot 2025-10-12 121250" src="https://github.com/user-attachments/assets/3dc73e4d-ea0c-4736-9234-3939816c9c0b" />
-
-
+## 📸 Screenshots
 
 
-<img width="408" height="905" alt="Screenshot 2025-10-12 121414" src="https://github.com/user-attachments/assets/8f9c61fd-7330-45c6-b6b3-80ac599c408e" />
-<img width="404" height="905" alt="Screenshot 2025-10-12 121545" src="https://github.com/user-attachments/assets/d4e0b5dc-2970-47e0-abb4-270e65294ab6" />
-<img width="404" height="903" alt="Screenshot 2025-10-12 121807" src="https://github.com/user-attachments/assets/5743be5e-fa34-4f7c-874d-c01864b3e569" />
+
+```md
+![Home](./screenshots/home.png)
+![AI Chat](./screenshots/chat.png)
+![Medication Management](./screenshots/medication.png) (./screenshots/medicationm.png)
+![Skin Detection](./screenshots/skin-detection.png) (./screenshots/skin-detectionm.png)
+![Settings](./screenshots/settings.png)
+![Login](./screenshots/Login.png)
+![Sign in](./screenshots/Sign-in.png)
+![Password](./screenshots/Password.png)
