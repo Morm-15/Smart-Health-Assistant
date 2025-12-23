@@ -141,23 +141,30 @@ These steps help improve generalization and reduce overfitting.
 ## 📸 Screenshots
 
 ### Home
-![Home](./screenshots/home.jpeg)
+<img src="./screenshots/home.jpeg" width="300" />
 
 ### AI Chat
-![AI Chat](./screenshots/chat.jpeg)
+<img src="./screenshots/chat.jpeg" width="300" />
 
 ### Medication Management
-![Medication Management](./screenshots/medication.jpeg)
-![Medication Management - Modal](./screenshots/medicationm.jpeg)
+<p>
+  <img src="./screenshots/medication.jpeg" width="280" />
+  <img src="./screenshots/medicationm.jpeg" width="280" />
+</p>
 
 ### Skin Disease Detection
-![Skin Detection](./screenshots/skin-detection.jpeg)
-![Skin Detection - Result](./screenshots/skin-detectionm.jpeg)
+<p>
+  <img src="./screenshots/skin-detection.jpeg" width="280" />
+  <img src="./screenshots/skin-detectionm.jpeg" width="280" />
+</p>
 
 ### Authentication
-![Login](./screenshots/login.jpeg)
-![Sign In](./screenshots/sign-in.jpeg)
-![Password Reset](./screenshots/password.jpeg)
+<p>
+  <img src="./screenshots/login.jpeg" width="280" />
+  <img src="./screenshots/sign-in.jpeg" width="280" />
+  <img src="./screenshots/password.jpeg" width="280" />
+</p>
 
 ### Settings
-![Settings](./screenshots/settings.jpeg)
+<img src="./screenshots/settings.jpeg" width="300" />
+
