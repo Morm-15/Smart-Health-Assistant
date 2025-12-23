@@ -140,14 +140,24 @@ These steps help improve generalization and reduce overfitting.
 
 ## 📸 Screenshots
 
+### Home
+![Home](./screenshots/home.jpeg)
 
+### AI Chat
+![AI Chat](./screenshots/chat.jpeg)
 
-```md
-![Home](./screenshots/home.png)
-![AI Chat](./screenshots/chat.png)
-![Medication Management](./screenshots/medication.png) (./screenshots/medicationm.png)
-![Skin Detection](./screenshots/skin-detection.png) (./screenshots/skin-detectionm.png)
-![Settings](./screenshots/settings.png)
-![Login](./screenshots/Login.png)
-![Sign in](./screenshots/Sign-in.png)
-![Password](./screenshots/Password.png)
+### Medication Management
+![Medication Management](./screenshots/medication.jpeg)
+![Medication Management - Modal](./screenshots/medicationm.jpeg)
+
+### Skin Disease Detection
+![Skin Detection](./screenshots/skin-detection.jpeg)
+![Skin Detection - Result](./screenshots/skin-detectionm.jpeg)
+
+### Authentication
+![Login](./screenshots/login.jpeg)
+![Sign In](./screenshots/sign-in.jpeg)
+![Password Reset](./screenshots/password.jpeg)
+
+### Settings
+![Settings](./screenshots/settings.jpeg)
