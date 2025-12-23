@@ -125,7 +125,11 @@
     "errorLoadingMedications": "حدث خطأ أثناء تحميل الأدوية",
     "dose": "الجرعة",
     "medicationExists": "⚠️ عذراً، الدواء \"{{medName}}\" موجود بالفعل في قائمتك!\n\nلا يمكنك إضافة نفس الدواء مرتين. يرجى اختيار اسم مختلف أو تعديل الدواء الموجود.",
-    "ok": "حسناً"
+    "ok": "حسناً",
+    "notificationTitle": "⏰ تذكير بالدواء: {{medName}}",
+    "notificationBodyEmpty": "حان وقت تناول {{doseAmount}} من {{medName}} على معدة فارغة",
+    "notificationBodyFull": "حان وقت تناول {{doseAmount}} من {{medName}} على معدة ممتلئة",
+    "notificationBody": "حان وقت تناول {{doseAmount}} من {{medName}}"
   },
 
   "camera": {

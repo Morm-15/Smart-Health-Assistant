@@ -1,6 +1,7 @@
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { scheduleNotification } from './notificationService';
+import { scheduleNotification, cancelAllNotifications } from './notificationService';
+import i18n from '../i18n';
 
 export interface Medication {
     id?: string;             // معرف الدواء
@@ -41,17 +42,8 @@ export const addMedication = async (
 
     const docRef = await addDoc(collection(db, 'medications'), newMed);
 
-    // جدولة الإشعار
-    const stomachText = stomachStatus === 'empty' ? ' على معدة فارغة' :
-                       stomachStatus === 'full' ? ' على معدة ممتلئة' : '';
-
-    await scheduleNotification(
-        `⏰ تذكير بالدواء: ${medName}`,
-        `حان وقت تناول ${doseAmount} من ${medName}${stomachText}`,
-        reminderTime,
-        reminderType as 'notification' | 'alarm',
-        'daily' // تكرار يومي
-    );
+    // إعادة جدولة جميع الإشعارات لضمان التزامن
+    await rescheduleAllMedicationNotifications();
 
     return docRef.id;
 };
@@ -92,7 +84,8 @@ export const deleteMedication = async (medicationId: string) => {
     const medicationRef = doc(db, 'medications', medicationId);
     await deleteDoc(medicationRef);
 
-    // يمكن إضافة كود لإلغاء الإشعار المجدول هنا إذا لزم الأمر
+    // إعادة جدولة جميع الإشعارات بعد الحذف
+    await rescheduleAllMedicationNotifications();
 };
 
 // دالة للتحقق من وجود دواء بنفس الاسم
@@ -147,19 +140,69 @@ export const updateMedication = async (
 
     await updateDoc(medicationRef, updatedMed);
 
-    // إعادة جدولة الإشعار
-    const stomachText = stomachStatus === 'empty' ? ' على معدة فارغة' :
-                       stomachStatus === 'full' ? ' على معدة ممتلئة' : '';
-
-    await scheduleNotification(
-        `⏰ تذكير بالدواء: ${medName}`,
-        `حان وقت تناول ${doseAmount} من ${medName}${stomachText}`,
-        reminderTime,
-        reminderType as 'notification' | 'alarm',
-        'daily'
-    );
+    // إعادة جدولة جميع الإشعارات لضمان التحديث
+    await rescheduleAllMedicationNotifications();
 
     return medicationId;
+};
+
+// دالة لإعادة جدولة جميع إشعارات الأدوية
+export const rescheduleAllMedicationNotifications = async () => {
+    try {
+        console.log('🔄 [Notifications] بدء إعادة جدولة الإشعارات...');
+
+        // 1. إلغاء جميع الإشعارات المجدولة
+        await cancelAllNotifications();
+        console.log('✅ [Notifications] تم إلغاء جميع الإشعارات القديمة');
+
+        // انتظار قصير للتأكد من إتمام الإلغاء
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // 2. جلب جميع الأدوية
+        const medications = await getMedications();
+        console.log(`📋 [Notifications] عدد الأدوية: ${medications.length}`);
+
+        // 3. جدولة إشعار لكل دواء
+        for (const med of medications) {
+            const reminderTime = med.reminderTime?.toDate ? med.reminderTime.toDate() : new Date(med.reminderTime);
+
+            // استخدام الترجمات المناسبة
+            const title = i18n.t('medication.notificationTitle', { medName: med.medName });
+            let body = '';
+
+            if (med.stomachStatus === 'empty') {
+                body = i18n.t('medication.notificationBodyEmpty', {
+                    doseAmount: med.doseAmount,
+                    medName: med.medName
+                });
+            } else if (med.stomachStatus === 'full') {
+                body = i18n.t('medication.notificationBodyFull', {
+                    doseAmount: med.doseAmount,
+                    medName: med.medName
+                });
+            } else {
+                body = i18n.t('medication.notificationBody', {
+                    doseAmount: med.doseAmount,
+                    medName: med.medName
+                });
+            }
+
+            console.log(`⏰ [Notifications] جدولة إشعار لـ: ${med.medName} في ${reminderTime.toLocaleTimeString()}`);
+
+            // جدولة إشعار واحد متكرر يومياً
+            await scheduleNotification(
+                title,
+                body,
+                reminderTime,
+                med.reminderType as 'notification' | 'alarm',
+                'daily'
+            );
+        }
+
+        console.log('✅ [Notifications] تم الانتهاء من جدولة جميع الإشعارات');
+    } catch (error) {
+        console.error('❌ [Notifications] خطأ في إعادة جدولة الإشعارات:', error);
+    }
 };
 
 

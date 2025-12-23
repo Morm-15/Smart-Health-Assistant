@@ -231,6 +231,18 @@ const SettingsScreen = () => {
                         </View>
                         <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.settingItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                        onPress={() => navigation.navigate('TestNotifications')}
+                    >
+                        <View style={styles.settingLeft}>
+                            <Ionicons name="flask" size={24} color="#F59E0B" />
+                            <Text style={[styles.settingText, { color: colors.text }]}>
+                                🧪 اختبار الإشعارات
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                    </TouchableOpacity>
                 </View>
 
                 {/* About Section */}

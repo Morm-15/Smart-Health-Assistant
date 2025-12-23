@@ -125,7 +125,11 @@
     "errorLoadingMedications": "An error occurred while loading medications",
     "dose": "Dose",
     "medicationExists": "⚠️ Sorry, the medication \"{{medName}}\" already exists in your list!\n\nYou cannot add the same medication twice. Please choose a different name or edit the existing medication.",
-    "ok": "OK"
+    "ok": "OK",
+    "notificationTitle": "⏰ Medication Reminder: {{medName}}",
+    "notificationBodyEmpty": "Time to take {{doseAmount}} of {{medName}} on empty stomach",
+    "notificationBodyFull": "Time to take {{doseAmount}} of {{medName}} on full stomach",
+    "notificationBody": "Time to take {{doseAmount}} of {{medName}}"
   },
 
   "camera": {

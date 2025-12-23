@@ -53,6 +53,7 @@ export async function scheduleNotification(
     weekdays?: number[]
 ) {
     try {
+        console.log(`📅 [scheduleNotification] بدء جدولة: "${title}" في ${date.toLocaleTimeString()}, نوع التكرار: ${repeatType}`);
 
         // التأكد من إنشاء القناة أولاً
         await createAndroidChannel();
@@ -61,22 +62,32 @@ export async function scheduleNotification(
         const targetTime = new Date(date);
 
         if (repeatType === 'daily') {
-            // تكرار يومي - استخدام CalendarTrigger
-            return await Notifications.scheduleNotificationAsync({
+            const targetHour = targetTime.getHours();
+            const targetMinute = targetTime.getMinutes();
+
+            console.log(`⏰ [scheduleNotification] جدولة إشعار يومي متكرر: ${targetHour}:${targetMinute}`);
+            console.log(`⏰ الوقت الحالي: ${now.toLocaleString()}`);
+
+            // استخدام CalendarTrigger البسيط
+            // Expo سيختار تلقائياً الموعد القادم (اليوم أو غداً)
+            const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
                     title,
                     body,
                     sound: true,
                     priority: Notifications.AndroidNotificationPriority.MAX,
-                    data: { type: 'medication_reminder' },
+                    data: { type: 'medication_reminder_daily' },
                 },
                 trigger: {
                     channelId: 'medication_reminders',
-                    hour: targetTime.getHours(),
-                    minute: targetTime.getMinutes(),
+                    hour: targetHour,
+                    minute: targetMinute,
                     repeats: true,
                 },
             });
+
+            console.log(`✅ تم جدولة إشعار يومي متكرر، ID: ${notificationId}`);
+            return notificationId;
 
         } else if (repeatType === 'weekly' && weekdays && weekdays.length > 0) {
             // تكرار أسبوعي
@@ -136,3 +147,50 @@ export async function scheduleNotification(
     }
 }
 
+// دالة لإلغاء جميع الإشعارات المجدولة
+export async function cancelAllNotifications() {
+    try {
+        await Notifications.cancelAllScheduledNotificationsAsync();
+    } catch (error) {
+        // Silent fail
+    }
+}
+
+// دالة لإلغاء إشعار محدد
+export async function cancelNotification(notificationId: string) {
+    try {
+        await Notifications.cancelScheduledNotificationAsync(notificationId);
+    } catch (error) {
+        // Silent fail
+    }
+}
+
+// دالة لإلغاء مجموعة من الإشعارات
+export async function cancelNotifications(notificationIds: string[]) {
+    try {
+        for (const id of notificationIds) {
+            await Notifications.cancelScheduledNotificationAsync(id);
+        }
+    } catch (error) {
+        // Silent fail
+    }
+}
+
+// دالة للحصول على جميع الإشعارات المجدولة (للتصحيح)
+export async function getAllScheduledNotifications() {
+    try {
+        return await Notifications.getAllScheduledNotificationsAsync();
+    } catch (error) {
+        return [];
+    }
+}
+
+// دالة للحصول على عدد الإشعارات المجدولة
+export async function getScheduledNotificationsCount() {
+    try {
+        const notifications = await Notifications.getAllScheduledNotificationsAsync();
+        return notifications.length;
+    } catch (error) {
+        return 0;
+    }
+}

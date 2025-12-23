@@ -125,7 +125,11 @@
     "errorLoadingMedications": "İlaçlar yüklenirken bir hata oluştu",
     "dose": "Doz",
     "medicationExists": "⚠️ Üzgünüz, \"{{medName}}\" ilacı listenizde zaten mevcut!\n\nAynı ilacı iki kez ekleyemezsiniz. Lütfen farklı bir isim seçin veya mevcut ilacı düzenleyin.",
-    "ok": "Tamam"
+    "ok": "Tamam",
+    "notificationTitle": "⏰ İlaç Hatırlatıcısı: {{medName}}",
+    "notificationBodyEmpty": "{{medName}} ilacından {{doseAmount}} almanın zamanı geldi (aç karnına)",
+    "notificationBodyFull": "{{medName}} ilacından {{doseAmount}} almanın zamanı geldi (tok karnına)",
+    "notificationBody": "{{medName}} ilacından {{doseAmount}} almanın zamanı geldi"
   },
 
   "camera": {
