@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
     userName: string;
@@ -11,6 +12,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ userName, onSettingsPress }) => {
     const { colors, isDarkMode } = useTheme();
+    const { t } = useTranslation();
 
     return (
         <View style={[styles.header, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -19,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ userName, onSettingsPress }) => {
                     <Ionicons name="person" size={28} color="#fff" />
                 </View>
                 <Text style={[styles.welcomeText, { color: colors.text }]}>
-                    مرحباً، {userName}! 👋
+                    {t('home.greeting')} {userName}! 👋
                 </Text>
             </View>
             <View style={styles.headerIcons}>

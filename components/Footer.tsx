@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigationState } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +14,7 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ onHomePress, onProfilePress, onSettingsPress }) => {
+    const { t } = useTranslation();
     const { colors, isDarkMode } = useTheme();
     const currentRoute = useNavigationState(state => state?.routes[state.index]?.name);
 
@@ -37,7 +39,7 @@ const Footer: React.FC<FooterProps> = ({ onHomePress, onProfilePress, onSettings
                     styles.footerText,
                     { color: currentRoute === 'Home' ? (isDarkMode ? '#667eea' : '#007acc') : colors.textSecondary }
                 ]}>
-                    الرئيسية
+                    {t('home.profile')}
                 </Text>
             </TouchableOpacity>
 
@@ -60,7 +62,7 @@ const Footer: React.FC<FooterProps> = ({ onHomePress, onProfilePress, onSettings
                     styles.footerText,
                     { color: currentRoute === 'Settings' ? (isDarkMode ? '#667eea' : '#007acc') : colors.textSecondary }
                 ]}>
-                    الإعدادات
+                    {t('home.settings')}
                 </Text>
             </TouchableOpacity>
         </View>

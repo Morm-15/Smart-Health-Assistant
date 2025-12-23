@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import * as tf from '@tensorflow/tfjs';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
+import { useTranslation } from 'react-i18next';
 
 // 1. استيراد ملف الـ JSON
 const modelJson = require('../assets/model/model.json');
@@ -14,6 +15,7 @@ const modelWeights2 = require('../assets/model/group1-shard2of3.bin');
 const modelWeights3 = require('../assets/model/group1-shard3of3.bin');
 
 export default function App() {
+    const { t } = useTranslation();
     const [isTfReady, setIsTfReady] = useState(false);
 
     // التعديل 1: تغيير النوع من LayersModel إلى GraphModel
@@ -55,17 +57,17 @@ export default function App() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Smart Health Assistant</Text>
+            <Text style={styles.title}>{t('home.welcome')}</Text>
 
             {!isTfReady || !model ? (
                 <View>
                     <ActivityIndicator size="large" color="#0000ff" />
-                    <Text style={styles.status}>Loading Model...</Text>
+                    <Text style={styles.status}>{t('common.loading')}</Text>
                     {loadingError && <Text style={styles.error}>{loadingError}</Text>}
                 </View>
             ) : (
                 <View>
-                    <Text style={styles.success}>Model Loaded Successfully! ✅</Text>
+                    <Text style={styles.success}>{t('common.done')} ✅</Text>
                 </View>
             )}
         </View>
