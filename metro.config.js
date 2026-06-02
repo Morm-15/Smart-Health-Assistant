@@ -2,9 +2,8 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// إضافة الامتدادات bin و json لقائمة الملفات التي يفهمها التطبيق
-// هذا ضروري جداً لكي يتمكن TensorFlow من قراءة أوزان الموديل
+// إضافة الامتداد bin لقائمة الملفات التي يفهمها التطبيق كأصول ثابتة
+// هذا ضروري جداً لكي يتمكن TensorFlow من قراءة أوزان الموديل الثنائية (.bin)
 config.resolver.assetExts.push('bin');
-config.resolver.assetExts.push('json');
 
 module.exports = config;

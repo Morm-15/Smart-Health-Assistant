@@ -25,8 +25,21 @@ const AppNavigator = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                try {
+                    // تحديث بيانات المستخدم من الخادم للحصول على أحدث emailVerified
+                    await currentUser.reload();
+                } catch {}
+                // فقط يُعتبر مسجلاً دخوله إذا تم تأكيد البريد الإلكتروني
+                if (currentUser.emailVerified) {
+                    setUser(currentUser);
+                } else {
+                    setUser(null);
+                }
+            } else {
+                setUser(null);
+            }
             setLoading(false);
         });
 
@@ -36,7 +49,7 @@ const AppNavigator = () => {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
+                <ActivityIndicator size="large" color="#6366F1" />
             </View>
         );
     }
@@ -75,7 +88,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
+        backgroundColor: '#F0F4FF',
     },
 });
 

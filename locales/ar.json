@@ -150,7 +150,13 @@
     "ok": "حسناً",
     "resultTitle": "نتيجة الفحص",
     "detected": "تم رصد",
-    "confidence": "نسبة التأكد"
+    "confidence": "نسبة التأكد",
+    "localAnalysis": "تحليل محلي",
+    "cloudAnalysis": "تحليل ذكي (أدق)",
+    "cloudAnalysisFailed": "فشل التحليل الذكي",
+    "localAnalysisFailed": "فشل التحليل المحلي",
+    "modelLoadingError": "فشل تحميل موديل الذكاء الاصطناعي المحلي. سيتم استخدام التحليل السحابي الذكي.",
+    "aiAnalysisResult": "تحليل الذكاء الاصطناعي"
   },
 
   "diseases": {

@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import { TextInput, View, StyleSheet, TextInputProps } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface CustomInputProps extends TextInputProps {
     value: string;
@@ -9,17 +10,27 @@ interface CustomInputProps extends TextInputProps {
 }
 
 const CustomInput = forwardRef<TextInput, CustomInputProps>(
-    ({ value, onChangeText, placeholder, secureTextEntry = false, ...rest }, ref) => {
+    ({ value, onChangeText, placeholder, secureTextEntry = false, style, ...rest }, ref) => {
+        const { colors, isDarkMode } = useTheme();
+
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, style as any]}>
                 <TextInput
                     ref={ref}
-                    style={styles.input}
+                    style={[
+                        styles.input,
+                        {
+                            backgroundColor: isDarkMode ? '#0B0F1A' : '#F8FAFF',
+                            borderColor: isDarkMode ? '#1E293B' : '#E2E8F0',
+                            color: isDarkMode ? '#F1F5F9' : '#1E293B',
+                        }
+                    ]}
                     value={value}
                     onChangeText={onChangeText}
                     placeholder={placeholder}
+                    placeholderTextColor={isDarkMode ? '#475569' : '#94A3B8'}
                     secureTextEntry={secureTextEntry}
-                    {...rest} // <-- هذا يسمح بتمرير returnKeyType, onSubmitEditing وغيرها
+                    {...rest}
                 />
             </View>
         );
@@ -29,15 +40,16 @@ const CustomInput = forwardRef<TextInput, CustomInputProps>(
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        marginBottom: 10,
+        marginBottom: 0,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
+        height: 52,
+        borderWidth: 1.5,
+        borderRadius: 14,
+        paddingHorizontal: 16,
+        fontSize: 15,
         width: '100%',
+        fontWeight: '500',
     },
 });
 

@@ -29,7 +29,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
 
     const [medName, setMedName] = useState(medication?.medName || '');
     const [stomachStatus, setStomachStatus] = useState(medication?.stomachStatus || 'doesntMatter');
-    const [reminderType, setReminderType] = useState(medication?.reminderType || 'notification');
+    const [reminderType, setReminderType] = useState('notification');
     const [doseAmount, setDoseAmount] = useState(medication?.doseAmount?.toString() || '');
     const [reminderTime, setReminderTime] = useState(
         medication?.reminderTime?.toDate ? medication.reminderTime.toDate() :
@@ -38,7 +38,6 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
     );
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [showStomachPicker, setShowStomachPicker] = useState(false);
-    const [showReminderPicker, setShowReminderPicker] = useState(false);
 
 
     const stomachOptions = [
@@ -47,11 +46,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
         { label: t('medication.stomachFull'), value: 'full', icon: { name: 'food-drumstick-outline', lib: 'MaterialCommunityIcons', color: '#34d399' } },
     ];
 
-    const reminderTypeOptions = [
-        { label: t('medication.notification'), value: 'notification', icon: { name: 'notifications-outline', lib: 'Ionicons', color: '#10b981' } },
-        { label: t('medication.alarm'), value: 'alarm', icon: { name: 'alarm-outline', lib: 'Ionicons', color: '#f97316' } },
-        { label: t('medication.both'), value: 'both', icon: { name: 'volume-high', lib: 'Ionicons', color: '#6366f1' } },
-    ];
+
 
     const renderOptionIcon = (icon: { name: string; lib: string; color?: string }, size = 20) => {
         const color = icon.color ?? '#333';
@@ -148,21 +143,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.fieldRow}>
-                <View style={styles.labelRow}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('medication.reminderType')}</Text>
-                    <Ionicons name="notifications-outline" size={20} color="#10b981" />
-                </View>
-                <TouchableOpacity style={[styles.pickerButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowReminderPicker(true)}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        {renderOptionIcon(reminderTypeOptions.find(o => o.value === reminderType)!.icon, 18)}
-                        <Text style={[styles.pickerText, { color: colors.text }]}>
-                            {reminderTypeOptions.find(o => o.value === reminderType)!.label}
-                        </Text>
-                        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} style={{ marginLeft: 6 }} />
-                    </View>
-                </TouchableOpacity>
-            </View>
+
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>
@@ -261,36 +242,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
                 </View>
             </Modal>
 
-            <Modal visible={showReminderPicker} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={[styles.modalListContainer, { backgroundColor: colors.surface }]}>
-                        <Text style={[styles.modalTitle, { color: colors.text }]}>{t('medication.reminderType')}</Text>
-                        <FlatList
-                            data={reminderTypeOptions}
-                            keyExtractor={(item) => item.value}
-                            renderItem={({ item }) => (
-                                <Pressable
-                                    onPress={() => {
-                                        setReminderType(item.value);
-                                        setShowReminderPicker(false);
-                                    }}
-                                    style={({ pressed }) => [
-                                        styles.optionRow,
-                                        pressed ? { backgroundColor: colors.border } : undefined,
-                                    ]}
-                                >
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <Text style={[styles.optionLabel, { color: colors.text }]}>{item.label}</Text>
-                                        <View style={{ width: 10 }} />
-                                        {renderOptionIcon(item.icon, 20)}
-                                    </View>
-                                </Pressable>
-                            )}
-                        />
-                        <Button title={t('common.cancel')} onPress={() => setShowReminderPicker(false)} color="#ef4444" />
-                    </View>
-                </View>
-            </Modal>
+
         </SafeAreaView>
     );
 };

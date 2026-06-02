@@ -150,7 +150,13 @@
     "ok": "Tamam",
     "resultTitle": "Tarama Sonucu",
     "detected": "Tespit Edilen",
-    "confidence": "Güven Oranı"
+    "confidence": "Güven Oranı",
+    "localAnalysis": "Yerel Analiz",
+    "cloudAnalysis": "Akıllı Yapay Zeka (Daha Doğru)",
+    "cloudAnalysisFailed": "Akıllı Yapay Zeka Analizi Başarısız",
+    "localAnalysisFailed": "Yerel Analiz Başarısız",
+    "modelLoadingError": "Yerel yapay zeka modeli yüklenemedi. Bulut analizi kullanılıyor.",
+    "aiAnalysisResult": "Yapay Zeka Analiz Sonucu"
   },
 
   "diseases": {

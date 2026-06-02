@@ -11,20 +11,23 @@ export default function BackButton() {
     const { colors, isDarkMode } = useTheme();
     const insets = useSafeAreaInsets();
 
+    // لا تُظهر الزر إذا لم يكن هناك شاشة للرجوع إليها
+    if (!navigation.canGoBack()) return null;
+
     return (
         <TouchableOpacity
             style={[
                 styles.backButton,
                 {
                     top: insets.top + 10,
-                    backgroundColor: isDarkMode ? 'rgba(102, 126, 234, 0.15)' : 'rgba(255, 255, 255, 0.95)',
-                    borderColor: isDarkMode ? 'rgba(102, 126, 234, 0.3)' : 'rgba(59, 130, 246, 0.3)',
+                    backgroundColor: isDarkMode ? '#1E293B' : '#EEF2FF',
+                    borderColor: isDarkMode ? '#334155' : '#C7D2FE',
                 }
             ]}
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
         >
-            <Ionicons name="arrow-back" size={24} color={colors.primary} />
+            <Ionicons name="arrow-back" size={22} color={isDarkMode ? '#818CF8' : '#6366F1'} />
         </TouchableOpacity>
     );
 }
@@ -36,14 +39,14 @@ const styles = StyleSheet.create({
         zIndex: 1000,
         width: 44,
         height: 44,
-        borderRadius: 22,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
+        borderWidth: 1.5,
+        shadowColor: '#6366F1',
+        shadowOpacity: 0.15,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 2 },
-        elevation: 4,
+        elevation: 3,
     },
 });

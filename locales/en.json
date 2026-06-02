@@ -150,7 +150,13 @@
     "ok": "OK",
     "resultTitle": "Scan Result",
     "detected": "Detected",
-    "confidence": "Confidence"
+    "confidence": "Confidence",
+    "localAnalysis": "Local Analysis",
+    "cloudAnalysis": "Smart AI Analysis (Accurate)",
+    "cloudAnalysisFailed": "Smart AI Analysis Failed",
+    "localAnalysisFailed": "Local Analysis Failed",
+    "modelLoadingError": "Local AI model failed to load. Falling back to Cloud Smart Analysis.",
+    "aiAnalysisResult": "AI Analysis Result"
   },
 
   "diseases": {

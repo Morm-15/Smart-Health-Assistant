@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Alert, Image, ActivityIndicator, ScrollView, Modal } from 'react-native';
 import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useTheme } from '../contexts/ThemeContext';
 
 // --- الذكاء الاصطناعي ---
 import * as tf from '@tensorflow/tfjs';
 import { bundleResourceIO, decodeJpeg } from '@tensorflow/tfjs-react-native';
+import { analyzeSkinImage } from '../services/geminiService';
 
 // --- الموديل ---
 const modelJson = require('../assets/model/model.json');
@@ -22,6 +24,7 @@ const LABELS = ['Acne', 'Carcinoma', 'Eczema', 'Keratosis', 'Milia', 'Rosacea'];
 const SkinDiseaseCameraScreen = () => {
     const navigation = useNavigation();
     const { t } = useTranslation();
+    const { colors, isDarkMode } = useTheme();
 
     // هوك الأذونات
     const [permission, requestPermission] = useCameraPermissions();
@@ -32,7 +35,9 @@ const SkinDiseaseCameraScreen = () => {
 
     const [model, setModel] = useState<tf.GraphModel | null>(null);
     const [isModelReady, setIsModelReady] = useState(false);
+    const [modelLoadError, setModelLoadError] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
     // 1. تحميل الموديل والإحماء
     useEffect(() => {
@@ -51,9 +56,11 @@ const SkinDiseaseCameraScreen = () => {
 
                 setModel(loadedModel);
                 setIsModelReady(true);
+                setModelLoadError(false);
                 console.log('Model Ready & Fast! 🚀');
             } catch (err) {
                 console.error('Error loading model:', err);
+                setModelLoadError(true);
             }
         };
         loadModel();
@@ -74,8 +81,20 @@ const SkinDiseaseCameraScreen = () => {
         return normalizedImage.expandDims(0);
     };
 
-    const confirmPicture = async () => {
-        if (!capturedImage || !model) return;
+    const getImageBase64 = async (uri: string) => {
+        const manipulatedImage = await ImageManipulator.manipulateAsync(
+            uri,
+            [{ resize: { width: 512, height: 512 } }],
+            { base64: true, format: ImageManipulator.SaveFormat.JPEG }
+        );
+        return manipulatedImage.base64!;
+    };
+
+    const confirmPictureLocal = async () => {
+        if (!capturedImage || !model) {
+            Alert.alert("Error", t('camera.modelLoadingError'));
+            return;
+        }
 
         setIsAnalyzing(true);
         requestAnimationFrame(async () => {
@@ -100,11 +119,27 @@ const SkinDiseaseCameraScreen = () => {
 
             } catch (error) {
                 console.error(error);
-                Alert.alert("Error", "Analysis failed.");
+                Alert.alert(t('camera.localAnalysisFailed'), "Analysis failed.");
             } finally {
                 setIsAnalyzing(false);
             }
         });
+    };
+
+    const confirmPictureCloud = async () => {
+        if (!capturedImage) return;
+
+        setIsAnalyzing(true);
+        try {
+            const base64 = await getImageBase64(capturedImage);
+            const result = await analyzeSkinImage(base64);
+            setAnalysisResult(result);
+        } catch (error) {
+            console.error(error);
+            Alert.alert(t('camera.cloudAnalysisFailed'), "Could not connect to Cloud AI.");
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const takePicture = async () => {
@@ -185,16 +220,75 @@ const SkinDiseaseCameraScreen = () => {
                 <TouchableOpacity style={styles.backButton} onPress={retakePicture}>
                     <Ionicons name="arrow-back" size={30} color="#fff" />
                 </TouchableOpacity>
+
                 <View style={styles.previewControls}>
-                    <TouchableOpacity style={styles.retakeButton} onPress={retakePicture} disabled={isAnalyzing}>
-                        <Ionicons name="refresh" size={30} color="#fff" />
-                        <Text style={styles.controlButtonText}>{t('camera.retake')}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.confirmButton} onPress={confirmPicture} disabled={isAnalyzing}>
-                        <Ionicons name="checkmark-circle" size={30} color="#fff" />
-                        <Text style={styles.controlButtonText}>{t('camera.confirm')}</Text>
-                    </TouchableOpacity>
+                    {isModelReady && !modelLoadError ? (
+                        <>
+                            <View style={styles.previewRow}>
+                                <TouchableOpacity style={styles.retakeButton} onPress={retakePicture} disabled={isAnalyzing}>
+                                    <Ionicons name="refresh" size={20} color="#fff" />
+                                    <Text style={styles.controlButtonText}>{t('camera.retake')}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.localConfirmButton} onPress={confirmPictureLocal} disabled={isAnalyzing}>
+                                    <Ionicons name="hardware-chip" size={20} color="#fff" />
+                                    <Text style={styles.controlButtonText}>{t('camera.localAnalysis')}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <TouchableOpacity style={styles.cloudConfirmButton} onPress={confirmPictureCloud} disabled={isAnalyzing}>
+                                <Ionicons name="sparkles" size={20} color="#fff" />
+                                <Text style={styles.cloudButtonText}>{t('camera.cloudAnalysis')}</Text>
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <View style={styles.previewRow}>
+                            <TouchableOpacity style={styles.retakeButton} onPress={retakePicture} disabled={isAnalyzing}>
+                                <Ionicons name="refresh" size={20} color="#fff" />
+                                <Text style={styles.controlButtonText}>{t('camera.retake')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.cloudConfirmButton, { flex: 1 }]} onPress={confirmPictureCloud} disabled={isAnalyzing}>
+                                <Ionicons name="sparkles" size={20} color="#fff" />
+                                <Text style={styles.cloudButtonText}>{t('camera.cloudAnalysis')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
+
+                {/* Modal for detailed Cloud AI Report */}
+                <Modal
+                    visible={analysisResult !== null}
+                    animationType="slide"
+                    transparent={true}
+                    onRequestClose={() => setAnalysisResult(null)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                            <View style={styles.modalHeader}>
+                                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                                    {t('camera.aiAnalysisResult')}
+                                </Text>
+                                <TouchableOpacity onPress={() => setAnalysisResult(null)}>
+                                    <Ionicons name="close" size={24} color={colors.text} />
+                                </TouchableOpacity>
+                            </View>
+                            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                                <Text style={[styles.modalText, { color: colors.text }]}>
+                                    {analysisResult}
+                                </Text>
+                            </ScrollView>
+                            <TouchableOpacity 
+                                style={[styles.modalCloseButton, { backgroundColor: colors.primary }]} 
+                                onPress={() => {
+                                    setAnalysisResult(null);
+                                    navigation.goBack();
+                                }}
+                            >
+                                <Text style={styles.modalCloseButtonText}>
+                                    {t('common.done') || "Done"}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         );
     }
@@ -224,10 +318,17 @@ const SkinDiseaseCameraScreen = () => {
                 <View style={{width: 50}} />
             </View>
 
-            {!isModelReady && (
+            {!isModelReady && !modelLoadError && (
                 <View style={styles.modelLoadingBadge}>
                     <ActivityIndicator size="small" color="#fff" />
-                    <Text style={{color:'white', marginLeft: 5, fontSize: 12}}>Loading AI...</Text>
+                    <Text style={{color:'white', marginLeft: 5, fontSize: 12}}>Loading Local AI...</Text>
+                </View>
+            )}
+
+            {modelLoadError && (
+                <View style={[styles.modelLoadingBadge, { backgroundColor: 'rgba(79, 70, 229, 0.8)' }]}>
+                    <Ionicons name="cloud-done" size={14} color="#fff" />
+                    <Text style={{color:'white', marginLeft: 5, fontSize: 12}}>Cloud AI Active</Text>
                 </View>
             )}
 
@@ -252,12 +353,100 @@ const styles = StyleSheet.create({
     captureButtonInner: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#fff' },
     instructionBox: { position: 'absolute', top: 120, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.7)', padding: 15, borderRadius: 10, alignItems: 'center', maxWidth: '80%', zIndex: 15 },
     instructionText: { color: '#fff', fontSize: 14, textAlign: 'center', lineHeight: 20 },
-    previewControls: { position: 'absolute', bottom: 40, width: '100%', flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 40, zIndex: 20 },
-    retakeButton: { alignItems: 'center', backgroundColor: 'rgba(239, 68, 68, 0.9)', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12, minWidth: 120, flexDirection: 'row', gap: 8 },
-    confirmButton: { alignItems: 'center', backgroundColor: 'rgba(34, 197, 94, 0.9)', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12, minWidth: 120, flexDirection: 'row', gap: 8 },
-    controlButtonText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
+    previewControls: {
+        position: 'absolute',
+        bottom: 40,
+        left: 20,
+        right: 20,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        borderRadius: 20,
+        padding: 16,
+        gap: 12,
+        alignItems: 'stretch',
+        zIndex: 20
+    },
+    previewRow: {
+        flexDirection: 'row',
+        gap: 12,
+        justifyContent: 'space-between',
+    },
+    retakeButton: {
+        flex: 1,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#EF4444',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    localConfirmButton: {
+        flex: 1,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#475569',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    cloudConfirmButton: {
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#4F46E5',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    controlButtonText: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
+    cloudButtonText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
     loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', zIndex: 30 },
-    modelLoadingBadge: { position: 'absolute', top: 60, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.6)', padding: 8, borderRadius: 20, zIndex: 15 }
+    modelLoadingBadge: { position: 'absolute', top: 60, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.6)', padding: 8, borderRadius: 20, zIndex: 15 },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 24,
+        maxHeight: '85%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    modalBody: {
+        marginBottom: 20,
+    },
+    modalText: {
+        fontSize: 15,
+        lineHeight: 24,
+    },
+    modalCloseButton: {
+        height: 48,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalCloseButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
 
 export default SkinDiseaseCameraScreen;

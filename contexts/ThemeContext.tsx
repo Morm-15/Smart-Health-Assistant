@@ -64,34 +64,32 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
     const colors = isDarkMode
         ? {
-            // Dark Mode Colors
-            background: '#0F172A',
-            surface: '#1E293B',
+            // Dark Mode Colors - Deep blue/slate
+            background: '#0B0F1A',
+            surface: '#151C2C',
             text: '#F1F5F9',
-            textSecondary: '#CBD5E1',
-            primary: '#3B82F6',
-            border: '#334155',
-            card: '#1E293B',
+            textSecondary: '#94A3B8',
+            primary: '#818CF8',
+            border: '#1E293B',
+            card: '#151C2C',
             shadow: '#000000',
-            // ألوان الكروت في الوضع الداكن
-            cardGradientStart: '#667eea',
-            cardGradientEnd: '#764ba2',
-            cardIconBg: 'rgba(102, 126, 234, 0.2)',
+            cardGradientStart: '#4F46E5',
+            cardGradientEnd: '#7C3AED',
+            cardIconBg: 'rgba(99, 102, 241, 0.2)',
         }
         : {
-            // Light Mode Colors
-            background: '#F8FAFC',
+            // Light Mode Colors - Clean white/indigo
+            background: '#F0F4FF',
             surface: '#FFFFFF',
             text: '#1E293B',
             textSecondary: '#64748B',
-            primary: '#3B82F6',
+            primary: '#6366F1',
             border: '#E2E8F0',
             card: '#FFFFFF',
-            shadow: '#000000',
-            // ألوان الكروت في الوضع الفاتح
-            cardGradientStart: '#009688',
-            cardGradientEnd: '#00796B',
-            cardIconBg: 'rgba(0, 150, 136, 0.1)',
+            shadow: '#6366F1',
+            cardGradientStart: '#6366F1',
+            cardGradientEnd: '#8B5CF6',
+            cardIconBg: 'rgba(99, 102, 241, 0.1)',
         };
 
     return (

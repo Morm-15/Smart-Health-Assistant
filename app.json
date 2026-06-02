@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "smart-health-ssistant",
-    "slug": "smart-health-ssistant",
+    "name": "Smart Health Assistant",
+    "slug": "smart-health-assistant",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -31,7 +31,9 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "POST_NOTIFICATIONS",
-        "SCHEDULE_EXACT_ALARM"
+        "SCHEDULE_EXACT_ALARM",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ],
       "useNextNotificationsApi": true
     },
@@ -53,13 +55,20 @@
           "color": "#ffffff",
           "defaultChannel": "medication_reminders"
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "notification": {
       "icon": "./assets/logo.png",
       "color": "#3B82F6",
       "androidMode": "default",
       "androidCollapsedTitle": "تذكيرات الأدوية"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f0900135-ea36-456d-acec-550130b07a6a"
+      }
+    },
+    "owner": "morm-15"
   }
 }

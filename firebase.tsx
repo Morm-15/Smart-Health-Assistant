@@ -4,20 +4,19 @@ import { getFirestore } from 'firebase/firestore';
 import {
     initializeAuth,
     getReactNativePersistence,
-    getAuth
 } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-// قم بتغيير هذه القيم ببيانات مشروعك الخاصة من لوحة تحكم Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyAPfZ0DYMJU8iNTmgRU90ewBV6QBQkT7i4",
-    authDomain: "smart-health-assistant-d2d64.firebaseapp.com",
-    projectId: "smart-health-assistant-d2d64",
-    storageBucket: "smart-health-assistant-d2d64.firebasestorage.app",
-    messagingSenderId: "987758210677",
-    appId: "1:987758210677:web:a207b5249c0383c4e0923c",
-    measurementId: "G-0Y18WLDKG9"
+    apiKey: "AIzaSyBuutbmXIR8hzK5DoOoyXZ-cw83W53ME5Y",
+    authDomain: "smart-health-assistant-4422a.firebaseapp.com",
+    projectId: "smart-health-assistant-4422a",
+    storageBucket: "smart-health-assistant-4422a.firebasestorage.app",
+    messagingSenderId: "251625268437",
+    appId: "1:251625268437:web:2789b44df1a0ee73666e5c",
+    measurementId: "G-L5DVWVEDH2"
 };
+
 // ✅ تهيئة التطبيق
 const app = initializeApp(firebaseConfig);
 

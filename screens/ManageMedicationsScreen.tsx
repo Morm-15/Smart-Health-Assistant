@@ -136,16 +136,7 @@ const ManageMedicationsScreen = ({ navigation }: any) => {
                         </Text>
                     </View>
 
-                    <View style={styles.infoRow}>
-                        <Ionicons
-                            name={reminderIcon.name as any}
-                            size={20}
-                            color={reminderIcon.color}
-                        />
-                        <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-                            {t(`medication.${item.reminderType}`)}
-                        </Text>
-                    </View>
+
 
                     <View style={styles.infoRow}>
                         <Ionicons name="time-outline" size={20} color={colors.primary} />
