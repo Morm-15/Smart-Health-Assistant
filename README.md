@@ -1,170 +1,160 @@
-# 🏥 Smart Health Assistant
+# 🏥 Smart Health Assistant | مساعد الصحة الذكي
 ### AI-Powered Multilingual Mobile Health Application
+### تطبيق صحي ذكي متعدد اللغات للهواتف المحمولة
 
-Smart Health Assistant is an **AI-powered, multilingual mobile health application** built with **React Native and Expo**.  
-The app helps users manage medications, interact with an AI health assistant, and perform **preliminary skin condition analysis** using on-device machine learning.
+Smart Health Assistant is an **AI-powered, multilingual mobile health application** built with **React Native and Expo**. The app helps users manage medications, interact with an AI health assistant, and perform **preliminary skin condition analysis** using on-device machine learning (TensorFlow.js) with cloud-based Google Gemini fallback reports.
 
-The application supports **Arabic (RTL)**, **English**, and **Turkish**, and focuses on combining modern mobile development with practical AI integration.
+مساعد الصحة الذكي هو تطبيق صحي للهواتف المحمولة متعدد اللغات يعمل بالذكاء الاصطناعي، تم بناؤه باستخدام **React Native** و **Expo**. يساعد التطبيق المستخدمين على إدارة الأدوية، والتفاعل مع مساعد صحي بالذكاء الاصطناعي، وإجراء **تحليل أولي للأمراض الجلدية** باستخدام التعلم الآلي المحلي على الهاتف (TensorFlow.js) مع تقارير داعمة سحابية مدعومة بنموذج Google Gemini.
 
 ---
 
-## 🎯 Project Motivation
+## 🎯 Project Motivation | دوافع المشروع
 
 Managing daily health tasks such as medication schedules, early symptom awareness, and accessing basic health guidance can be challenging.
 
 This project aims to:
-- Simplify **personal health management**
-- Demonstrate **real-world AI integration** in mobile apps
-- Provide a clean, scalable, and multilingual mobile architecture
+- Simplify **personal health management** for diverse users.
+- Demonstrate **real-world on-device AI integration** in mobile apps.
+- Provide a clean, scalable, and multilingual mobile architecture supporting LTR/RTL layouts.
 
-> ⚠️ This application is **not a medical product** and is intended for **educational and demonstration purposes only**.
-
----
-
-## ✨ Key Features
-
-### 🤖 AI Health Chat
-- AI-powered chat using **Google Gemini AI**
-- Health-related questions and explanations
-- Responses adapted to the selected language
-- Clean and user-friendly chat interface
-
-### 💊 Medication Management
-- Add, edit, and delete medications
-- Schedule reminders (daily / custom)
-- Automatic notifications using Expo Notifications
-- Dosage instructions (empty stomach / full stomach)
-- Duplicate medication prevention
-
-### 📸 Skin Disease Detection (AI)
-- Capture images via camera or gallery
-- Image analysis using an on-device **TensorFlow.js model**
-- Preliminary classification of possible skin conditions
-- AI-generated guidance and recommendations
-
-### 🔐 Authentication & User Management
-- Secure authentication with **Firebase Authentication**
-- Login, registration, password reset
-- User profile management
-- Clear and descriptive error handling
-
-### 🌍 Multilingual & Accessibility
-- Arabic (Full RTL support)
-- English
-- Turkish
-- Full localization using `i18next`
-
-### ⚙️ App Settings
-- Dark / Light mode
-- Notification control
-- Language switching
-- Profile editing
+> ⚠️ **Disclaimer / إخلاء مسؤولية:** This application is **not a medical product** and is intended for **educational, demonstration, and preliminary awareness purposes only**. Always consult a professional doctor for medical advice.
+> 
+> هذا التطبيق **ليس منتجاً طبياً** ومخصص **لأغراض التعليم والتوضيح والتوعية الأولية فقط**. استشر دائماً طبيباً مختصاً للحصول على استشارة طبية.
 
 ---
 
-## 🧠 Model Training – Skin Disease Classifier
+## ✨ Key Features | الميزات الرئيسية
 
-The **Skin Disease Detection** feature is powered by a custom-trained image classification model.
+### 🤖 AI Health Chat | الدردشة الصحية بالذكاء الاصطناعي
+- AI-powered chat using **Google Gemini AI** (`gemini-2.5-flash`).
+- Natural language health-related explanations.
+- Responses automatically adapted to the selected language (Arabic, English, Turkish).
 
-### Dataset
-- Source: Publicly available skin-condition image datasets
-- Multiple skin condition categories
-- Dataset split into training, validation, and testing sets
+### 💊 Medication Management | إدارة الأدوية والتذكيرات
+- Add, edit, and delete medications.
+- Schedule automatic notification reminders.
+- Dosage instructions based on meal times (empty stomach / full stomach).
+- Local notifications scheduled dynamically via **Expo Notifications**.
 
-### Preprocessing
-- Image resizing to a fixed input size
-- Pixel normalization
-- Data augmentation:
-  - Rotation
-  - Horizontal flipping
-  - Zoom and brightness variations  
-These steps help improve generalization and reduce overfitting.
+### 📸 Skin Disease Detection (Local AI) | تشخيص الأمراض الجلدية (ذكاء اصطناعي محلي)
+- Capture images via camera or import from the gallery.
+- Real-time, **on-device** image analysis using a local **TensorFlow.js model** (stored under `assets/model/`).
+- Classifies common skin conditions (Acne, Eczema, Rosacea, Carcinoma, Keratosis, Milia).
+- Generates a detailed AI report locally without uploading photos to external servers.
 
-### Model Architecture
-- CNN-based image classification model
-- Optimized for **mobile deployment**
-- Trained using TensorFlow/Keras
-- Loss function: categorical cross-entropy
-- Optimizer: Adam
+### 🔐 Authentication & User Management | الحسابات والمصادقة الأمنية
+- Secure login, registration, and password recovery using **Firebase Authentication**.
+- Profile information management and secure password updates.
 
-### Evaluation
-- Model evaluated using validation accuracy and loss
-- Focus on balancing performance and lightweight execution
-- Designed for **educational and demonstrational accuracy**, not clinical use
-
-### Mobile Deployment
-- Trained model converted to **TensorFlow.js format**
-- Loaded directly inside the React Native app
-- Runs **on-device**, without sending images to external servers
-- Model files stored under `assets/model/`
-
-### Limitations
-- Results may vary depending on lighting, camera quality, and skin tone
-- Provides **initial guidance only**, not medical diagnosis
+### 🌍 Multilingual & RTL Support | دعم كامل للغات والاتجاهات
+- Complete localization for **Arabic (RTL)**, **English**, and **Turkish** using `i18next`.
+- Smooth user interface adjustments according to language direction.
 
 ---
 
-## 🛠️ Tech Stack
+## 🚀 Getting Started | دليل البدء والتشغيل
 
-### Frontend
-- React Native
-- Expo
-- TypeScript
-- React Navigation
-- React Hook Form
-- i18next
+Follow these steps to run the project locally or build the APK file.
 
-### Backend & Services
-- Firebase Authentication
-- Firebase Firestore
-- Google Gemini AI
-- TensorFlow.js
-
-### Additional Libraries
-- Expo Camera
-- Expo Notifications
-- AsyncStorage
-- Yup (Form validation)
+### Prerequisites | المتطلبات الأساسية
+- **Node.js** (v18 or higher recommended)
+- **Expo CLI** (`npm install -g expo-cli`)
+- **EAS CLI** (for cloud builds: `npm install -g eas-cli`)
 
 ---
 
-## 🧩 High-Level Architecture
+### 💻 Local Installation | التثبيت المحلي
 
-1. User authenticates via Firebase
-2. User data and medications stored securely in Firestore
-3. AI chat requests handled via Gemini API
-4. Image classification runs locally using TensorFlow.js
-5. Notifications scheduled and managed via Expo
+1. **Clone the repository | استنساخ المستودع**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/smart-health-assistant.git
+   cd smart-health-assistant
+   ```
+
+2. **Configure Environment Variables | إعداد ملف البيئة**
+   Copy the example environment file and rename it to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and replace the placeholder with your actual Google Gemini API key:
+   ```env
+   EXPO_PUBLIC_GEMINI_API_KEY=your_google_gemini_api_key_here
+   ```
+
+3. **Install Dependencies | تثبيت المكتبات**
+   Install the node packages using the legacy peer dependencies setting:
+   ```bash
+   npm install
+   ```
+
+4. **Configure Firebase | إعداد قاعدة البيانات**
+   Update the Firebase config inside `firebase.tsx` with your web app credentials from the Firebase Console.
+
+5. **Start Development Server | تشغيل خادم التطوير**
+   ```bash
+   npm run start
+   ```
+   Scan the QR code in your terminal using the Expo Go app on your phone (or press `a` for Android Emulator / `i` for iOS Simulator).
 
 ---
 
-## 📸 Screenshots
+### 📦 Building the Android APK | بناء تطبيق الأندرويد
 
-### Home
-<img src="./screenshots/home.jpeg" width="300" />
+To build a standalone APK without publishing to the app stores, use Expo Application Services (EAS):
 
-### AI Chat
-<img src="./screenshots/chat.jpeg" width="300" />
+1. **Log in to Expo | تسجيل الدخول في إكسبو**
+   ```bash
+   npx eas-cli login
+   ```
 
-### Medication Management
-<p>
-  <img src="./screenshots/medication.jpeg" width="280" />
-  <img src="./screenshots/medicationm.jpeg" width="280" />
+2. **Run EAS Build | بدء بناء الملف**
+   ```bash
+   npx eas-cli build --platform android --profile preview
+   ```
+   This will compile the app on the Expo cloud servers and provide a direct download link for the `.apk` file once finished.
+
+---
+
+## 🧠 Model Details & Training | تفاصيل تدريب النموذج
+
+The **Skin Disease Classifier** is built using TensorFlow/Keras and converted for mobile devices.
+
+### Preprocessing & Architecture
+- **Input Size:** 224x224 RGB images.
+- **Augmentation:** Rotation, zoom, horizontal flips, and brightness variation to prevent overfitting.
+- **Deployment:** Converted to TensorFlow.js Graph Model layers. Shards and `model.json` are stored in `assets/model/` and parsed locally during classification.
+
+---
+
+## 📸 Screenshots | لقطات من التطبيق
+
+### Home Screen
+<img src="./screenshots/home.jpeg" width="300" alt="Home Screen" />
+
+### AI Chat & Skin Diagnosis
+<p float="left">
+  <img src="./screenshots/chat.jpeg" width="280" alt="AI Chat" />
+  <img src="./screenshots/skin-detection.jpeg" width="280" alt="Skin Camera" />
+  <img src="./screenshots/skin-detectionm.jpeg" width="280" alt="Skin Diagnosis Report" />
 </p>
 
-### Skin Disease Detection
-<p>
-  <img src="./screenshots/skin-detection.jpeg" width="280" />
-  <img src="./screenshots/skin-detectionm.jpeg" width="280" />
+### Medication Scheduler
+<p float="left">
+  <img src="./screenshots/medication.jpeg" width="280" alt="Medication List" />
+  <img src="./screenshots/medicationm.jpeg" width="280" alt="Add Medication" />
 </p>
 
-### Authentication
-<p>
-  <img src="./screenshots/login.jpeg" width="280" />
-  <img src="./screenshots/sign-in.jpeg" width="280" />
-  <img src="./screenshots/password.jpeg" width="280" />
+### Auth & Settings
+<p float="left">
+  <img src="./screenshots/login.jpeg" width="280" alt="Login" />
+  <img src="./screenshots/settings.jpeg" width="280" alt="Settings" />
 </p>
 
-### Settings
-<img src="./screenshots/settings.jpeg" width="300" />
+---
 
+## 🛠️ Tech Stack | التقنيات المستخدمة
+
+- **Frontend:** React Native, Expo SDK 54, TypeScript, React Navigation, React Hook Form, i18next (Localization).
+- **Database & Auth:** Firebase Authentication, Firestore Database.
+- **AI Engine:** Google Gemini API, TensorFlow.js React Native wrapper.
+- **Build System:** EAS (Expo Application Services).
