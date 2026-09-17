@@ -60,7 +60,8 @@
     "chatWithAI": "Chat with AI",
     "medicationReminder": "Medication Reminder",
     "manageMedications": "Manage Medications",
-    "skinDiseaseDetection": "Skin Disease Detection",
+    "skinDiseaseDetection": "Skin Disease Camera Scan",
+    "medicalDevicesGuide": "Home Medical Devices Guide",
     "profile": "Profile",
     "settings": "Settings",
     "errorFetchingUser": "An error occurred while fetching user data"

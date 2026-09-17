@@ -12,6 +12,7 @@ import {
     Alert,
     Share,
     Platform,
+    Modal,
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,13 +25,22 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 
-const CHAT_STORAGE_KEY = "@smart_health_ai_chat_v1";
+const SESSIONS_STORAGE_KEY = "@smart_health_ai_sessions_v2";
+const LEGACY_CHAT_KEY = "@smart_health_ai_chat_v1";
 
-interface Message {
+export interface ChatMessage {
     id: string;
     role: "user" | "ai";
     text: string;
     timestamp: number;
+}
+
+export interface ChatSession {
+    id: string;
+    title: string;
+    createdAt: number;
+    updatedAt: number;
+    messages: ChatMessage[];
 }
 
 // Typing dots animation
@@ -72,7 +82,7 @@ const typingStyles = StyleSheet.create({
     dot: { width: 8, height: 8, borderRadius: 4 },
 });
 
-// مكوّن تنسيق النصوص الطبية بجمالية واحترافية عالية (بدون نجوم مشوهة وبتنظيم رائع للنقاط)
+// مكوّن تنسيق الرد الطبي الاحترافي
 const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boolean; textColor: string }) => {
     if (!isAI) {
         return <Text style={[styles.bubbleText, { color: '#FFFFFF' }]}>{text}</Text>;
@@ -87,7 +97,6 @@ const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boole
                     return <View key={idx} style={{ height: 6 }} />;
                 }
 
-                // كشف تنبيهات وإخلاء المسؤولية الطبية لتنسيقها في صندوق حماية طبي ملون
                 if (
                     trimmed.startsWith('⚠️') ||
                     trimmed.startsWith('💡') ||
@@ -105,7 +114,6 @@ const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boole
                     );
                 }
 
-                // كشف عناصر القوائم والنقاط (Bullets)
                 if (trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('* ')) {
                     const cleanContent = trimmed.replace(/^[•\-\*]\s*/, '').replace(/\*\*/g, '');
                     return (
@@ -118,7 +126,6 @@ const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boole
                     );
                 }
 
-                // كشف الخطوات المرقمة (Numbered Steps)
                 const numMatch = trimmed.match(/^(\d+)[\.\)]\s*(.*)/);
                 if (numMatch) {
                     return (
@@ -133,7 +140,6 @@ const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boole
                     );
                 }
 
-                // كشف العناوين الفرعية (التي تنتهي بنقطتين أو كانت محاطة بنجوم)
                 const isHeading = (line.includes('**') && trimmed.endsWith(':')) || trimmed.endsWith(':');
                 if (isHeading) {
                     return (
@@ -143,7 +149,6 @@ const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boole
                     );
                 }
 
-                // نص عادي منسق ومريح للعين
                 return (
                     <Text key={idx} style={[styles.bubbleText, { color: textColor }]}>
                         {trimmed.replace(/\*\*/g, '')}
@@ -160,8 +165,13 @@ const ChatAI = () => {
     const navigation = useNavigation();
     const route = useRoute<RouteProp<AuthStackParamList, 'ChatAI'>>();
 
+    // إدارة الجلسات المتعددة (Multi-Session Management)
+    const [sessions, setSessions] = useState<ChatSession[]>([]);
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
+
     const [input, setInput] = useState("");
-    const [messages, setMessages] = useState<Message[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
@@ -178,43 +188,112 @@ const ChatAI = () => {
         };
     }, []);
 
-    // 1. استرجاع المحادثة المحفوظة من AsyncStorage
+    // 1. تحميل سجل الجلسات وترحيل البيانات السابقة إن وجدت
     useEffect(() => {
-        const loadSavedChat = async () => {
+        const loadAllSessions = async () => {
             try {
-                const saved = await AsyncStorage.getItem(CHAT_STORAGE_KEY);
-                if (saved) {
-                    const parsed: Message[] = JSON.parse(saved);
-                    setMessages(parsed);
+                const storedSessions = await AsyncStorage.getItem(SESSIONS_STORAGE_KEY);
+                if (storedSessions) {
+                    const parsed: ChatSession[] = JSON.parse(storedSessions);
+                    setSessions(parsed);
+                    if (parsed.length > 0) {
+                        setCurrentSessionId(parsed[0].id);
+                        setMessages(parsed[0].messages);
+                    }
+                } else {
+                    // فحص التوافقية السابقة
+                    const legacy = await AsyncStorage.getItem(LEGACY_CHAT_KEY);
+                    if (legacy) {
+                        const legacyMsgs: ChatMessage[] = JSON.parse(legacy);
+                        if (legacyMsgs.length > 0) {
+                            const firstPrompt = legacyMsgs.find(m => m.role === 'user')?.text || "استشارة سابقة";
+                            const initialSession: ChatSession = {
+                                id: `session_${Date.now()}`,
+                                title: firstPrompt.slice(0, 35) + (firstPrompt.length > 35 ? '...' : ''),
+                                createdAt: legacyMsgs[0]?.timestamp || Date.now(),
+                                updatedAt: legacyMsgs[legacyMsgs.length - 1]?.timestamp || Date.now(),
+                                messages: legacyMsgs,
+                            };
+                            setSessions([initialSession]);
+                            setCurrentSessionId(initialSession.id);
+                            setMessages(initialSession.messages);
+                            await AsyncStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify([initialSession]));
+                        }
+                    }
                 }
             } catch (e) {
-                console.error("Error loading chat history:", e);
+                console.error("Error loading chat sessions:", e);
             } finally {
                 setIsLoaded(true);
             }
         };
-        loadSavedChat();
+        loadAllSessions();
     }, []);
 
-    // 2. حفظ الرسائل تلقائياً عند أي تعديل
-    useEffect(() => {
-        if (!isLoaded) return;
-        const persistChat = async () => {
-            try {
-                await AsyncStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
-            } catch (e) {
-                console.error("Error saving chat history:", e);
-            }
-        };
-        persistChat();
-    }, [messages, isLoaded]);
+    // 2. حفظ الجلسات في الذاكرة تلقائياً عند أي تعديل
+    const persistSessions = async (updatedSessions: ChatSession[]) => {
+        setSessions(updatedSessions);
+        try {
+            await AsyncStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(updatedSessions));
+        } catch (e) {
+            console.error("Error saving sessions:", e);
+        }
+    };
 
-    // دالة الإرسال مع تمرير سياق المحادثة الكاملة
-    const sendMessageText = useCallback(async (textToSend: string, currentHistory: Message[]) => {
+    // بدء محادثة / استشارة جديدة (+ New Consultation)
+    const handleStartNewSession = () => {
+        Speech.stop();
+        setSpeakingMessageId(null);
+        setCurrentSessionId(null);
+        setMessages([]);
+        setShowHistoryModal(false);
+        setTimeout(() => inputRef.current?.focus(), 250);
+    };
+
+    // التبديل إلى استشارة سابقة من السجل
+    const handleSelectSession = (session: ChatSession) => {
+        Speech.stop();
+        setSpeakingMessageId(null);
+        setCurrentSessionId(session.id);
+        setMessages(session.messages);
+        setShowHistoryModal(false);
+    };
+
+    // حذف استشارة محددة من السجل
+    const handleDeleteSession = (sessionId: string, e?: any) => {
+        e?.stopPropagation?.();
+        Alert.alert(
+            "حذف الاستشارة",
+            "هل أنت متأكد من رغبتك في حذف هذه الاستشارة نهائياً؟",
+            [
+                { text: "إلغاء", style: "cancel" },
+                {
+                    text: "حذف",
+                    style: "destructive",
+                    onPress: async () => {
+                        const remaining = sessions.filter(s => s.id !== sessionId);
+                        await persistSessions(remaining);
+                        if (currentSessionId === sessionId) {
+                            if (remaining.length > 0) {
+                                setCurrentSessionId(remaining[0].id);
+                                setMessages(remaining[0].messages);
+                            } else {
+                                setCurrentSessionId(null);
+                                setMessages([]);
+                            }
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
+    // إرسال رسالة مع تحديث الجلسة وسياقها
+    const sendMessageText = useCallback(async (textToSend: string, currentHistory: ChatMessage[]) => {
         if (!textToSend.trim() || isTyping) return;
 
         const trimmed = textToSend.trim();
-        const userMsg: Message = {
+        const userMsg: ChatMessage = {
             id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
             role: "user",
             text: trimmed,
@@ -237,13 +316,51 @@ const ChatAI = () => {
                 updatedHistory.map(m => ({ role: m.role, text: m.text }))
             );
 
-            const aiMsg: Message = {
+            const aiMsg: ChatMessage = {
                 id: `ai_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
                 role: "ai",
                 text: reply,
                 timestamp: Date.now(),
             };
-            setMessages(prev => [...prev, aiMsg]);
+            const finalMessages = [...updatedHistory, aiMsg];
+            setMessages(finalMessages);
+
+            // تحديث أو إنشاء الجلسة في قائمة الجلسات
+            setSessions(prevSessions => {
+                let targetId = currentSessionId;
+                let newSessions: ChatSession[];
+
+                if (!targetId || !prevSessions.some(s => s.id === targetId)) {
+                    // إنشاء جلسة جديدة مع عنوان مشتق بذكاء من أول سؤال
+                    const newTitle = trimmed.length > 36 ? `${trimmed.slice(0, 36)}...` : trimmed;
+                    const newSession: ChatSession = {
+                        id: `session_${Date.now()}`,
+                        title: newTitle,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now(),
+                        messages: finalMessages,
+                    };
+                    targetId = newSession.id;
+                    setCurrentSessionId(newSession.id);
+                    newSessions = [newSession, ...prevSessions];
+                } else {
+                    // تحديث الجلسة القائمة
+                    newSessions = prevSessions.map(s => {
+                        if (s.id === targetId) {
+                            return {
+                                ...s,
+                                updatedAt: Date.now(),
+                                messages: finalMessages,
+                            };
+                        }
+                        return s;
+                    }).sort((a, b) => b.updatedAt - a.updatedAt);
+                }
+
+                AsyncStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(newSessions)).catch(console.error);
+                return newSessions;
+            });
+
         } catch {
             setMessages(prev => [
                 ...prev,
@@ -259,18 +376,22 @@ const ChatAI = () => {
         }
 
         Keyboard.dismiss();
-    }, [isTyping, sendScale, t]);
+    }, [isTyping, sendScale, currentSessionId, t]);
 
-    // التعامل مع الفحص القادم من كاميرا الأمراض الجلدية
+    // معالجة الانتقال من فاحص الجلد
     useEffect(() => {
         if (!isLoaded || initialPromptHandled.current) return;
 
         const initialPrompt = route.params?.initialPrompt;
         if (initialPrompt && initialPrompt.trim()) {
             initialPromptHandled.current = true;
-            sendMessageText(initialPrompt.trim(), messages);
+            // بدء جلسة جديدة خاصة بالفحص السريري
+            handleStartNewSession();
+            setTimeout(() => {
+                sendMessageText(initialPrompt.trim(), []);
+            }, 300);
         }
-    }, [isLoaded, route.params?.initialPrompt, messages, sendMessageText]);
+    }, [isLoaded, route.params?.initialPrompt, sendMessageText]);
 
     const handleSend = () => {
         sendMessageText(input, messages);
@@ -286,29 +407,18 @@ const ChatAI = () => {
         return d.toLocaleTimeString(isAr ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
-    // مسح المحادثة بالكامل
-    const handleClearChat = () => {
-        Alert.alert(
-            t('chat.clearConfirmTitle') || "مسح المحادثة",
-            t('chat.clearConfirmMessage') || "هل تريد حذف جميع الرسائل السابقة؟",
-            [
-                { text: t('medication.cancel') || "إلغاء", style: 'cancel' },
-                {
-                    text: t('chat.clear') || "مسح",
-                    style: 'destructive',
-                    onPress: async () => {
-                        Speech.stop();
-                        setSpeakingMessageId(null);
-                        setMessages([]);
-                        try {
-                            await AsyncStorage.removeItem(CHAT_STORAGE_KEY);
-                        } catch (e) {
-                            console.error("Error clearing chat:", e);
-                        }
-                    },
-                },
-            ]
-        );
+    const formatDate = (ts: number) => {
+        const d = new Date(ts);
+        const today = new Date();
+        if (d.toDateString() === today.toDateString()) {
+            return `اليوم ${formatTime(ts)}`;
+        }
+        return d.toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ar-SA', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
     };
 
     // مشاركة المحادثة
@@ -331,14 +441,14 @@ const ChatAI = () => {
     };
 
     // نسخ الرسالة
-    const handleCopyMessage = async (msg: Message) => {
+    const handleCopyMessage = async (msg: ChatMessage) => {
         await Clipboard.setStringAsync(msg.text);
         setCopiedMessageId(msg.id);
         setTimeout(() => setCopiedMessageId(null), 2000);
     };
 
     // نطق الرسالة صوتياً
-    const handleSpeakMessage = async (msg: Message) => {
+    const handleSpeakMessage = async (msg: ChatMessage) => {
         if (speakingMessageId === msg.id) {
             await Speech.stop();
             setSpeakingMessageId(null);
@@ -350,8 +460,6 @@ const ChatAI = () => {
 
         const currentLang = i18n.language;
         const voiceLang = currentLang === 'en' ? 'en-US' : currentLang === 'tr' ? 'tr-TR' : 'ar-SA';
-
-        // تنظيف الرموز قبل القراءة لنطق سليم
         const cleanText = msg.text.replace(/[\*•\-_#]/g, ' ');
 
         Speech.speak(cleanText, {
@@ -363,6 +471,8 @@ const ChatAI = () => {
             onError: () => setSpeakingMessageId(null),
         });
     };
+
+    const currentSession = sessions.find(s => s.id === currentSessionId);
 
     // اقتراحات البداية
     const suggestions = [
@@ -387,7 +497,7 @@ const ChatAI = () => {
                 translucent={false}
             />
 
-            {/* Header الاحترافي الفاخر للطبيب الذكي */}
+            {/* Header الاحترافي مع دعم سجل المحادثات المتعددة */}
             <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity
@@ -409,24 +519,40 @@ const ChatAI = () => {
 
                     <View style={styles.headerTitleGroup}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            <Text style={[styles.headerTitle, { color: colors.text }]}>
-                                {i18n.language === 'en' ? 'Dr. Smart Health' : 'د. سمارت هيلث'}
+                            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+                                {currentSession?.title || (i18n.language === 'en' ? 'Dr. Smart Health' : 'د. سمارت هيلث')}
                             </Text>
-                            <View style={styles.liveTag}>
-                                <Text style={styles.liveTagText}>AI MD</Text>
-                            </View>
                         </View>
                         <View style={styles.statusRow}>
                             <View style={[styles.statusDot, { backgroundColor: isTyping ? '#F59E0B' : '#10B981' }]} />
                             <Text style={[styles.headerStatus, { color: colors.textSecondary }]}>
-                                {isTyping ? (t('chat.typing_indicator') || 'يكتب استشارته...') : (t('chat.connected') || 'متصل • استشاري ذكي')}
+                                {isTyping ? (t('chat.typing_indicator') || 'يكتب...') : (t('chat.connected') || 'متصل • استشاري ذكي')}
                             </Text>
                         </View>
                     </View>
                 </View>
 
-                {/* أزرار الإجراءات العلوية */}
+                {/* أزرار السجل وبدء محادثة جديدة */}
                 <View style={styles.headerActions}>
+                    {/* زر بدء استشارة جديدة */}
+                    <TouchableOpacity
+                        style={[styles.headerActionBtn, { backgroundColor: 'rgba(79, 70, 229, 0.1)' }]}
+                        onPress={handleStartNewSession}
+                        accessibilityLabel="New Consultation"
+                    >
+                        <Ionicons name="create-outline" size={19} color="#4F46E5" />
+                    </TouchableOpacity>
+
+                    {/* زر فتح سجل الاستشارات السابقة */}
+                    <TouchableOpacity
+                        style={[styles.headerActionBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9' }]}
+                        onPress={() => setShowHistoryModal(true)}
+                        accessibilityLabel="History"
+                    >
+                        <Ionicons name="time-outline" size={19} color={colors.text} />
+                    </TouchableOpacity>
+
+                    {/* زر المشاركة */}
                     {messages.length > 0 && (
                         <TouchableOpacity
                             style={[styles.headerActionBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9' }]}
@@ -434,15 +560,6 @@ const ChatAI = () => {
                             accessibilityLabel="Share"
                         >
                             <Ionicons name="share-social-outline" size={18} color={colors.text} />
-                        </TouchableOpacity>
-                    )}
-                    {messages.length > 0 && (
-                        <TouchableOpacity
-                            style={[styles.headerActionBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#FEE2E2' }]}
-                            onPress={handleClearChat}
-                            accessibilityLabel="Clear"
-                        >
-                            <Ionicons name="trash-outline" size={18} color="#EF4444" />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -455,17 +572,17 @@ const ChatAI = () => {
                 contentContainerStyle={styles.chatBoxContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* شاشة البداية عند خلو المحادثة */}
+                {/* شاشة البداية عند خلو الجلسة */}
                 {messages.length === 0 && (
                     <View style={styles.emptyState}>
                         <View style={[styles.emptyIconCircle, { backgroundColor: isDarkMode ? '#1E293B' : '#EEF2FF' }]}>
                             <Ionicons name="medkit" size={38} color="#4F46E5" />
                         </View>
                         <Text style={[styles.emptyTitle, { color: colors.text }]}>
-                            مرحباً بك في عيادة Smart Health الذكية
+                            مرحباً بك في استشارة طبية جديدة
                         </Text>
                         <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
-                            استشارتك الطبية الشخصية الموثوقة مع ذاكرة مستمرة لحفظ تاريخك الصحي وخصوصية كاملة.
+                            اطرح سؤالك أو صف الأعراض بدقة، وسيتم أرشفة هذه الجلسة تلقائياً في سجل محادثاتك.
                         </Text>
 
                         {/* اقتراحات البداية */}
@@ -526,7 +643,6 @@ const ChatAI = () => {
                                                 borderColor: isDarkMode ? '#334155' : '#E2E8F0',
                                             }],
                                     ]}>
-                                        {/* شريط رأس فقاعة الطبيب */}
                                         {!isUser && (
                                             <View style={styles.doctorBubbleHeader}>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
@@ -541,14 +657,12 @@ const ChatAI = () => {
                                             </View>
                                         )}
 
-                                        {/* محتوى الرسالة المنسق */}
                                         <FormattedMessage
                                             text={msg.text}
                                             isAI={!isUser}
                                             textColor={isUser ? '#FFFFFF' : colors.text}
                                         />
 
-                                        {/* أزرار الإجراءات أسفل رد الذكاء الاصطناعي */}
                                         {!isUser && (
                                             <View style={[styles.aiActionBar, { borderTopColor: isDarkMode ? '#334155' : '#F1F5F9' }]}>
                                                 <TouchableOpacity
@@ -598,7 +712,6 @@ const ChatAI = () => {
                                 )}
                             </View>
 
-                            {/* أزرار المتابعة السريعة بعد الرد الأخير للطبيب */}
                             {!isUser && isLastMessage && !isTyping && (
                                 <View style={styles.quickFollowUpWrapper}>
                                     <View style={styles.followUpHeader}>
@@ -657,7 +770,7 @@ const ChatAI = () => {
                 <View style={{ height: 20 }} />
             </ScrollView>
 
-            {/* شريط الإدخال الفاخر */}
+            {/* شريط الإدخال */}
             <View style={[styles.inputWrapper, {
                 backgroundColor: colors.surface,
                 borderTopColor: colors.border,
@@ -707,6 +820,113 @@ const ChatAI = () => {
                     </Text>
                 </View>
             </View>
+
+            {/* نافذة / درج سجل الاستشارات السابقة (Sessions History Modal) */}
+            <Modal
+                visible={showHistoryModal}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setShowHistoryModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalDrawer, { backgroundColor: colors.surface }]}>
+                        {/* رأس النافذة */}
+                        <View style={styles.drawerHeader}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Ionicons name="albums-outline" size={22} color="#4F46E5" />
+                                <Text style={[styles.drawerTitle, { color: colors.text }]}>
+                                    سجل الاستشارات الطبية
+                                </Text>
+                            </View>
+                            <TouchableOpacity
+                                style={[styles.drawerCloseBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9' }]}
+                                onPress={() => setShowHistoryModal(false)}
+                            >
+                                <Ionicons name="close" size={20} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* زر بدء استشارة جديدة داخل السجل */}
+                        <TouchableOpacity
+                            style={styles.newChatBtnLarge}
+                            onPress={handleStartNewSession}
+                            activeOpacity={0.85}
+                        >
+                            <Ionicons name="add-circle" size={22} color="#fff" />
+                            <Text style={styles.newChatBtnLargeText}>
+                                + بدء استشارة طبية جديدة
+                            </Text>
+                        </TouchableOpacity>
+
+                        {/* قائمة الجلسات المؤرشفة */}
+                        <ScrollView style={styles.sessionsList} showsVerticalScrollIndicator={false}>
+                            {sessions.length === 0 ? (
+                                <View style={styles.emptySessionsBox}>
+                                    <Ionicons name="chatbubbles-outline" size={44} color={colors.textSecondary} />
+                                    <Text style={[styles.emptySessionsText, { color: colors.textSecondary }]}>
+                                        لا توجد استشارات سابقة حتى الآن.
+                                    </Text>
+                                </View>
+                            ) : (
+                                sessions.map(session => {
+                                    const isSelected = session.id === currentSessionId;
+                                    return (
+                                        <TouchableOpacity
+                                            key={session.id}
+                                            style={[
+                                                styles.sessionCard,
+                                                {
+                                                    backgroundColor: isSelected
+                                                        ? (isDarkMode ? 'rgba(79, 70, 229, 0.2)' : '#EEF2FF')
+                                                        : (isDarkMode ? '#1E293B' : '#F8FAFC'),
+                                                    borderColor: isSelected ? '#4F46E5' : (isDarkMode ? '#334155' : '#E2E8F0'),
+                                                }
+                                            ]}
+                                            onPress={() => handleSelectSession(session)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <View style={styles.sessionCardLeft}>
+                                                <Ionicons
+                                                    name={isSelected ? "chatbubble-ellipses" : "chatbubble-outline"}
+                                                    size={18}
+                                                    color={isSelected ? "#4F46E5" : colors.textSecondary}
+                                                />
+                                                <View style={{ flex: 1 }}>
+                                                    <Text
+                                                        style={[
+                                                            styles.sessionTitleText,
+                                                            { color: isSelected ? '#4F46E5' : colors.text }
+                                                        ]}
+                                                        numberOfLines={1}
+                                                    >
+                                                        {session.title}
+                                                    </Text>
+                                                    <View style={styles.sessionMetaRow}>
+                                                        <Text style={[styles.sessionMetaText, { color: colors.textSecondary }]}>
+                                                            {session.messages.length} رسائل
+                                                        </Text>
+                                                        <Text style={[styles.sessionMetaText, { color: colors.textSecondary }]}>
+                                                            • {formatDate(session.updatedAt)}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+
+                                            <TouchableOpacity
+                                                style={styles.sessionDeleteBtn}
+                                                onPress={(e) => handleDeleteSession(session.id, e)}
+                                                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                            >
+                                                <Ionicons name="trash-outline" size={17} color="#EF4444" />
+                                            </TouchableOpacity>
+                                        </TouchableOpacity>
+                                    );
+                                })
+                            )}
+                        </ScrollView>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -733,8 +953,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     backBtn: {
-        width: 38,
-        height: 38,
+        width: 36,
+        height: 36,
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
@@ -743,9 +963,9 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     avatarGradient: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 42,
+        height: 42,
+        borderRadius: 21,
         backgroundColor: '#4F46E5',
         alignItems: 'center',
         justifyContent: 'center',
@@ -759,9 +979,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: -1,
         right: -1,
-        width: 15,
-        height: 15,
-        borderRadius: 7.5,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
         backgroundColor: '#10B981',
         alignItems: 'center',
         justifyContent: 'center',
@@ -770,21 +990,11 @@ const styles = StyleSheet.create({
     },
     headerTitleGroup: {
         flex: 1,
+        marginRight: 6,
     },
     headerTitle: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '800',
-    },
-    liveTag: {
-        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 6,
-    },
-    liveTagText: {
-        fontSize: 10,
-        fontWeight: '700',
-        color: '#4F46E5',
     },
     statusRow: {
         flexDirection: 'row',
@@ -798,7 +1008,7 @@ const styles = StyleSheet.create({
         borderRadius: 3.5,
     },
     headerStatus: {
-        fontSize: 12,
+        fontSize: 11.5,
         fontWeight: '500',
     },
     headerActions: {
@@ -816,7 +1026,7 @@ const styles = StyleSheet.create({
     chatBox: { flex: 1 },
     chatBoxContent: {
         paddingHorizontal: 16,
-        paddingTop: 20, // مسافة علوية كافية تمنع أي تداخل مع الهيدر
+        paddingTop: 18,
         paddingBottom: 16,
     },
     emptyState: {
@@ -1139,6 +1349,105 @@ const styles = StyleSheet.create({
     disclaimerText: {
         fontSize: 11,
         fontWeight: '500',
+    },
+    // ستايلات نافذة سجل الاستشارات (History Modal)
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.55)',
+        justifyContent: 'flex-end',
+    },
+    modalDrawer: {
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        maxHeight: '82%',
+        paddingBottom: 30,
+        paddingHorizontal: 18,
+        paddingTop: 18,
+    },
+    drawerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingBottom: 14,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(148, 163, 184, 0.2)',
+    },
+    drawerTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+    },
+    drawerCloseBtn: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    newChatBtnLarge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        backgroundColor: '#4F46E5',
+        borderRadius: 16,
+        paddingVertical: 14,
+        marginTop: 14,
+        marginBottom: 12,
+        shadowColor: '#4F46E5',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 3,
+    },
+    newChatBtnLargeText: {
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: '700',
+    },
+    sessionsList: {
+        marginTop: 4,
+    },
+    emptySessionsBox: {
+        alignItems: 'center',
+        paddingVertical: 36,
+        gap: 12,
+    },
+    emptySessionsText: {
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    sessionCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 14,
+        borderRadius: 16,
+        borderWidth: 1.5,
+        marginBottom: 10,
+    },
+    sessionCardLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        flex: 1,
+        marginRight: 10,
+    },
+    sessionTitleText: {
+        fontSize: 14,
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    sessionMetaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    sessionMetaText: {
+        fontSize: 11.5,
+        fontWeight: '500',
+    },
+    sessionDeleteBtn: {
+        padding: 6,
     },
 });
 

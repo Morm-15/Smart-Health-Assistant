@@ -60,7 +60,8 @@
     "chatWithAI": "Yapay Zeka ile Sohbet",
     "medicationReminder": "İlaç Hatırlatıcı",
     "manageMedications": "İlaçları Yönet",
-    "skinDiseaseDetection": "Cilt Hastalığı Tespiti",
+    "skinDiseaseDetection": "Cilt Hastalığı Kamera Taraması",
+    "medicalDevicesGuide": "Ev Tıbbi Cihazları Rehberi",
     "profile": "Profil",
     "settings": "Ayarlar",
     "errorFetchingUser": "Kullanıcı verileri alınırken bir hata oluştu"

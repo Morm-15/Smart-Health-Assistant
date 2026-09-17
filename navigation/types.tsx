@@ -14,4 +14,5 @@ export type AuthStackParamList = {
     EditProfile: undefined;
     ChangePassword: undefined;
     TestNotifications: undefined;
+    MedicalDevicesGuide: undefined;
 };

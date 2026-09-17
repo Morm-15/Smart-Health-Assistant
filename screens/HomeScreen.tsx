@@ -68,6 +68,13 @@ const HomeScreen = () => {
             route: 'SkinDiseaseCamera',
             delay: 300,
         },
+        {
+            icon: 'speedometer-outline',
+            title: t('home.medicalDevicesGuide') || 'دليل الأجهزة الطبية والحاسبة',
+            color: '#06B6D4',
+            route: 'MedicalDevicesGuide',
+            delay: 400,
+        },
     ];
 
     return (
