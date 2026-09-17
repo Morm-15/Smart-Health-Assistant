@@ -68,17 +68,9 @@ const SkinDiseaseCameraScreen = () => {
         const loadModel = async () => {
             try {
                 await tf.ready();
-                let loadedModel: any;
-                try {
-                    loadedModel = await tf.loadLayersModel(
-                        bundleResourceIO(modelJson, [modelWeights1, modelWeights2, modelWeights3])
-                    );
-                } catch (layersErr) {
-                    console.log('Falling back to loadGraphModel:', layersErr);
-                    loadedModel = await tf.loadGraphModel(
-                        bundleResourceIO(modelJson, [modelWeights1, modelWeights2, modelWeights3])
-                    );
-                }
+                const loadedModel = await tf.loadLayersModel(
+                    bundleResourceIO(modelJson, [modelWeights1, modelWeights2, modelWeights3])
+                );
 
                 // Warm Up
                 const zeroTensor = tf.zeros([1, 224, 224, 3]);
