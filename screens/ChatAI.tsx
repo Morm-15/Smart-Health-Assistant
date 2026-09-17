@@ -17,13 +17,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Speech from 'expo-speech';
 import * as Clipboard from 'expo-clipboard';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { AuthStackParamList } from '../navigation/types';
 import { sendToGemini } from "../services/geminiService";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
-import BackButton from "../components/BackButton";
 
 const CHAT_STORAGE_KEY = "@smart_health_ai_chat_v1";
 
@@ -45,15 +44,15 @@ const TypingDots = ({ color }: { color: string }) => {
             Animated.loop(
                 Animated.sequence([
                     Animated.delay(delay),
-                    Animated.timing(dot, { toValue: -6, duration: 300, useNativeDriver: true }),
-                    Animated.timing(dot, { toValue: 0, duration: 300, useNativeDriver: true }),
-                    Animated.delay(600),
+                    Animated.timing(dot, { toValue: -5, duration: 280, useNativeDriver: true }),
+                    Animated.timing(dot, { toValue: 0, duration: 280, useNativeDriver: true }),
+                    Animated.delay(500),
                 ])
             ).start();
 
         animate(dot1, 0);
-        animate(dot2, 150);
-        animate(dot3, 300);
+        animate(dot2, 140);
+        animate(dot3, 280);
     }, []);
 
     return (
@@ -69,13 +68,96 @@ const TypingDots = ({ color }: { color: string }) => {
 };
 
 const typingStyles = StyleSheet.create({
-    container: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 8, paddingHorizontal: 4 },
-    dot: { width: 9, height: 9, borderRadius: 5 },
+    container: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 4 },
+    dot: { width: 8, height: 8, borderRadius: 4 },
 });
+
+// مكوّن تنسيق النصوص الطبية بجمالية واحترافية عالية (بدون نجوم مشوهة وبتنظيم رائع للنقاط)
+const FormattedMessage = ({ text, isAI, textColor }: { text: string; isAI: boolean; textColor: string }) => {
+    if (!isAI) {
+        return <Text style={[styles.bubbleText, { color: '#FFFFFF' }]}>{text}</Text>;
+    }
+
+    const lines = text.split('\n');
+    return (
+        <View style={styles.formattedContainer}>
+            {lines.map((line, idx) => {
+                const trimmed = line.trim();
+                if (!trimmed) {
+                    return <View key={idx} style={{ height: 6 }} />;
+                }
+
+                // كشف تنبيهات وإخلاء المسؤولية الطبية لتنسيقها في صندوق حماية طبي ملون
+                if (
+                    trimmed.startsWith('⚠️') ||
+                    trimmed.startsWith('💡') ||
+                    trimmed.includes('تنبيه صحي') ||
+                    trimmed.includes('إخلاء مسؤولية') ||
+                    trimmed.includes('استشارة الطبيب المختص')
+                ) {
+                    return (
+                        <View key={idx} style={styles.calloutCard}>
+                            <Ionicons name="shield-checkmark" size={16} color="#0D9488" style={{ marginTop: 2 }} />
+                            <Text style={styles.calloutText}>
+                                {trimmed.replace(/\*\*/g, '')}
+                            </Text>
+                        </View>
+                    );
+                }
+
+                // كشف عناصر القوائم والنقاط (Bullets)
+                if (trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('* ')) {
+                    const cleanContent = trimmed.replace(/^[•\-\*]\s*/, '').replace(/\*\*/g, '');
+                    return (
+                        <View key={idx} style={styles.bulletRow}>
+                            <View style={styles.bulletDot} />
+                            <Text style={[styles.bulletText, { color: textColor }]}>
+                                {cleanContent}
+                            </Text>
+                        </View>
+                    );
+                }
+
+                // كشف الخطوات المرقمة (Numbered Steps)
+                const numMatch = trimmed.match(/^(\d+)[\.\)]\s*(.*)/);
+                if (numMatch) {
+                    return (
+                        <View key={idx} style={styles.numberRow}>
+                            <View style={styles.numberBadge}>
+                                <Text style={styles.numberBadgeText}>{numMatch[1]}</Text>
+                            </View>
+                            <Text style={[styles.numberText, { color: textColor }]}>
+                                {numMatch[2].replace(/\*\*/g, '')}
+                            </Text>
+                        </View>
+                    );
+                }
+
+                // كشف العناوين الفرعية (التي تنتهي بنقطتين أو كانت محاطة بنجوم)
+                const isHeading = (line.includes('**') && trimmed.endsWith(':')) || trimmed.endsWith(':');
+                if (isHeading) {
+                    return (
+                        <Text key={idx} style={[styles.headingText, { color: textColor }]}>
+                            {trimmed.replace(/\*\*/g, '')}
+                        </Text>
+                    );
+                }
+
+                // نص عادي منسق ومريح للعين
+                return (
+                    <Text key={idx} style={[styles.bubbleText, { color: textColor }]}>
+                        {trimmed.replace(/\*\*/g, '')}
+                    </Text>
+                );
+            })}
+        </View>
+    );
+};
 
 const ChatAI = () => {
     const { t, i18n } = useTranslation();
     const { colors, isDarkMode } = useTheme();
+    const navigation = useNavigation();
     const route = useRoute<RouteProp<AuthStackParamList, 'ChatAI'>>();
 
     const [input, setInput] = useState("");
@@ -90,14 +172,13 @@ const ChatAI = () => {
     const sendScale = useRef(new Animated.Value(1)).current;
     const initialPromptHandled = useRef(false);
 
-    // Stop speech when component unmounts
     useEffect(() => {
         return () => {
             Speech.stop();
         };
     }, []);
 
-    // 1. استرجاع المحادثة المحفوظة من الذاكرة المحلية (AsyncStorage)
+    // 1. استرجاع المحادثة المحفوظة من AsyncStorage
     useEffect(() => {
         const loadSavedChat = async () => {
             try {
@@ -128,7 +209,7 @@ const ChatAI = () => {
         persistChat();
     }, [messages, isLoaded]);
 
-    // دالة الإرسال مع تمرير سجل المحادثة الكامل لحفظ السياق (Multi-turn Context)
+    // دالة الإرسال مع تمرير سياق المحادثة الكاملة
     const sendMessageText = useCallback(async (textToSend: string, currentHistory: Message[]) => {
         if (!textToSend.trim() || isTyping) return;
 
@@ -151,7 +232,6 @@ const ChatAI = () => {
         ]).start();
 
         try {
-            // نمرر التاريخ بالكامل لدعم السياق التراكمي (مع نافذة الـ 6 رسائل المنزلقة بالخلفية لحفظ التوكنز)
             const reply = await sendToGemini(
                 trimmed,
                 updatedHistory.map(m => ({ role: m.role, text: m.text }))
@@ -170,7 +250,7 @@ const ChatAI = () => {
                 {
                     id: `ai_err_${Date.now()}`,
                     role: "ai",
-                    text: t('chat.errorMessage'),
+                    text: t('chat.errorMessage') || "حدث خطأ أثناء التواصل مع المساعد الطبي. يرجى المحاولة ثانية.",
                     timestamp: Date.now(),
                 },
             ]);
@@ -181,7 +261,7 @@ const ChatAI = () => {
         Keyboard.dismiss();
     }, [isTyping, sendScale, t]);
 
-    // 3. التعامل مع الانتقال القادم من فاحص الأمراض الجلدية (route.params?.initialPrompt)
+    // التعامل مع الفحص القادم من كاميرا الأمراض الجلدية
     useEffect(() => {
         if (!isLoaded || initialPromptHandled.current) return;
 
@@ -197,20 +277,20 @@ const ChatAI = () => {
     };
 
     useEffect(() => {
-        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 150);
     }, [messages, isTyping]);
 
     const formatTime = (ts: number) => {
         const d = new Date(ts);
-        const locale = i18n.language === 'ar' ? 'ar-SA' : i18n.language === 'tr' ? 'tr-TR' : 'en-US';
-        return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+        const isAr = i18n.language !== 'en';
+        return d.toLocaleTimeString(isAr ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
-    // ميزة مسح المحادثة بالكامل (Clear Chat)
+    // مسح المحادثة بالكامل
     const handleClearChat = () => {
         Alert.alert(
-            t('chat.clearConfirmTitle') || "مسح سجل المحادثة",
-            t('chat.clearConfirmMessage') || "هل أنت متأكد من رغبتك في حذف جميع الرسائل السابقة؟",
+            t('chat.clearConfirmTitle') || "مسح المحادثة",
+            t('chat.clearConfirmMessage') || "هل تريد حذف جميع الرسائل السابقة؟",
             [
                 { text: t('medication.cancel') || "إلغاء", style: 'cancel' },
                 {
@@ -231,33 +311,33 @@ const ChatAI = () => {
         );
     };
 
-    // ميزة مشاركة وتصدير المحادثة (Share Chat)
+    // مشاركة المحادثة
     const handleShareChat = async () => {
         if (messages.length === 0) return;
 
         try {
             const formatted = messages.map(m => {
-                const sender = m.role === 'user' ? '👤 المستخدم' : '🤖 Smart Health AI';
+                const sender = m.role === 'user' ? '👤 المريض' : '🩺 د. سمارت هيلث';
                 return `${sender} [${formatTime(m.timestamp)}]:\n${m.text}\n`;
             }).join('\n----------------------\n\n');
 
             await Share.share({
-                title: t('chat.shareTitle') || "سجل الاستشارة الطبية - Smart Health",
-                message: `📋 ${t('chat.shareTitle') || "سجل الاستشارة الطبية"}\n\n${formatted}`,
+                title: "استشارة طبية - Smart Health",
+                message: `📋 استشارة طبية ذكية - Smart Health\n\n${formatted}`,
             });
         } catch (e) {
             console.error("Error sharing chat:", e);
         }
     };
 
-    // ميزة نسخ نص الرد إلى الحافظة (Copy to Clipboard)
+    // نسخ الرسالة
     const handleCopyMessage = async (msg: Message) => {
         await Clipboard.setStringAsync(msg.text);
         setCopiedMessageId(msg.id);
         setTimeout(() => setCopiedMessageId(null), 2000);
     };
 
-    // ميزة القراءة الصوتية (Text-to-Speech)
+    // نطق الرسالة صوتياً
     const handleSpeakMessage = async (msg: Message) => {
         if (speakingMessageId === msg.id) {
             await Speech.stop();
@@ -269,120 +349,144 @@ const ChatAI = () => {
         setSpeakingMessageId(msg.id);
 
         const currentLang = i18n.language;
-        const voiceLang = currentLang === 'ar' ? 'ar-SA' : currentLang === 'tr' ? 'tr-TR' : 'en-US';
+        const voiceLang = currentLang === 'en' ? 'en-US' : currentLang === 'tr' ? 'tr-TR' : 'ar-SA';
 
-        Speech.speak(msg.text, {
+        // تنظيف الرموز قبل القراءة لنطق سليم
+        const cleanText = msg.text.replace(/[\*•\-_#]/g, ' ');
+
+        Speech.speak(cleanText, {
             language: voiceLang,
             pitch: 1.0,
-            rate: Platform.OS === 'ios' ? 0.9 : 1.0,
+            rate: Platform.OS === 'ios' ? 0.92 : 1.0,
             onDone: () => setSpeakingMessageId(null),
             onStopped: () => setSpeakingMessageId(null),
             onError: () => setSpeakingMessageId(null),
         });
     };
 
-    // اقتراحات البداية (Empty state suggestions)
+    // اقتراحات البداية
     const suggestions = [
-        "ما هي أعراض ارتفاع ضغط الدم وكيفية الوقاية؟",
-        "كيف أتعامل مع حساسية الجلد ونزلات البرد؟",
-        "ما هي أهم النصائح لتعزيز المناعة اليومية؟",
+        "ما هي أسباب ظهور بقع حمراء مع حكة في الجلد؟",
+        "كيف أتعامل مع الصداع النصفي المفاجئ؟",
+        "ما هي الأطعمة التي ترفع مناعة الجسم؟",
     ];
 
-    // أزرار المتابعة التفاعلية السريعة (Follow-up Quick Chips)
+    // أزرار المتابعة التفاعلية السريعة
     const quickFollowUps = [
-        { label: "💊 ما هي العلاجات أو المستحضرات الشائعة؟", prompt: "ما هي العلاجات الدوائية أو المستحضرات الطبية الشائعة المرتبطة بهذه الحالة؟" },
-        { label: "🥗 ما هي النصائح الغذائية ونمط الحياة؟", prompt: "ما هي النصائح الغذائية ونمط الحياة المناسب لهذه الحالة؟" },
-        { label: "🚨 متى يتوجب علي مراجعة الطبيب فوراً؟", prompt: "ما هي العلامات التحذيرية التي تستدعي مراجعة طبيب الطوارئ أو الاستشاري فوراً؟" },
-        { label: "❓ اشرح لي بالتفصيل أكثر", prompt: "هل يمكنك شرح ذلك بتفصيل وبشكل مبسط أكثر؟" },
+        { label: "💊 العلاجات والمستحضرات الشائعة", prompt: "ما هي العلاجات الدوائية أو الموضعية الشائعة لهذه الحالة؟" },
+        { label: "🥗 النصائح الغذائية ونمط الحياة", prompt: "ما هي التوصيات الغذائية والعادات الصحية المناسبة لتسريع الشفاء؟" },
+        { label: "🚨 علامات تستوجب الطبيب فوراً", prompt: "ما هي العلامات التحذيرية التي تستدعي مراجعة طبيب الطوارئ أو الاستشاري فوراً؟" },
+        { label: "❓ تفاصيل إضافية عن الحالة", prompt: "اشرح لي بمزيد من التفصيل العلمي المبسط عن طبيعة هذه الحالة." },
     ];
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
             <StatusBar
                 barStyle={isDarkMode ? "light-content" : "dark-content"}
-                backgroundColor={colors.background}
+                backgroundColor={colors.surface}
                 translucent={false}
             />
 
-            {/* Header */}
+            {/* Header الاحترافي الفاخر للطبيب الذكي */}
             <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
                 <View style={styles.headerLeft}>
-                    <BackButton />
-                    <View style={styles.headerCenter}>
-                        <View style={[styles.aiAvatarBig, { backgroundColor: isDarkMode ? '#4F46E5' : '#6366F1' }]}>
-                            <Text style={styles.aiAvatarEmoji}>🤖</Text>
+                    <TouchableOpacity
+                        style={[styles.backBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9' }]}
+                        onPress={() => navigation.goBack()}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Ionicons name="chevron-forward" size={22} color={colors.text} />
+                    </TouchableOpacity>
+
+                    <View style={styles.doctorBadge}>
+                        <View style={styles.avatarGradient}>
+                            <Ionicons name="medical" size={20} color="#fff" />
                         </View>
-                        <View>
-                            <Text style={[styles.headerTitle, { color: colors.text }]}>{t('chat.title')}</Text>
-                            <View style={styles.statusRow}>
-                                <View style={[styles.statusDot, { backgroundColor: isTyping ? '#F59E0B' : '#10B981' }]} />
-                                <Text style={[styles.headerStatus, { color: colors.textSecondary }]}>
-                                    {isTyping ? t('chat.typing_indicator') : t('chat.connected')}
-                                </Text>
+                        <View style={styles.verifiedCheck}>
+                            <Ionicons name="checkmark" size={9} color="#fff" />
+                        </View>
+                    </View>
+
+                    <View style={styles.headerTitleGroup}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <Text style={[styles.headerTitle, { color: colors.text }]}>
+                                {i18n.language === 'en' ? 'Dr. Smart Health' : 'د. سمارت هيلث'}
+                            </Text>
+                            <View style={styles.liveTag}>
+                                <Text style={styles.liveTagText}>AI MD</Text>
                             </View>
+                        </View>
+                        <View style={styles.statusRow}>
+                            <View style={[styles.statusDot, { backgroundColor: isTyping ? '#F59E0B' : '#10B981' }]} />
+                            <Text style={[styles.headerStatus, { color: colors.textSecondary }]}>
+                                {isTyping ? (t('chat.typing_indicator') || 'يكتب استشارته...') : (t('chat.connected') || 'متصل • استشاري ذكي')}
+                            </Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Right Action Icons (Clear & Share) */}
+                {/* أزرار الإجراءات العلوية */}
                 <View style={styles.headerActions}>
                     {messages.length > 0 && (
                         <TouchableOpacity
                             style={[styles.headerActionBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9' }]}
                             onPress={handleShareChat}
-                            accessibilityLabel="Share chat"
+                            accessibilityLabel="Share"
                         >
-                            <Ionicons name="share-social-outline" size={19} color={colors.text} />
+                            <Ionicons name="share-social-outline" size={18} color={colors.text} />
                         </TouchableOpacity>
                     )}
                     {messages.length > 0 && (
                         <TouchableOpacity
                             style={[styles.headerActionBtn, { backgroundColor: isDarkMode ? '#1E293B' : '#FEE2E2' }]}
                             onPress={handleClearChat}
-                            accessibilityLabel="Clear chat"
+                            accessibilityLabel="Clear"
                         >
-                            <Ionicons name="trash-outline" size={19} color="#EF4444" />
+                            <Ionicons name="trash-outline" size={18} color="#EF4444" />
                         </TouchableOpacity>
                     )}
                 </View>
             </View>
 
-            {/* Messages Scroll Area */}
+            {/* منطقة الرسائل */}
             <ScrollView
                 ref={scrollViewRef}
                 style={styles.chatBox}
                 contentContainerStyle={styles.chatBoxContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Empty State */}
+                {/* شاشة البداية عند خلو المحادثة */}
                 {messages.length === 0 && (
                     <View style={styles.emptyState}>
                         <View style={[styles.emptyIconCircle, { backgroundColor: isDarkMode ? '#1E293B' : '#EEF2FF' }]}>
-                            <Text style={styles.emptyEmoji}>💬</Text>
+                            <Ionicons name="medkit" size={38} color="#4F46E5" />
                         </View>
                         <Text style={[styles.emptyTitle, { color: colors.text }]}>
-                            {t('chat.startConversation')}
+                            مرحباً بك في عيادة Smart Health الذكية
                         </Text>
                         <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
-                            {t('chat.medicalAssistant')} — ذاكرة ذكية مستمرة وخصوصية كاملة
+                            استشارتك الطبية الشخصية الموثوقة مع ذاكرة مستمرة لحفظ تاريخك الصحي وخصوصية كاملة.
                         </Text>
 
-                        {/* Initial Suggestion chips */}
+                        {/* اقتراحات البداية */}
                         <View style={styles.suggestionsContainer}>
                             <Text style={[styles.suggestionsLabel, { color: colors.textSecondary }]}>
-                                💡 مقترحات أسئلة سريعة:
+                                💡 مواضيع مقترحة للاستشارة:
                             </Text>
                             {suggestions.map((s, i) => (
                                 <TouchableOpacity
                                     key={i}
                                     style={[styles.suggestionChip, {
-                                        backgroundColor: isDarkMode ? '#1E293B' : '#EEF2FF',
-                                        borderColor: isDarkMode ? '#4F46E5' : '#C7D2FE',
+                                        backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
+                                        borderColor: isDarkMode ? '#334155' : '#E0E7FF',
                                     }]}
                                     onPress={() => sendMessageText(s, messages)}
+                                    activeOpacity={0.8}
                                 >
-                                    <Ionicons name="sparkles" size={16} color="#6366F1" />
-                                    <Text style={[styles.suggestionText, { color: isDarkMode ? '#A5B4FC' : '#4F46E5' }]}>
+                                    <View style={styles.suggestionIcon}>
+                                        <Ionicons name="chatbubble-ellipses-outline" size={16} color="#4F46E5" />
+                                    </View>
+                                    <Text style={[styles.suggestionText, { color: colors.text }]}>
                                         {s}
                                     </Text>
                                 </TouchableOpacity>
@@ -391,7 +495,7 @@ const ChatAI = () => {
                     </View>
                 )}
 
-                {/* Message Bubbles */}
+                {/* فقاعات الرسائل */}
                 {messages.map((msg, idx) => {
                     const isUser = msg.role === 'user';
                     const isLastMessage = idx === messages.length - 1;
@@ -399,7 +503,7 @@ const ChatAI = () => {
                     const isCopied = copiedMessageId === msg.id;
 
                     return (
-                        <View key={msg.id || idx}>
+                        <View key={msg.id || idx} style={styles.messageItemWrapper}>
                             <View
                                 style={[
                                     styles.messageRow,
@@ -407,8 +511,8 @@ const ChatAI = () => {
                                 ]}
                             >
                                 {!isUser && (
-                                    <View style={[styles.miniAvatar, { backgroundColor: '#6366F1' }]}>
-                                        <Text style={{ fontSize: 13 }}>🤖</Text>
+                                    <View style={styles.aiMiniBadge}>
+                                        <Ionicons name="pulse" size={15} color="#4F46E5" />
                                     </View>
                                 )}
 
@@ -418,89 +522,107 @@ const ChatAI = () => {
                                         isUser
                                             ? styles.userBubble
                                             : [styles.aiBubble, {
-                                                backgroundColor: isDarkMode ? '#1E293B' : '#F8FAFF',
-                                                borderColor: isDarkMode ? '#334155' : '#E0E7FF'
+                                                backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
+                                                borderColor: isDarkMode ? '#334155' : '#E2E8F0',
                                             }],
                                     ]}>
-                                        <Text style={[
-                                            styles.bubbleText,
-                                            !isUser && { color: colors.text }
-                                        ]}>
-                                            {msg.text}
-                                        </Text>
-
-                                        {/* Action Bar for AI response: Copy & Read Aloud */}
+                                        {/* شريط رأس فقاعة الطبيب */}
                                         {!isUser && (
-                                            <View style={[styles.aiActionBar, { borderTopColor: isDarkMode ? '#334155' : '#EEF2F6' }]}>
-                                                <TouchableOpacity
-                                                    style={styles.actionIconButton}
-                                                    onPress={() => handleCopyMessage(msg)}
-                                                    activeOpacity={0.7}
-                                                >
-                                                    <Ionicons
-                                                        name={isCopied ? "checkmark-circle" : "copy-outline"}
-                                                        size={16}
-                                                        color={isCopied ? "#10B981" : colors.textSecondary}
-                                                    />
-                                                    <Text style={[styles.actionIconLabel, { color: isCopied ? "#10B981" : colors.textSecondary }]}>
-                                                        {isCopied ? (t('chat.copied') || "تم النسخ") : "نسخ"}
+                                            <View style={styles.doctorBubbleHeader}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                                    <Ionicons name="shield-checkmark" size={13} color="#10B981" />
+                                                    <Text style={[styles.doctorHeaderName, { color: colors.textSecondary }]}>
+                                                        استشارة سريرية موجهة
                                                     </Text>
-                                                </TouchableOpacity>
+                                                </View>
+                                                <Text style={[styles.bubbleTime, { color: colors.textSecondary }]}>
+                                                    {formatTime(msg.timestamp)}
+                                                </Text>
+                                            </View>
+                                        )}
 
+                                        {/* محتوى الرسالة المنسق */}
+                                        <FormattedMessage
+                                            text={msg.text}
+                                            isAI={!isUser}
+                                            textColor={isUser ? '#FFFFFF' : colors.text}
+                                        />
+
+                                        {/* أزرار الإجراءات أسفل رد الذكاء الاصطناعي */}
+                                        {!isUser && (
+                                            <View style={[styles.aiActionBar, { borderTopColor: isDarkMode ? '#334155' : '#F1F5F9' }]}>
                                                 <TouchableOpacity
-                                                    style={[styles.actionIconButton, isSpeaking && styles.actionIconButtonActive]}
+                                                    style={[styles.actionPill, isSpeaking && styles.actionPillActive]}
                                                     onPress={() => handleSpeakMessage(msg)}
                                                     activeOpacity={0.7}
                                                 >
                                                     <Ionicons
                                                         name={isSpeaking ? "stop-circle" : "volume-medium-outline"}
-                                                        size={16}
-                                                        color={isSpeaking ? "#EF4444" : colors.textSecondary}
+                                                        size={15}
+                                                        color={isSpeaking ? "#EF4444" : "#4F46E5"}
                                                     />
-                                                    <Text style={[styles.actionIconLabel, { color: isSpeaking ? "#EF4444" : colors.textSecondary }]}>
-                                                        {isSpeaking ? "إيقاف" : "استماع"}
+                                                    <Text style={[styles.actionPillText, { color: isSpeaking ? "#EF4444" : "#4F46E5" }]}>
+                                                        {isSpeaking ? "إيقاف القراءة" : "استماع صوتي"}
+                                                    </Text>
+                                                </TouchableOpacity>
+
+                                                <TouchableOpacity
+                                                    style={styles.actionPill}
+                                                    onPress={() => handleCopyMessage(msg)}
+                                                    activeOpacity={0.7}
+                                                >
+                                                    <Ionicons
+                                                        name={isCopied ? "checkmark-circle" : "copy-outline"}
+                                                        size={15}
+                                                        color={isCopied ? "#10B981" : colors.textSecondary}
+                                                    />
+                                                    <Text style={[styles.actionPillText, { color: isCopied ? "#10B981" : colors.textSecondary }]}>
+                                                        {isCopied ? "تم النسخ" : "نسخ التقرير"}
                                                     </Text>
                                                 </TouchableOpacity>
                                             </View>
                                         )}
                                     </View>
 
-                                    <Text style={[styles.timeStamp, {
-                                        color: colors.textSecondary,
-                                        textAlign: isUser ? 'right' : 'left',
-                                    }]}>
-                                        {formatTime(msg.timestamp)}
-                                    </Text>
+                                    {isUser && (
+                                        <Text style={[styles.timeStampUser, { color: colors.textSecondary }]}>
+                                            {formatTime(msg.timestamp)}
+                                        </Text>
+                                    )}
                                 </View>
 
                                 {isUser && (
-                                    <View style={[styles.miniAvatar, { backgroundColor: isDarkMode ? '#4F46E5' : '#6366F1' }]}>
+                                    <View style={[styles.userMiniBadge, { backgroundColor: '#4F46E5' }]}>
                                         <Ionicons name="person" size={14} color="#fff" />
                                     </View>
                                 )}
                             </View>
 
-                            {/* Quick Follow-up Chips after the latest AI reply */}
+                            {/* أزرار المتابعة السريعة بعد الرد الأخير للطبيب */}
                             {!isUser && isLastMessage && !isTyping && (
-                                <View style={styles.quickFollowUpContainer}>
-                                    <Text style={[styles.quickFollowUpTitle, { color: colors.textSecondary }]}>
-                                        ⚡ مقترحات المتابعة:
-                                    </Text>
+                                <View style={styles.quickFollowUpWrapper}>
+                                    <View style={styles.followUpHeader}>
+                                        <Ionicons name="flash" size={13} color="#F59E0B" />
+                                        <Text style={[styles.followUpTitle, { color: colors.textSecondary }]}>
+                                            مقترحات متابعة سريرية سريعة:
+                                        </Text>
+                                    </View>
                                     <ScrollView
                                         horizontal
                                         showsHorizontalScrollIndicator={false}
-                                        contentContainerStyle={styles.chipsScroll}
+                                        contentContainerStyle={styles.chipsScrollContent}
                                     >
                                         {quickFollowUps.map((chip, cIdx) => (
                                             <TouchableOpacity
                                                 key={cIdx}
-                                                style={[styles.quickChip, {
-                                                    backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9',
+                                                style={[styles.quickFollowUpChip, {
+                                                    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
                                                     borderColor: isDarkMode ? '#334155' : '#E2E8F0',
                                                 }]}
                                                 onPress={() => sendMessageText(chip.prompt, messages)}
+                                                activeOpacity={0.8}
                                             >
-                                                <Text style={[styles.quickChipText, { color: colors.text }]}>
+                                                <Text style={[styles.quickFollowUpChipText, { color: colors.text }]}>
                                                     {chip.label}
                                                 </Text>
                                             </TouchableOpacity>
@@ -512,66 +634,78 @@ const ChatAI = () => {
                     );
                 })}
 
-                {/* Typing Indicator */}
+                {/* مؤشر جاري الكتابة */}
                 {isTyping && (
                     <View style={[styles.messageRow, styles.messageRowAI]}>
-                        <View style={[styles.miniAvatar, { backgroundColor: '#6366F1' }]}>
-                            <Text style={{ fontSize: 13 }}>🤖</Text>
+                        <View style={styles.aiMiniBadge}>
+                            <Ionicons name="pulse" size={15} color="#4F46E5" />
                         </View>
                         <View style={[styles.bubble, styles.aiBubble, {
-                            backgroundColor: isDarkMode ? '#1E293B' : '#F8FAFF',
-                            borderColor: isDarkMode ? '#334155' : '#E0E7FF',
+                            backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
+                            borderColor: isDarkMode ? '#334155' : '#E2E8F0',
                         }]}>
-                            <TypingDots color={colors.primary} />
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <TypingDots color="#4F46E5" />
+                                <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: '500' }}>
+                                    الدكتور يستشير السجل الطبي ويجهز الرد...
+                                </Text>
+                            </View>
                         </View>
                     </View>
                 )}
 
-                <View style={{ height: 16 }} />
+                <View style={{ height: 20 }} />
             </ScrollView>
 
-            {/* Input Bar */}
+            {/* شريط الإدخال الفاخر */}
             <View style={[styles.inputWrapper, {
                 backgroundColor: colors.surface,
                 borderTopColor: colors.border,
             }]}>
-                <View style={[styles.inputContainer, {
-                    backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFF',
-                    borderColor: isDarkMode ? '#334155' : '#E0E7FF',
+                <View style={[styles.inputCard, {
+                    backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
+                    borderColor: isDarkMode ? '#334155' : '#E2E8F0',
                 }]}>
                     <TextInput
                         ref={inputRef}
-                        style={[styles.input, { color: colors.text }]}
-                        placeholder={t('chat.inputPlaceholder')}
+                        style={[styles.textInput, { color: colors.text }]}
+                        placeholder={i18n.language === 'en' ? "Type medical question..." : "اكتب استفسارك الطبي أو الصحي هنا..."}
                         placeholderTextColor={colors.textSecondary}
                         value={input}
                         onChangeText={setInput}
                         onSubmitEditing={handleSend}
                         returnKeyType="send"
                         multiline
-                        maxLength={600}
+                        maxLength={700}
                     />
+
                     <Animated.View style={{ transform: [{ scale: sendScale }] }}>
                         <TouchableOpacity
                             style={[
-                                styles.sendButton,
-                                { backgroundColor: input.trim() ? '#6366F1' : (isDarkMode ? '#334155' : '#E0E7FF') }
+                                styles.sendActionBtn,
+                                { backgroundColor: input.trim() ? '#4F46E5' : (isDarkMode ? '#334155' : '#E2E8F0') }
                             ]}
                             onPress={handleSend}
                             disabled={!input.trim() || isTyping}
                             activeOpacity={0.8}
                         >
                             <Ionicons
-                                name="send"
-                                size={18}
-                                color={input.trim() ? '#fff' : (isDarkMode ? '#64748B' : '#94A3B8')}
+                                name="arrow-up"
+                                size={20}
+                                color={input.trim() ? '#FFFFFF' : (isDarkMode ? '#64748B' : '#94A3B8')}
                             />
                         </TouchableOpacity>
                     </Animated.View>
                 </View>
-                <Text style={[styles.disclaimer, { color: colors.textSecondary }]}>
-                    ⚠️ للاستشارة والتوجيه الطبي فقط — لا يغني عن تشخيص الطبيب المختص
-                </Text>
+
+                <View style={styles.disclaimerRow}>
+                    <Ionicons name="information-circle-outline" size={13} color={colors.textSecondary} />
+                    <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
+                        {i18n.language === 'en'
+                            ? "Guidance only — consult a physician for official diagnosis."
+                            : "للاستشارة والتوجيه الصحي فقط — لا يغني عن الفحص السريري المباشر للطبيب."}
+                    </Text>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -583,49 +717,74 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingBottom: 12,
+        paddingVertical: 12,
         paddingHorizontal: 16,
-        paddingTop: 8,
         borderBottomWidth: 1,
         shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
+        shadowOpacity: 0.04,
+        shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
-        elevation: 3,
+        elevation: 2,
     },
     headerLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-    },
-    headerCenter: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 10,
         gap: 10,
+        flex: 1,
     },
-    headerActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    headerActionBtn: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+    backBtn: {
+        width: 38,
+        height: 38,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    aiAvatarBig: {
+    doctorBadge: {
+        position: 'relative',
+    },
+    avatarGradient: {
         width: 44,
         height: 44,
         borderRadius: 22,
+        backgroundColor: '#4F46E5',
         alignItems: 'center',
         justifyContent: 'center',
+        shadowColor: '#4F46E5',
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 3,
     },
-    aiAvatarEmoji: { fontSize: 22 },
+    verifiedCheck: {
+        position: 'absolute',
+        bottom: -1,
+        right: -1,
+        width: 15,
+        height: 15,
+        borderRadius: 7.5,
+        backgroundColor: '#10B981',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1.5,
+        borderColor: '#fff',
+    },
+    headerTitleGroup: {
+        flex: 1,
+    },
     headerTitle: {
         fontSize: 16,
+        fontWeight: '800',
+    },
+    liveTag: {
+        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
+    },
+    liveTagText: {
+        fontSize: 10,
         fontWeight: '700',
+        color: '#4F46E5',
     },
     statusRow: {
         flexDirection: 'row',
@@ -640,165 +799,346 @@ const styles = StyleSheet.create({
     },
     headerStatus: {
         fontSize: 12,
+        fontWeight: '500',
+    },
+    headerActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    headerActionBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     chatBox: { flex: 1 },
-    chatBoxContent: { padding: 16 },
+    chatBoxContent: {
+        paddingHorizontal: 16,
+        paddingTop: 20, // مسافة علوية كافية تمنع أي تداخل مع الهيدر
+        paddingBottom: 16,
+    },
     emptyState: {
         alignItems: 'center',
-        paddingTop: 24,
-        paddingHorizontal: 12,
+        paddingTop: 20,
+        paddingHorizontal: 8,
     },
     emptyIconCircle: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 76,
+        height: 76,
+        borderRadius: 38,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 16,
+        shadowColor: '#4F46E5',
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 3,
     },
-    emptyEmoji: { fontSize: 40 },
-    emptyTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 6 },
-    emptySubtext: { fontSize: 13, textAlign: 'center', marginBottom: 20, opacity: 0.8 },
-    suggestionsContainer: { width: '100%', gap: 10 },
-    suggestionsLabel: { fontSize: 13, fontWeight: '600', marginBottom: 4, textAlign: 'right' },
+    emptyTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        textAlign: 'center',
+        marginBottom: 8,
+    },
+    emptySubtext: {
+        fontSize: 13.5,
+        lineHeight: 22,
+        textAlign: 'center',
+        marginBottom: 24,
+        paddingHorizontal: 12,
+    },
+    suggestionsContainer: {
+        width: '100%',
+        gap: 10,
+    },
+    suggestionsLabel: {
+        fontSize: 13,
+        fontWeight: '700',
+        marginBottom: 2,
+        textAlign: 'right',
+    },
     suggestionChip: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        padding: 12,
-        borderRadius: 14,
-        borderWidth: 1,
-    },
-    suggestionText: { fontSize: 13, fontWeight: '500', flex: 1 },
-    messageRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginBottom: 10,
-        gap: 8,
-    },
-    messageRowUser: { justifyContent: 'flex-end' },
-    messageRowAI: { justifyContent: 'flex-start' },
-    miniAvatar: {
-        width: 32,
-        height: 32,
+        gap: 10,
+        paddingVertical: 14,
+        paddingHorizontal: 14,
         borderRadius: 16,
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOpacity: 0.03,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 1,
+    },
+    suggestionIcon: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(79, 70, 229, 0.08)',
         alignItems: 'center',
         justifyContent: 'center',
-        flexShrink: 0,
     },
-    bubbleWrapper: { maxWidth: '82%' },
+    suggestionText: {
+        fontSize: 13.5,
+        fontWeight: '600',
+        flex: 1,
+        lineHeight: 20,
+    },
+    messageItemWrapper: {
+        marginBottom: 16,
+    },
+    messageRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 8,
+    },
+    messageRowUser: {
+        justifyContent: 'flex-end',
+    },
+    messageRowAI: {
+        justifyContent: 'flex-start',
+    },
+    aiMiniBadge: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 4,
+    },
+    userMiniBadge: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 4,
+    },
+    bubbleWrapper: {
+        maxWidth: '84%',
+    },
     bubble: {
         paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 20,
+        paddingVertical: 14,
+        borderRadius: 18,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
-        shadowRadius: 3,
-        elevation: 1,
+        shadowRadius: 4,
+        elevation: 2,
     },
     userBubble: {
-        backgroundColor: '#6366F1',
+        backgroundColor: '#4F46E5',
         borderBottomRightRadius: 4,
     },
     aiBubble: {
         borderBottomLeftRadius: 4,
         borderWidth: 1,
+        borderLeftWidth: 3.5,
+        borderLeftColor: '#4F46E5',
+    },
+    doctorBubbleHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+        paddingBottom: 6,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(148, 163, 184, 0.15)',
+    },
+    doctorHeaderName: {
+        fontSize: 11.5,
+        fontWeight: '700',
+    },
+    bubbleTime: {
+        fontSize: 11,
+    },
+    timeStampUser: {
+        fontSize: 11,
+        marginTop: 3,
+        textAlign: 'right',
+        paddingHorizontal: 4,
+    },
+    formattedContainer: {
+        gap: 4,
     },
     bubbleText: {
-        color: '#fff',
         fontSize: 14.5,
+        lineHeight: 23,
+    },
+    headingText: {
+        fontSize: 15,
+        fontWeight: '800',
+        marginTop: 6,
+        marginBottom: 2,
+    },
+    bulletRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 8,
+        marginVertical: 2,
+    },
+    bulletDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#4F46E5',
+        marginTop: 8,
+    },
+    bulletText: {
+        flex: 1,
+        fontSize: 14,
         lineHeight: 22,
+    },
+    numberRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 8,
+        marginVertical: 3,
+    },
+    numberBadge: {
+        width: 18,
+        height: 18,
+        borderRadius: 9,
+        backgroundColor: 'rgba(79, 70, 229, 0.12)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 2,
+    },
+    numberBadgeText: {
+        fontSize: 11,
+        fontWeight: '800',
+        color: '#4F46E5',
+    },
+    numberText: {
+        flex: 1,
+        fontSize: 14,
+        lineHeight: 22,
+    },
+    calloutCard: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 8,
+        backgroundColor: 'rgba(13, 148, 136, 0.08)',
+        borderColor: 'rgba(13, 148, 136, 0.25)',
+        borderWidth: 1,
+        padding: 10,
+        borderRadius: 12,
+        marginTop: 8,
+    },
+    calloutText: {
+        flex: 1,
+        fontSize: 12.5,
+        lineHeight: 19,
+        color: '#0D9488',
+        fontWeight: '600',
     },
     aiActionBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        marginTop: 10,
-        paddingTop: 8,
+        gap: 10,
+        marginTop: 12,
+        paddingTop: 10,
         borderTopWidth: 1,
-        gap: 16,
     },
-    actionIconButton: {
+    actionPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-        paddingVertical: 2,
+        gap: 5,
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 20,
+        backgroundColor: 'rgba(79, 70, 229, 0.06)',
     },
-    actionIconButtonActive: {
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        paddingHorizontal: 6,
-        borderRadius: 6,
+    actionPillActive: {
+        backgroundColor: 'rgba(239, 68, 68, 0.12)',
     },
-    actionIconLabel: {
+    actionPillText: {
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '700',
     },
-    timeStamp: {
-        fontSize: 11,
-        marginTop: 3,
-        opacity: 0.65,
-        paddingHorizontal: 4,
-    },
-    quickFollowUpContainer: {
-        marginTop: 4,
-        marginBottom: 14,
-        marginLeft: 40,
-    },
-    quickFollowUpTitle: {
-        fontSize: 11.5,
-        fontWeight: '600',
-        marginBottom: 6,
-        textAlign: 'right',
-    },
-    chipsScroll: {
-        gap: 8,
-        paddingRight: 10,
-    },
-    quickChip: {
+    quickFollowUpWrapper: {
+        marginTop: 8,
         paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 18,
-        borderWidth: 1,
     },
-    quickChipText: {
+    followUpHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        marginBottom: 8,
+    },
+    followUpTitle: {
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '700',
+    },
+    chipsScrollContent: {
+        gap: 8,
+        paddingRight: 16,
+    },
+    quickFollowUpChip: {
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 20,
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOpacity: 0.04,
+        shadowRadius: 3,
+        shadowOffset: { width: 0, height: 1 },
+        elevation: 1,
+    },
+    quickFollowUpChipText: {
+        fontSize: 12.5,
+        fontWeight: '600',
     },
     inputWrapper: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         paddingTop: 10,
         paddingBottom: 10,
         borderTopWidth: 1,
     },
-    inputContainer: {
+    inputCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        borderRadius: 22,
+        borderRadius: 24,
         borderWidth: 1.5,
-        minHeight: 50,
+        paddingHorizontal: 14,
+        minHeight: 52,
+        shadowColor: '#000',
+        shadowOpacity: 0.02,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 1 },
+        elevation: 1,
     },
-    input: {
+    textInput: {
         flex: 1,
-        paddingHorizontal: 8,
         paddingVertical: 8,
+        paddingHorizontal: 6,
         fontSize: 15,
-        maxHeight: 100,
+        maxHeight: 110,
     },
-    sendButton: {
+    sendActionBtn: {
         width: 38,
         height: 38,
         borderRadius: 19,
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
         marginLeft: 6,
     },
-    disclaimer: {
-        fontSize: 11,
-        textAlign: 'center',
+    disclaimerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5,
         marginTop: 6,
-        opacity: 0.7,
+    },
+    disclaimerText: {
+        fontSize: 11,
+        fontWeight: '500',
     },
 });
 
