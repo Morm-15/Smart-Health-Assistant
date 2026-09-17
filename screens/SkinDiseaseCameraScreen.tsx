@@ -19,7 +19,27 @@ const modelWeights1 = require('../assets/model/group1-shard1of3.bin');
 const modelWeights2 = require('../assets/model/group1-shard2of3.bin');
 const modelWeights3 = require('../assets/model/group1-shard3of3.bin');
 
-const LABELS = ['Acne', 'Carcinoma', 'Eczema', 'Keratosis', 'Milia', 'Rosacea'];
+const LABELS = [
+    'Acne',
+    'Benign_Tumors',
+    'Eczema',
+    'Malignant_Carcinoma',
+    'Normal_Skin',
+    'Psoriasis',
+    'Rosacea'
+];
+
+interface DiagnosisItem {
+    key: string;
+    label: string;
+    confidence: number;
+}
+
+interface LocalDiagnosisResult {
+    primary: DiagnosisItem;
+    differential: DiagnosisItem;
+    allSorted: DiagnosisItem[];
+}
 
 const SkinDiseaseCameraScreen = () => {
     const navigation = useNavigation();
@@ -33,37 +53,50 @@ const SkinDiseaseCameraScreen = () => {
     const [facing, setFacing] = useState<CameraType>('back');
     const cameraRef = useRef<any>(null);
 
-    const [model, setModel] = useState<tf.GraphModel | null>(null);
+    const [model, setModel] = useState<tf.LayersModel | tf.GraphModel | null>(null);
     const [isModelReady, setIsModelReady] = useState(false);
     const [modelLoadError, setModelLoadError] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+    const [localDiagnosis, setLocalDiagnosis] = useState<LocalDiagnosisResult | null>(null);
 
     // 1. تحميل الموديل والإحماء
     useEffect(() => {
+        let isMounted = true;
         const loadModel = async () => {
             try {
                 await tf.ready();
-                const loadedModel = await tf.loadGraphModel(
-                    bundleResourceIO(modelJson, [modelWeights1, modelWeights2, modelWeights3])
-                );
+                let loadedModel: any;
+                try {
+                    loadedModel = await tf.loadLayersModel(
+                        bundleResourceIO(modelJson, [modelWeights1, modelWeights2, modelWeights3])
+                    );
+                } catch (layersErr) {
+                    console.log('Falling back to loadGraphModel:', layersErr);
+                    loadedModel = await tf.loadGraphModel(
+                        bundleResourceIO(modelJson, [modelWeights1, modelWeights2, modelWeights3])
+                    );
+                }
 
                 // Warm Up
                 const zeroTensor = tf.zeros([1, 224, 224, 3]);
-                const result = await loadedModel.predict(zeroTensor) as tf.Tensor;
+                const result = (await loadedModel.predict(zeroTensor)) as tf.Tensor;
                 result.dispose();
                 zeroTensor.dispose();
 
-                setModel(loadedModel);
-                setIsModelReady(true);
-                setModelLoadError(false);
-                console.log('Model Ready & Fast! 🚀');
+                if (isMounted) {
+                    setModel(loadedModel);
+                    setIsModelReady(true);
+                    setModelLoadError(false);
+                    console.log('MobileNetV2 7-Class Model Ready & Fast! 🚀');
+                }
             } catch (err) {
                 console.error('Error loading model:', err);
-                setModelLoadError(true);
+                if (isMounted) setModelLoadError(true);
             }
         };
         loadModel();
+        return () => { isMounted = false; };
     }, []);
 
     // 2. دالة التحويل السريعة
@@ -100,25 +133,25 @@ const SkinDiseaseCameraScreen = () => {
         requestAnimationFrame(async () => {
             try {
                 const imageTensor = await transformImageToTensor(capturedImage);
-                const prediction = await model.predict(imageTensor) as tf.Tensor;
-                const values = prediction.dataSync();
+                const prediction = (await model.predict(imageTensor)) as tf.Tensor;
+                const rawValues = Array.from(await prediction.data());
 
-                const maxIndex = values.indexOf(Math.max(...values));
-                const englishLabel = LABELS[maxIndex];
-                const translatedLabel = t(`diseases.${englishLabel.toLowerCase()}`, englishLabel);
-                const confidence = (values[maxIndex] * 100).toFixed(1);
+                const sortedItems: DiagnosisItem[] = LABELS.map((key, idx) => ({
+                    key,
+                    label: t(`diseases.${key.toLowerCase()}`, key.replace('_', ' ')),
+                    confidence: Math.max(0, (rawValues[idx] || 0) * 100)
+                })).sort((a, b) => b.confidence - a.confidence);
 
-                // تنظيف الذاكرة (مهم جداً)
+                // تنظيف الذاكرة الفوري لمنع أي بطء
                 tf.dispose([imageTensor, prediction]);
 
-                Alert.alert(
-                    t('camera.resultTitle') || "Result",
-                    `${t('camera.detected')}: ${translatedLabel}\n${t('camera.confidence')}: ${confidence}%`,
-                    [{ text: "OK", onPress: () => navigation.goBack() }]
-                );
-
+                setLocalDiagnosis({
+                    primary: sortedItems[0],
+                    differential: sortedItems[1] || sortedItems[0],
+                    allSorted: sortedItems.slice(0, 3)
+                });
             } catch (error) {
-                console.error(error);
+                console.error("Local diagnosis error:", error);
                 Alert.alert(t('camera.localAnalysisFailed'), "Analysis failed.");
             } finally {
                 setIsAnalyzing(false);
@@ -289,6 +322,111 @@ const SkinDiseaseCameraScreen = () => {
                         </View>
                     </View>
                 </Modal>
+
+                {/* Modal for Local Clinical Differential Diagnosis */}
+                <Modal
+                    visible={localDiagnosis !== null}
+                    animationType="slide"
+                    transparent={true}
+                    onRequestClose={() => setLocalDiagnosis(null)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                            <View style={styles.modalHeader}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                    <Ionicons name="medical" size={22} color="#4F46E5" />
+                                    <Text style={[styles.modalTitle, { color: colors.text }]}>
+                                        {t('camera.resultTitle') || "التشخيص السريري المباشر"}
+                                    </Text>
+                                </View>
+                                <TouchableOpacity onPress={() => setLocalDiagnosis(null)}>
+                                    <Ionicons name="close" size={24} color={colors.text} />
+                                </TouchableOpacity>
+                            </View>
+
+                            {localDiagnosis && (
+                                <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                                    {/* Primary Diagnosis Card */}
+                                    <View style={[styles.diagnosisCard, { 
+                                        backgroundColor: localDiagnosis.primary.key === 'Normal_Skin' ? 'rgba(34, 197, 94, 0.12)' : 
+                                                         localDiagnosis.primary.key === 'Malignant_Carcinoma' ? 'rgba(239, 68, 68, 0.12)' : 
+                                                         'rgba(99, 102, 241, 0.12)',
+                                        borderColor: localDiagnosis.primary.key === 'Normal_Skin' ? '#22C55E' : 
+                                                     localDiagnosis.primary.key === 'Malignant_Carcinoma' ? '#EF4444' : 
+                                                     '#6366F1',
+                                    }]}>
+                                        <View style={styles.cardHeaderRow}>
+                                            <Text style={[styles.primaryBadgeText, {
+                                                color: localDiagnosis.primary.key === 'Normal_Skin' ? '#16A34A' : 
+                                                       localDiagnosis.primary.key === 'Malignant_Carcinoma' ? '#DC2626' : 
+                                                       '#4F46E5'
+                                            }]}>
+                                                {localDiagnosis.primary.key === 'Normal_Skin' ? "🟢 جلد سليم وطبيعي" : 
+                                                 localDiagnosis.primary.key === 'Malignant_Carcinoma' ? "🔴 اشتباه سريري يستدعي فحصاً" : 
+                                                 "🔵 التشخيص الأولي الأساسي"}
+                                            </Text>
+                                            <Text style={[styles.confidenceBadge, {
+                                                color: localDiagnosis.primary.key === 'Normal_Skin' ? '#16A34A' : 
+                                                       localDiagnosis.primary.key === 'Malignant_Carcinoma' ? '#DC2626' : 
+                                                       '#4F46E5'
+                                            }]}>
+                                                {localDiagnosis.primary.confidence.toFixed(1)}%
+                                            </Text>
+                                        </View>
+                                        <Text style={[styles.conditionName, { color: colors.text }]}>
+                                            {localDiagnosis.primary.label}
+                                        </Text>
+                                    </View>
+
+                                    {/* Differential Diagnosis (Top-2) */}
+                                    {localDiagnosis.differential && localDiagnosis.differential.key !== localDiagnosis.primary.key && (
+                                        <View style={[styles.differentialBox, { backgroundColor: isDarkMode ? '#1E293B' : '#F8FAFC' }]}>
+                                            <Text style={styles.diffTitle}>
+                                                🔬 التشخيص التفريقي البديل (Differential Diagnosis):
+                                            </Text>
+                                            <View style={styles.cardHeaderRow}>
+                                                <Text style={[styles.diffLabel, { color: colors.text }]}>
+                                                    {localDiagnosis.differential.label}
+                                                </Text>
+                                                <Text style={styles.diffPercentage}>
+                                                    {localDiagnosis.differential.confidence.toFixed(1)}%
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {/* Medical Advice Box */}
+                                    <View style={[styles.adviceBox, { backgroundColor: isDarkMode ? '#0F2A28' : '#F0FDFA' }]}>
+                                        <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
+                                        <Text style={styles.adviceText}>
+                                            {localDiagnosis.primary.key === 'Normal_Skin'
+                                                ? "الجلد سليم ولا توجد علامات لآفات غير طبيعية. يوصى بالترطيب واستخدام واقي الشمس."
+                                                : localDiagnosis.primary.key === 'Malignant_Carcinoma'
+                                                ? "يوصى بشدة بمراجعة طبيب جلدية استشاري لإجراء فحص سريري دقيق والتأكد من طبيعة الآفة."
+                                                : "يوصى بتجنب لمس أو فرك المنطقة المصابة، واستشارة الصيدلي أو الطبيب للخطة العلاجية الملائمة."}
+                                        </Text>
+                                    </View>
+
+                                    <Text style={styles.disclaimerText}>
+                                        ⚠️ هذا الفحص أداة استرشادية ذكية ولا يغني عن استشارة الطبيب المختص.
+                                    </Text>
+                                </ScrollView>
+                            )}
+
+                            <TouchableOpacity 
+                                style={[styles.modalCloseButton, { backgroundColor: '#4F46E5' }]} 
+                                onPress={() => {
+                                    setLocalDiagnosis(null);
+                                    navigation.goBack();
+                                }}
+                            >
+                                <Text style={styles.modalCloseButtonText}>
+                                    {t('common.done') || "حسناً / تم"}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         );
     }
@@ -446,6 +584,74 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    diagnosisCard: {
+        borderRadius: 16,
+        borderWidth: 1.5,
+        padding: 16,
+        marginBottom: 14,
+    },
+    cardHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 6,
+    },
+    primaryBadgeText: {
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    confidenceBadge: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    conditionName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: 4,
+    },
+    differentialBox: {
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 14,
+        borderWidth: 1,
+        borderColor: 'rgba(148, 163, 184, 0.2)',
+    },
+    diffTitle: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#64748B',
+        marginBottom: 6,
+    },
+    diffLabel: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    diffPercentage: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#6366F1',
+    },
+    adviceBox: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 10,
+        padding: 14,
+        borderRadius: 12,
+        marginBottom: 12,
+    },
+    adviceText: {
+        flex: 1,
+        fontSize: 13,
+        lineHeight: 20,
+        color: '#0F766E',
+    },
+    disclaimerText: {
+        fontSize: 11,
+        color: '#94A3B8',
+        textAlign: 'center',
+        lineHeight: 16,
+        marginBottom: 16,
     },
 });
 

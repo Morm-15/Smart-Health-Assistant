@@ -161,11 +161,12 @@
 
   "diseases": {
     "acne": "حب الشباب (Acne)",
-    "carcinoma": "سرطان الخلايا (Carcinoma)",
-    "eczema": "إكزيما (Eczema)",
-    "keratosis": "التقرن (Keratosis)",
-    "milia": "ميليا (Milia)",
-    "rosacea": "الوردية (Rosacea)"
+    "benign_tumors": "شامات وأورام حميدة (Benign Tumors)",
+    "eczema": "الأكزيما والتهاب الجلد (Eczema)",
+    "malignant_carcinoma": "أورام خبيثة مشتبه بها (Malignant Carcinoma)",
+    "normal_skin": "جلد طبيعي سليم (Normal Skin)",
+    "psoriasis": "الصدفية والتقشرات (Psoriasis)",
+    "rosacea": "الوردية واحمرار الوجه (Rosacea)"
   },
 
   "settings": {

@@ -161,10 +161,11 @@
 
   "diseases": {
     "acne": "Akne (Acne)",
-    "carcinoma": "Karsinom (Carcinoma)",
-    "eczema": "Egzama (Eczema)",
-    "keratosis": "Keratoz (Keratosis)",
-    "milia": "Milia",
+    "benign_tumors": "Benign Tümörler ve Benler (Benign Tumors)",
+    "eczema": "Egzama ve Dermatit (Eczema)",
+    "malignant_carcinoma": "Şüpheli Malign Karsinom (Malignant Carcinoma)",
+    "normal_skin": "Normal Sağlıklı Cilt (Normal Skin)",
+    "psoriasis": "Sedef Hastalığı (Psoriasis)",
     "rosacea": "Gül Hastalığı (Rosacea)"
   },
 

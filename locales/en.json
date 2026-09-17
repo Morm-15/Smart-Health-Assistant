@@ -161,10 +161,11 @@
 
   "diseases": {
     "acne": "Acne",
-    "carcinoma": "Carcinoma",
-    "eczema": "Eczema",
-    "keratosis": "Keratosis",
-    "milia": "Milia",
+    "benign_tumors": "Benign Tumors / Moles",
+    "eczema": "Eczema & Dermatitis",
+    "malignant_carcinoma": "Suspected Malignant Carcinoma",
+    "normal_skin": "Normal Healthy Skin",
+    "psoriasis": "Psoriasis",
     "rosacea": "Rosacea"
   },
 
