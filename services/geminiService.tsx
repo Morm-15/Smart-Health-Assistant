@@ -15,7 +15,15 @@ const getSystemInstruction = (language: string) => {
     return instructions[language] || instructions.ar;
 };
 
-export const sendToGemini = async (prompt: string): Promise<string> => {
+export interface ChatMessageContext {
+    role: "user" | "ai";
+    text: string;
+}
+
+export const sendToGemini = async (
+    prompt: string,
+    history: ChatMessageContext[] = []
+): Promise<string> => {
     try {
         if (!apiKey) {
             console.error("❌ API Key missing");
@@ -28,9 +36,34 @@ export const sendToGemini = async (prompt: string): Promise<string> => {
 
         const language = i18n.language || 'ar';
         const systemInstruction = getSystemInstruction(language);
-        const fullPrompt = `${systemInstruction}\n\nالسؤال: ${prompt.trim()}`;
 
-        console.log("📤 Calling Gemini API...");
+        // تقنية النافذة المنزلقة (Sliding Window): أخذ آخر 6 رسائل فقط لحفظ التوكنز والسرعة
+        const slidingHistory = history.slice(-6);
+
+        // تنسيق المحادثة المتعددة الأدوار المتوافقة مع معايير Gemini
+        const formattedContents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+
+        // التأكد من أن أول رسالة دائماً من المستخدم (قاعدة أساسية في Gemini API)
+        let startIndex = 0;
+        while (startIndex < slidingHistory.length && slidingHistory[startIndex].role !== 'user') {
+            startIndex++;
+        }
+
+        for (let i = startIndex; i < slidingHistory.length; i++) {
+            const item = slidingHistory[i];
+            formattedContents.push({
+                role: item.role === 'user' ? 'user' : 'model',
+                parts: [{ text: item.text }]
+            });
+        }
+
+        // إضافة السؤال الجديد
+        formattedContents.push({
+            role: 'user',
+            parts: [{ text: prompt.trim() }]
+        });
+
+        console.log(`📤 Calling Gemini API with ${formattedContents.length} context turns...`);
 
         const url = `${GEMINI_BASE_URL}?key=${apiKey}`;
 
@@ -42,7 +75,10 @@ export const sendToGemini = async (prompt: string): Promise<string> => {
             method: 'POST',
             headers,
             body: JSON.stringify({
-                contents: [{ parts: [{ text: fullPrompt }] }],
+                system_instruction: {
+                    parts: [{ text: systemInstruction }]
+                },
+                contents: formattedContents,
                 generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
             }),
         });

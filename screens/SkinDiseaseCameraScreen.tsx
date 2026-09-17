@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert, Image, ActivityIndicator, ScrollView, Modal } from 'react-native';
 import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../navigation/types';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -42,7 +44,7 @@ interface LocalDiagnosisResult {
 }
 
 const SkinDiseaseCameraScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
     const { t } = useTranslation();
     const { colors, isDarkMode } = useTheme();
 
@@ -309,6 +311,21 @@ const SkinDiseaseCameraScreen = () => {
                                 </Text>
                             </ScrollView>
                             <TouchableOpacity 
+                                style={[styles.modalChatButton, { backgroundColor: '#10B981' }]} 
+                                onPress={() => {
+                                    const result = analysisResult;
+                                    setAnalysisResult(null);
+                                    const prompt = `لقد قمت بتحليل صورة جلدية وحصلت على التقرير الطبي التالي:\n"${result?.slice(0, 300)}..."\nما هي أهم النصائح والتوجيهات الطبية المناسبة؟`;
+                                    navigation.navigate('ChatAI', { initialPrompt: prompt });
+                                }}
+                            >
+                                <Ionicons name="chatbubble-ellipses-outline" size={20} color="#fff" style={{ marginHorizontal: 8 }} />
+                                <Text style={styles.modalChatButtonText}>
+                                    {t('chat.discussWithAiDoctor') || "ناقش هذا الفحص مع المساعد الطبي 💬"}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
                                 style={[styles.modalCloseButton, { backgroundColor: colors.primary }]} 
                                 onPress={() => {
                                     setAnalysisResult(null);
@@ -411,6 +428,26 @@ const SkinDiseaseCameraScreen = () => {
                                         ⚠️ هذا الفحص أداة استرشادية ذكية ولا يغني عن استشارة الطبيب المختص.
                                     </Text>
                                 </ScrollView>
+                            )}
+
+                            {localDiagnosis && (
+                                <TouchableOpacity 
+                                    style={[styles.modalChatButton, { backgroundColor: '#10B981' }]} 
+                                    onPress={() => {
+                                        const diag = localDiagnosis;
+                                        setLocalDiagnosis(null);
+                                        const diffText = diag.differential && diag.differential.key !== diag.primary.key
+                                            ? `، والتشخيص التفريقي البديل: ${diag.differential.label} (${diag.differential.confidence.toFixed(1)}%)`
+                                            : '';
+                                        const prompt = `لقد قمت بفحص صورة جلدية عبر الذكاء الاصطناعي السريري وظهرت النتيجة: ${diag.primary.label} بدقة (${diag.primary.confidence.toFixed(1)}%)${diffText}. ما هي النصائح الطبية والتوجيهات المناسبة لهذه الحالة؟`;
+                                        navigation.navigate('ChatAI', { initialPrompt: prompt });
+                                    }}
+                                >
+                                    <Ionicons name="chatbubble-ellipses-outline" size={20} color="#fff" style={{ marginHorizontal: 8 }} />
+                                    <Text style={styles.modalChatButtonText}>
+                                        {t('chat.discussWithAiDoctor') || "ناقش هذا الفحص مع المساعد الطبي 💬"}
+                                    </Text>
+                                </TouchableOpacity>
                             )}
 
                             <TouchableOpacity 
@@ -573,6 +610,24 @@ const styles = StyleSheet.create({
     modalText: {
         fontSize: 15,
         lineHeight: 24,
+    },
+    modalChatButton: {
+        flexDirection: 'row',
+        height: 50,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 10,
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    modalChatButtonText: {
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: 'bold',
     },
     modalCloseButton: {
         height: 48,

@@ -84,7 +84,14 @@
     "connected": "Online now",
     "typing_indicator": "Typing...",
     "startConversation": "Start a conversation with AI",
-    "medicalAssistant": "Your Smart Medical Assistant"
+    "medicalAssistant": "Your Smart Medical Assistant",
+    "clearChat": "Clear Chat",
+    "clearConfirmTitle": "Clear Chat History",
+    "clearConfirmMessage": "Are you sure you want to delete all previous messages?",
+    "clear": "Clear",
+    "copied": "Copied to clipboard successfully",
+    "shareTitle": "Smart Health Medical Consultation",
+    "discussWithAiDoctor": "Discuss scan with AI Doctor 💬"
   },
 
   "medication": {

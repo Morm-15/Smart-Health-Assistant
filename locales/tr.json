@@ -84,7 +84,14 @@
     "connected": "Şimdi çevrimiçi",
     "typing_indicator": "Yazıyor...",
     "startConversation": "Yapay zeka ile sohbet başlat",
-    "medicalAssistant": "Akıllı Tıbbi Asistanınız"
+    "medicalAssistant": "Akıllı Tıbbi Asistanınız",
+    "clearChat": "Sohbeti Temizle",
+    "clearConfirmTitle": "Sohbet Geçmişini Temizle",
+    "clearConfirmMessage": "Tüm geçmiş mesajları silmek istediğinizden emin misiniz?",
+    "clear": "Temizle",
+    "copied": "Panoya başarıyla kopyalandı",
+    "shareTitle": "Smart Health Tıbbi Danışma Geçmişi",
+    "discussWithAiDoctor": "Yapay Zeka Doktoru ile Tartış 💬"
   },
 
   "medication": {

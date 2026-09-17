@@ -84,7 +84,14 @@
     "connected": "متصل الآن",
     "typing_indicator": "يكتب...",
     "startConversation": "ابدأ محادثة مع الذكاء الاصطناعي",
-    "medicalAssistant": "مساعدك الطبي الذكي"
+    "medicalAssistant": "مساعدك الطبي الذكي",
+    "clearChat": "مسح المحادثة",
+    "clearConfirmTitle": "مسح سجل المحادثة",
+    "clearConfirmMessage": "هل أنت متأكد من رغبتك في حذف جميع الرسائل السابقة؟",
+    "clear": "مسح",
+    "copied": "تم النسخ إلى الحافظة بنجاح",
+    "shareTitle": "سجل استشارة Smart Health الذكية",
+    "discussWithAiDoctor": "ناقش هذا الفحص مع المساعد الطبي 💬"
   },
 
   "medication": {

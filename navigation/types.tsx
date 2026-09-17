@@ -6,7 +6,7 @@ export type AuthStackParamList = {
     Register: undefined;
     ForgotPassword: undefined;
     Home: undefined;
-    ChatAI: undefined;
+    ChatAI: { initialPrompt?: string } | undefined;
     AddMedicationScreen: { medication?: Medication; isEdit?: boolean } | undefined;
     ManageMedicationsScreen: undefined;
     SkinDiseaseCamera: undefined;
