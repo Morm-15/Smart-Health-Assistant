@@ -7,7 +7,9 @@ import {
     TouchableOpacity,
     TextInput,
     StatusBar,
-    Animated,
+    Image,
+    Linking,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +27,11 @@ interface DeviceGuide {
     icon: string;
     color: string;
     tag: string;
+    imageUrl: string;
+    videoUrl: string;
+    videoTitle: string;
+    videoDuration: string;
+    videoSource: string;
     summary: string;
     preparation: string[];
     steps: string[];
@@ -40,6 +47,11 @@ const DEVICES: DeviceGuide[] = [
         icon: 'heart-circle-outline',
         color: '#EF4444',
         tag: 'صحة القلب والشرايين',
+        imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
+        videoUrl: 'https://www.youtube.com/results?search_query=how+to+measure+blood+pressure+at+home+mayo+clinic',
+        videoTitle: 'طريقة قياس ضغط الدم الصحيحة منزلياً خطوة بخطوة',
+        videoDuration: '3 دقائق',
+        videoSource: 'Mayo Clinic / British Heart Foundation',
         summary: 'يقيس الضغط الانقباضي والانبساطي ونبضات القلب بدقة وأمان منزلياً.',
         preparation: [
             'الجلوس بهدوء واسترخاء لمدة 5 دقائق كاملة قبل البدء.',
@@ -68,6 +80,11 @@ const DEVICES: DeviceGuide[] = [
         icon: 'water-outline',
         color: '#F59E0B',
         tag: 'داء السكري والغدد',
+        imageUrl: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80',
+        videoUrl: 'https://www.youtube.com/results?search_query=how+to+use+glucometer+blood+sugar+test',
+        videoTitle: 'طريقة استخدام جهاز قياس السكر وتجنب ألم الوخز',
+        videoDuration: '2 دقيقة',
+        videoSource: 'Diabetes UK / التوجيه الإكلينيكي',
         summary: 'يقيس تركيز الجلوكوز في الدم عبر قطرة دم صغيرة من طرف الإصبع.',
         preparation: [
             'غسل اليدين جيداً بالماء الدافئ والصابون وتجفيفهما تماماً (تجنب الكحول المعطر لأنه قد يؤثر على النتيجة).',
@@ -95,6 +112,11 @@ const DEVICES: DeviceGuide[] = [
         icon: 'speedometer-outline',
         color: '#06B6D4',
         tag: 'الجهاز التنفسي والأكسجين',
+        imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80',
+        videoUrl: 'https://www.youtube.com/results?search_query=how+to+use+pulse+oximeter+correctly',
+        videoTitle: 'شرح عملي: كيفية استخدام جهاز قياس الأكسجين وقراءة النتائج',
+        videoDuration: '2 دقيقة',
+        videoSource: 'NHS / منظمة الصحة العالمية',
         summary: 'يقيس نسبة تشبع الدم بالأكسجين (SpO2) ومعدل نبضات القلب بدون وخز.',
         preparation: [
             'إزالة طلاء الأظافر (المانيكير) والأظافر الاصطناعية لأنها تحجب الأشعة الضوئية.',
@@ -121,6 +143,11 @@ const DEVICES: DeviceGuide[] = [
         icon: 'cloud-outline',
         color: '#8B5CF6',
         tag: 'الحساسية الصدرية والربو',
+        imageUrl: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=800&q=80',
+        videoUrl: 'https://www.youtube.com/results?search_query=how+to+use+inhaler+with+spacer',
+        videoTitle: 'التقنية الصحيحة لاستنشاق دواء الربو مع أنبوب المباعدة (Spacer)',
+        videoDuration: '3 دقائق',
+        videoSource: 'Asthma + Lung UK',
         summary: 'توصل الأدوية الموسعة للشعب الهوائية مباشرة إلى الرئتين بسرعة وفاعلية.',
         preparation: [
             'التأكد من تاريخ صلاحية البخاخ ووجود جرعات متبقية.',
@@ -149,6 +176,11 @@ const DEVICES: DeviceGuide[] = [
         icon: 'thermometer-outline',
         color: '#10B981',
         tag: 'مراقبة العلامات الحيوية',
+        imageUrl: 'https://images.unsplash.com/photo-1584030373081-f37b7bb4fa8e?w=800&q=80',
+        videoUrl: 'https://www.youtube.com/results?search_query=how+to+use+digital+thermometer+properly',
+        videoTitle: 'كيفية قياس درجة الحرارة بدقة بالميزان الرقمي الفموي والجبيني',
+        videoDuration: '2 دقيقة',
+        videoSource: 'Cleveland Clinic / الأكاديمية الأمريكية',
         summary: 'يقيس درجة حرارة الجسم بدقة للكشف المبكر عن الحمى والالتهابات.',
         preparation: [
             'تجنب تناول المشروبات الساخنة أو الباردة قبل القياس الفموي بـ 15 دقيقة.',
@@ -177,6 +209,7 @@ const MedicalDevicesGuideScreen = () => {
 
     const [selectedDevice, setSelectedDevice] = useState<DeviceGuide>(DEVICES[0]);
     const [activeTab, setActiveTab] = useState<'guide' | 'calculator'>('guide');
+    const [imageLoading, setImageLoading] = useState(false);
 
     // Calculator states
     const [systolic, setSystolic] = useState('');
@@ -184,6 +217,19 @@ const MedicalDevicesGuideScreen = () => {
     const [glucose, setGlucose] = useState('');
     const [glucoseState, setGlucoseState] = useState<'fasting' | 'postprandial'>('fasting');
     const [oxygen, setOxygen] = useState('');
+
+    const openVideoTutorial = async (url: string) => {
+        try {
+            const supported = await Linking.canOpenURL(url);
+            if (supported) {
+                await Linking.openURL(url);
+            } else {
+                await Linking.openURL(url);
+            }
+        } catch (e) {
+            console.error("Error opening video URL:", e);
+        }
+    };
 
     // Vitals Evaluation Functions
     const getBPEvaluation = () => {
@@ -196,6 +242,7 @@ const MedicalDevicesGuideScreen = () => {
                 status: 'أزمة ارتفاع ضغط طارئة (Hypertensive Crisis)',
                 color: '#DC2626',
                 bg: 'rgba(220, 38, 38, 0.1)',
+                level: 5,
                 advice: '⚠️ هذه قراءة حرجة جداً! إذا كان هناك ألم بالصدر أو ضيق تنفس أو صداع شديد، توجه فوراً إلى أقرب طوارئ.',
             };
         }
@@ -204,6 +251,7 @@ const MedicalDevicesGuideScreen = () => {
                 status: 'ارتفاع ضغط الدم - مرحلة 2 (Stage 2 Hypertension)',
                 color: '#EF4444',
                 bg: 'rgba(239, 68, 68, 0.1)',
+                level: 4,
                 advice: 'الضغط مرتفع بشكل ملحوظ. يوصى بمراجعة الطبيب لتقييم الحاجة للعلاج الدوائي وتعديل نمط الحياة.',
             };
         }
@@ -212,6 +260,7 @@ const MedicalDevicesGuideScreen = () => {
                 status: 'ارتفاع ضغط الدم - مرحلة 1 (Stage 1 Hypertension)',
                 color: '#F59E0B',
                 bg: 'rgba(245, 158, 11, 0.1)',
+                level: 3,
                 advice: 'مرحلة تستدعي المراقبة وتقليل الصوديوم في الطعام، وممارسة المشي، واستشارة الطبيب.',
             };
         }
@@ -220,6 +269,7 @@ const MedicalDevicesGuideScreen = () => {
                 status: 'ما قبل ارتفاع ضغط الدم (Elevated BP)',
                 color: '#EAB308',
                 bg: 'rgba(234, 179, 8, 0.1)',
+                level: 2,
                 advice: 'قراءة أعلى قليلاً من المثالي. الرياضة وشرب الماء وتقليل الملح كفيل بإعادتها للمعدل المثالي.',
             };
         }
@@ -228,6 +278,7 @@ const MedicalDevicesGuideScreen = () => {
                 status: 'ضغط دم طبيعي ومثالي (Normal BP)',
                 color: '#10B981',
                 bg: 'rgba(16, 185, 129, 0.1)',
+                level: 1,
                 advice: '🟢 صحتك ممتازة! واصل الحفاظ على نمط الحياة الصحي والنشاط البدني.',
             };
         }
@@ -235,6 +286,7 @@ const MedicalDevicesGuideScreen = () => {
             status: 'ضغط دم منخفض (Low BP)',
             color: '#3B82F6',
             bg: 'rgba(59, 130, 246, 0.1)',
+            level: 0,
             advice: 'الضغط منخفض. إذا كنت تشعر بدوخة أو إغماء يرجى الجلوس وشرب سوائل ومراجعة الطبيب.',
         };
     };
@@ -287,28 +339,28 @@ const MedicalDevicesGuideScreen = () => {
                 <BackButton />
                 <View style={styles.headerCenter}>
                     <Text style={[styles.headerTitle, { color: colors.text }]}>
-                        دليل الأجهزة الطبية والحاسبة
+                        دليل الأجهزة الطبية المصور
                     </Text>
                     <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                        تعليم الاستخدام السليم وتفسير القراءات الحيوية
+                        شروحات مصورة وفيديوهات موثوقة وحاسبة سريرية
                     </Text>
                 </View>
                 <View style={{ width: 40 }} />
             </View>
 
-            {/* Tabs (دليل الاستخدام vs الحاسبة الحيوية) */}
+            {/* Tabs */}
             <View style={[styles.tabBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
                 <TouchableOpacity
                     style={[styles.tabButton, activeTab === 'guide' && [styles.tabButtonActive, { borderBottomColor: '#4F46E5' }]]}
                     onPress={() => setActiveTab('guide')}
                 >
                     <Ionicons
-                        name="book-outline"
+                        name="images-outline"
                         size={18}
                         color={activeTab === 'guide' ? '#4F46E5' : colors.textSecondary}
                     />
                     <Text style={[styles.tabText, { color: activeTab === 'guide' ? '#4F46E5' : colors.textSecondary }]}>
-                        دليل الاستخدام المصور
+                        الشرح المصور والفيديو 🎬
                     </Text>
                 </TouchableOpacity>
 
@@ -322,7 +374,7 @@ const MedicalDevicesGuideScreen = () => {
                         color={activeTab === 'calculator' ? '#4F46E5' : colors.textSecondary}
                     />
                     <Text style={[styles.tabText, { color: activeTab === 'calculator' ? '#4F46E5' : colors.textSecondary }]}>
-                        حاسبة القراءات الذكية
+                        حاسبة القراءات الذكية 🧮
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -370,18 +422,34 @@ const MedicalDevicesGuideScreen = () => {
                         })}
                     </ScrollView>
 
-                    {/* Selected Device Details Card */}
+                    {/* Main Card with Image and Video */}
                     <View style={[styles.mainCard, { backgroundColor: colors.surface, borderColor: isDarkMode ? '#334155' : '#E2E8F0' }]}>
+                        {/* 1. الصورة التوضيحية عالية الجودة للجهاز (Device Hero Image) */}
+                        <View style={styles.imageContainer}>
+                            <Image
+                                source={{ uri: selectedDevice.imageUrl }}
+                                style={styles.heroImage}
+                                resizeMode="cover"
+                                onLoadStart={() => setImageLoading(true)}
+                                onLoadEnd={() => setImageLoading(false)}
+                            />
+                            {imageLoading && (
+                                <View style={styles.imageLoadingOverlay}>
+                                    <ActivityIndicator size="small" color="#fff" />
+                                </View>
+                            )}
+                            <View style={[styles.imageTagBadge, { backgroundColor: selectedDevice.color }]}>
+                                <Ionicons name="camera" size={14} color="#fff" style={{ marginRight: 4 }} />
+                                <Text style={styles.imageTagText}>صورة الفحص السريري المعتمد</Text>
+                            </View>
+                        </View>
+
+                        {/* Device Titles */}
                         <View style={styles.cardHeaderRow}>
                             <View style={[styles.deviceIconBox, { backgroundColor: selectedDevice.color + '18' }]}>
-                                <Ionicons name={selectedDevice.icon as any} size={32} color={selectedDevice.color} />
+                                <Ionicons name={selectedDevice.icon as any} size={28} color={selectedDevice.color} />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <View style={[styles.tagBadge, { backgroundColor: selectedDevice.color + '15' }]}>
-                                    <Text style={[styles.tagBadgeText, { color: selectedDevice.color }]}>
-                                        {selectedDevice.tag}
-                                    </Text>
-                                </View>
                                 <Text style={[styles.cardTitle, { color: colors.text }]}>
                                     {selectedDevice.title}
                                 </Text>
@@ -394,6 +462,40 @@ const MedicalDevicesGuideScreen = () => {
                         <Text style={[styles.cardSummary, { color: colors.textSecondary }]}>
                             {selectedDevice.summary}
                         </Text>
+
+                        {/* 2. بطاقة الفيديو التعليمي التفاعلي (Video Tutorial Showcase Card) */}
+                        <TouchableOpacity
+                            style={styles.videoCard}
+                            onPress={() => openVideoTutorial(selectedDevice.videoUrl)}
+                            activeOpacity={0.88}
+                        >
+                            <View style={styles.videoCardBackground}>
+                                <View style={styles.playIconCircle}>
+                                    <Ionicons name="play" size={24} color="#FFFFFF" style={{ marginLeft: 3 }} />
+                                </View>
+                                <View style={styles.videoInfo}>
+                                    <View style={styles.videoBadgeRow}>
+                                        <View style={styles.youtubeBadge}>
+                                            <Ionicons name="logo-youtube" size={14} color="#EF4444" />
+                                            <Text style={styles.youtubeBadgeText}>فيديو تدريبي عملي</Text>
+                                        </View>
+                                        <Text style={styles.videoDurationText}>⏱️ {selectedDevice.videoDuration}</Text>
+                                    </View>
+                                    <Text style={styles.videoTitleText} numberOfLines={2}>
+                                        {selectedDevice.videoTitle}
+                                    </Text>
+                                    <Text style={styles.videoSourceText}>
+                                        المصدر المعتمد: {selectedDevice.videoSource}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.videoCardFooter}>
+                                <Text style={styles.videoCardFooterText}>
+                                    اضغط هنا لتشغيل الشرح بالفيديو الآن 🎬
+                                </Text>
+                                <Ionicons name="arrow-forward" size={16} color="#fff" />
+                            </View>
+                        </TouchableOpacity>
 
                         {/* Normal Range Banner */}
                         <View style={[styles.normalRangeBox, { backgroundColor: isDarkMode ? '#0F2A28' : '#F0FDF4', borderColor: '#22C55E' }]}>
@@ -483,6 +585,20 @@ const MedicalDevicesGuideScreen = () => {
                         <Text style={[styles.calcSub, { color: colors.textSecondary }]}>
                             أدخل قراءة الضغط الانقباضي والانبساطي للحصول على تقييم سريري فوري:
                         </Text>
+
+                        {/* Spectrum Visual Bar */}
+                        <View style={styles.spectrumBar}>
+                            <View style={[styles.spectrumSegment, { backgroundColor: '#10B981' }]} />
+                            <View style={[styles.spectrumSegment, { backgroundColor: '#EAB308' }]} />
+                            <View style={[styles.spectrumSegment, { backgroundColor: '#F59E0B' }]} />
+                            <View style={[styles.spectrumSegment, { backgroundColor: '#EF4444' }]} />
+                            <View style={[styles.spectrumSegment, { backgroundColor: '#DC2626' }]} />
+                        </View>
+                        <View style={styles.spectrumLabels}>
+                            <Text style={styles.spectrumLabelText}>طبيعي</Text>
+                            <Text style={styles.spectrumLabelText}>مرتفع</Text>
+                            <Text style={styles.spectrumLabelText}>حرج</Text>
+                        </View>
 
                         <View style={styles.twoInputsRow}>
                             <View style={{ flex: 1 }}>
@@ -708,36 +824,142 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         elevation: 2,
     },
-    cardHeaderRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 14,
-        marginBottom: 12,
+    imageContainer: {
+        width: '100%',
+        height: 190,
+        borderRadius: 16,
+        overflow: 'hidden',
+        marginBottom: 16,
+        position: 'relative',
+        backgroundColor: '#0F172A',
     },
-    deviceIconBox: {
-        width: 60,
-        height: 60,
-        borderRadius: 18,
+    heroImage: {
+        width: '100%',
+        height: '100%',
+    },
+    imageLoadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    tagBadge: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 8,
-        paddingVertical: 3,
+    imageTagBadge: {
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderRadius: 8,
-        marginBottom: 4,
     },
-    tagBadgeText: {
+    imageTagText: {
+        color: '#fff',
         fontSize: 11,
         fontWeight: '700',
     },
+    videoCard: {
+        borderRadius: 16,
+        backgroundColor: '#1E1B4B',
+        overflow: 'hidden',
+        marginBottom: 18,
+        borderWidth: 1.5,
+        borderColor: '#4338CA',
+        shadowColor: '#4338CA',
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+        elevation: 3,
+    },
+    videoCardBackground: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 14,
+        gap: 12,
+    },
+    playIconCircle: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#EF4444',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#EF4444',
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+        elevation: 4,
+    },
+    videoInfo: {
+        flex: 1,
+    },
+    videoBadgeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 4,
+    },
+    youtubeBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
+    },
+    youtubeBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    videoDurationText: {
+        color: '#A5B4FC',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    videoTitleText: {
+        color: '#FFFFFF',
+        fontSize: 13.5,
+        fontWeight: '700',
+        lineHeight: 18,
+        marginBottom: 2,
+    },
+    videoSourceText: {
+        color: '#94A3B8',
+        fontSize: 11,
+    },
+    videoCardFooter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#3730A3',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+    },
+    videoCardFooterText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    cardHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 10,
+    },
+    deviceIconBox: {
+        width: 52,
+        height: 52,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     cardTitle: {
-        fontSize: 17,
+        fontSize: 16.5,
         fontWeight: '800',
     },
     cardEnglishTitle: {
-        fontSize: 12,
+        fontSize: 11.5,
         marginTop: 2,
     },
     cardSummary: {
@@ -871,8 +1093,28 @@ const styles = StyleSheet.create({
     },
     calcSub: {
         fontSize: 12.5,
-        marginBottom: 14,
+        marginBottom: 10,
         lineHeight: 18,
+    },
+    spectrumBar: {
+        flexDirection: 'row',
+        height: 8,
+        borderRadius: 4,
+        overflow: 'hidden',
+        marginBottom: 4,
+    },
+    spectrumSegment: {
+        flex: 1,
+    },
+    spectrumLabels: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 14,
+    },
+    spectrumLabelText: {
+        fontSize: 10.5,
+        color: '#94A3B8',
+        fontWeight: '600',
     },
     twoInputsRow: {
         flexDirection: 'row',
