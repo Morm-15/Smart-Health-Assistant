@@ -75,6 +75,13 @@ const HomeScreen = () => {
             route: 'MedicalDevicesGuide',
             delay: 400,
         },
+        {
+            icon: 'flask-outline',
+            title: t('home.labReportAnalyzer') || 'محلل التحاليل والروشتات الذكي',
+            color: '#EC4899',
+            route: 'LabReportAnalyzer',
+            delay: 500,
+        },
     ];
 
     return (
