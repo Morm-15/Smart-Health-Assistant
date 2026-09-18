@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { auth } from '../firebase';
 
 interface HeaderProps {
     userName: string;
@@ -12,72 +11,85 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ userName, onSettingsPress }) => {
     const { colors, isDarkMode } = useTheme();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour < 12) return '🌅 صباح الخير';
-        if (hour < 17) return '☀️ مساء النور';
-        return '🌙 مساء الخير';
+        if (i18n.language === 'en') {
+            if (hour < 12) return 'Good morning';
+            if (hour < 17) return 'Good afternoon';
+            return 'Good evening';
+        }
+        if (i18n.language === 'tr') {
+            if (hour < 12) return 'Günaydın';
+            if (hour < 17) return 'İyi günler';
+            return 'İyi akşamlar';
+        }
+        if (hour < 12) return 'صباح الخير';
+        if (hour < 17) return 'مساء النور';
+        return 'مساء الخير';
     };
 
     const initials = userName
         ? userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-        : '👤';
+        : '🩺';
 
     return (
         <View style={styles.wrapper}>
-            {/* Greeting row */}
-            <View style={styles.greetingRow}>
-                <View style={styles.leftSection}>
-                    {/* Avatar */}
-                    <View style={[styles.avatar, { backgroundColor: isDarkMode ? '#4F46E5' : '#6366F1' }]}>
+            {/* Top Bar: Profile Greeting & Settings */}
+            <View style={styles.topRow}>
+                <View style={styles.userSection}>
+                    <View style={[styles.avatarBox, { backgroundColor: '#4F46E5', borderColor: isDarkMode ? '#6366F1' : '#C7D2FE' }]}>
                         <Text style={styles.avatarText}>{initials}</Text>
+                        <View style={styles.onlineBadge} />
                     </View>
 
                     <View style={styles.textSection}>
-                        <Text style={[styles.greetingText, { color: isDarkMode ? '#94A3B8' : '#64748B' }]}>
-                            {getGreeting()}
+                        <Text style={[styles.greetingText, { color: colors.textSecondary }]}>
+                            {getGreeting()} 👋
                         </Text>
-                        <Text style={[styles.userName, { color: isDarkMode ? '#F1F5F9' : '#1E293B' }]} numberOfLines={1}>
-                            {userName || t('home.greeting')} 👋
+                        <Text style={[styles.userNameText, { color: colors.text }]} numberOfLines={1}>
+                            {userName || t('home.greeting')}
                         </Text>
                     </View>
                 </View>
 
-                {/* Settings button */}
+                {/* Modern Settings Action */}
                 <TouchableOpacity
                     style={[
-                        styles.settingsBtn,
-                        { backgroundColor: isDarkMode ? '#1E293B' : '#F1F5F9' }
+                        styles.settingsButton,
+                        {
+                            backgroundColor: colors.surface,
+                            borderColor: isDarkMode ? '#1E293B' : '#E2E8F0',
+                        },
                     ]}
                     onPress={onSettingsPress}
                     activeOpacity={0.7}
                 >
-                    <Ionicons name="settings-outline" size={22} color={isDarkMode ? '#818CF8' : '#6366F1'} />
+                    <Ionicons name="settings-outline" size={20} color={colors.text} />
                 </TouchableOpacity>
             </View>
 
-            {/* Stats bar */}
-            <View style={[styles.statsBar, { backgroundColor: isDarkMode ? '#1E293B' : '#F8FAFF' }]}>
-                <View style={styles.statItem}>
-                    <Ionicons name="heart-outline" size={18} color="#EF4444" />
-                    <Text style={[styles.statLabel, { color: isDarkMode ? '#94A3B8' : '#64748B' }]}>
-                        مساعدك الصحي
+            {/* Daily Medical Pulse / Assistant Status Bar */}
+            <View style={[styles.pulseCard, { backgroundColor: colors.surface, borderColor: isDarkMode ? '#1E293B' : '#EDF2F7' }]}>
+                <View style={styles.pulseItem}>
+                    <View style={[styles.pulseDot, { backgroundColor: '#10B981' }]} />
+                    <Text style={[styles.pulseLabel, { color: colors.text }]}>
+                        {i18n.language === 'en' ? 'Smart Health AI' : i18n.language === 'tr' ? 'Akıllı Sağlık AI' : 'سمارت هيلث AI'}
                     </Text>
                 </View>
-                <View style={[styles.statDivider, { backgroundColor: isDarkMode ? '#334155' : '#E2E8F0' }]} />
-                <View style={styles.statItem}>
-                    <Ionicons name="shield-checkmark-outline" size={18} color="#10B981" />
-                    <Text style={[styles.statLabel, { color: isDarkMode ? '#94A3B8' : '#64748B' }]}>
-                        آمن وموثوق
+                <View style={[styles.divider, { backgroundColor: isDarkMode ? '#1E293B' : '#E2E8F0' }]} />
+                <View style={styles.pulseItem}>
+                    <Ionicons name="shield-checkmark" size={15} color="#4F46E5" />
+                    <Text style={[styles.pulseLabel, { color: colors.textSecondary }]}>
+                        {i18n.language === 'en' ? 'Verified Clinical' : i18n.language === 'tr' ? 'Onaylı Klinik' : 'توجيه سريري'}
                     </Text>
                 </View>
-                <View style={[styles.statDivider, { backgroundColor: isDarkMode ? '#334155' : '#E2E8F0' }]} />
-                <View style={styles.statItem}>
-                    <Ionicons name="time-outline" size={18} color="#6366F1" />
-                    <Text style={[styles.statLabel, { color: isDarkMode ? '#94A3B8' : '#64748B' }]}>
-                        متاح 24/7
+                <View style={[styles.divider, { backgroundColor: isDarkMode ? '#1E293B' : '#E2E8F0' }]} />
+                <View style={styles.pulseItem}>
+                    <Ionicons name="sparkles" size={15} color="#F59E0B" />
+                    <Text style={[styles.pulseLabel, { color: colors.textSecondary }]}>
+                        {i18n.language === 'en' ? '24/7 Active' : i18n.language === 'tr' ? '7/24 Aktif' : 'نشط 24/7'}
                     </Text>
                 </View>
             </View>
@@ -89,75 +101,102 @@ const styles = StyleSheet.create({
     wrapper: {
         marginBottom: 20,
     },
-    greetingRow: {
+    topRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 14,
+        marginBottom: 16,
     },
-    leftSection: {
+    userSection: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
     },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+    avatarBox: {
+        width: 48,
+        height: 48,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 12,
-        shadowColor: '#6366F1',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-        elevation: 4,
+        marginLeft: 2,
+        borderWidth: 1.5,
+        position: 'relative',
     },
     avatarText: {
-        color: '#fff',
-        fontSize: 18,
+        color: '#FFFFFF',
+        fontSize: 16,
         fontWeight: '800',
+    },
+    onlineBadge: {
+        position: 'absolute',
+        bottom: -2,
+        right: -2,
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: '#10B981',
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
     },
     textSection: {
         flex: 1,
     },
     greetingText: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '500',
         marginBottom: 2,
     },
-    userName: {
-        fontSize: 20,
+    userNameText: {
+        fontSize: 19,
         fontWeight: '800',
+        letterSpacing: -0.3,
     },
-    settingsBtn: {
-        width: 46,
-        height: 46,
-        borderRadius: 14,
+    settingsButton: {
+        width: 42,
+        height: 42,
+        borderRadius: 13,
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        elevation: 2,
     },
-    statsBar: {
+    pulseCard: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 16,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
+        paddingVertical: 11,
+        paddingHorizontal: 14,
+        borderWidth: 1,
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+        elevation: 1,
     },
-    statItem: {
+    pulseItem: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
     },
-    statLabel: {
-        fontSize: 12,
+    pulseDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+    },
+    pulseLabel: {
+        fontSize: 11,
         fontWeight: '600',
     },
-    statDivider: {
+    divider: {
         width: 1,
-        height: 20,
+        height: 18,
         marginHorizontal: 4,
     },
 });

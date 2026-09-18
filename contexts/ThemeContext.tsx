@@ -64,32 +64,32 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
     const colors = isDarkMode
         ? {
-            // Dark Mode Colors - Deep blue/slate
-            background: '#0B0F1A',
-            surface: '#151C2C',
-            text: '#F1F5F9',
+            // Dark Mode Colors - Deep obsidian slate
+            background: '#090D16',
+            surface: '#111827',
+            text: '#F8FAFC',
             textSecondary: '#94A3B8',
-            primary: '#818CF8',
+            primary: '#6366F1',
             border: '#1E293B',
-            card: '#151C2C',
+            card: '#111827',
             shadow: '#000000',
             cardGradientStart: '#4F46E5',
             cardGradientEnd: '#7C3AED',
-            cardIconBg: 'rgba(99, 102, 241, 0.2)',
+            cardIconBg: 'rgba(99, 102, 241, 0.18)',
         }
         : {
-            // Light Mode Colors - Clean white/indigo
-            background: '#F0F4FF',
+            // Light Mode Colors - Modern crisp clinical palette
+            background: '#F8FAFC',
             surface: '#FFFFFF',
-            text: '#1E293B',
+            text: '#0F172A',
             textSecondary: '#64748B',
-            primary: '#6366F1',
+            primary: '#4F46E5',
             border: '#E2E8F0',
             card: '#FFFFFF',
-            shadow: '#6366F1',
-            cardGradientStart: '#6366F1',
-            cardGradientEnd: '#8B5CF6',
-            cardIconBg: 'rgba(99, 102, 241, 0.1)',
+            shadow: '#0F172A',
+            cardGradientStart: '#4F46E5',
+            cardGradientEnd: '#6366F1',
+            cardIconBg: 'rgba(79, 70, 229, 0.08)',
         };
 
     return (

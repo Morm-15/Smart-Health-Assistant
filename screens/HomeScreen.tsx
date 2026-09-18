@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View, StatusBar, Text, Animated } from 'react-native';
+import { ScrollView, StyleSheet, View, StatusBar, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -16,7 +16,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'H
 
 const HomeScreen = () => {
     const navigation = useNavigation<HomeScreenNavigationProp>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { colors, isDarkMode } = useTheme();
     const [userName, setUserName] = useState<string>('');
 
@@ -32,57 +32,79 @@ const HomeScreen = () => {
                         setUserName(data.firstName || '');
                     }
                 }
-            } catch {
-                // Silent
-            }
+            } catch {}
         };
         fetchUserName();
     }, [t]);
+
+    const getBadge = (ar: string, en: string, tr: string) => {
+        if (i18n.language === 'en') return en;
+        if (i18n.language === 'tr') return tr;
+        return ar;
+    };
 
     const features = [
         {
             icon: 'chatbubble-ellipses-outline',
             title: t('home.chatWithAI'),
-            color: '#6366F1',
+            color: '#4F46E5',
             route: 'ChatAI',
+            badgeText: getBadge('طبيب AI', 'AI Doctor', 'AI Doktor'),
             delay: 0,
-        },
-        {
-            icon: 'alarm-outline',
-            title: t('home.medicationReminder'),
-            color: '#F59E0B',
-            route: 'AddMedicationScreen',
-            delay: 100,
-        },
-        {
-            icon: 'medkit-outline',
-            title: t('home.manageMedications'),
-            color: '#10B981',
-            route: 'ManageMedicationsScreen',
-            delay: 200,
-        },
-        {
-            icon: 'camera-outline',
-            title: t('home.skinDiseaseDetection'),
-            color: '#8B5CF6',
-            route: 'SkinDiseaseCamera',
-            delay: 300,
-        },
-        {
-            icon: 'speedometer-outline',
-            title: t('home.medicalDevicesGuide') || 'دليل الأجهزة الطبية والحاسبة',
-            color: '#06B6D4',
-            route: 'MedicalDevicesGuide',
-            delay: 400,
         },
         {
             icon: 'flask-outline',
             title: t('home.labReportAnalyzer') || 'محلل التحاليل والروشتات الذكي',
             color: '#EC4899',
             route: 'LabReportAnalyzer',
-            delay: 500,
+            badgeText: getBadge('جديد ✨', 'New ✨', 'Yeni ✨'),
+            delay: 80,
+        },
+        {
+            icon: 'camera-outline',
+            title: t('home.skinDiseaseDetection'),
+            color: '#8B5CF6',
+            route: 'SkinDiseaseCamera',
+            badgeText: getBadge('فحص بصري', 'Vision AI', 'Görsel AI'),
+            delay: 160,
+        },
+        {
+            icon: 'speedometer-outline',
+            title: t('home.medicalDevicesGuide') || 'دليل الأجهزة الطبية والحاسبة',
+            color: '#06B6D4',
+            route: 'MedicalDevicesGuide',
+            badgeText: getBadge('دليل عملي', 'Guide & Calc', 'Rehber & Hesap'),
+            delay: 240,
+        },
+        {
+            icon: 'alarm-outline',
+            title: t('home.medicationReminder'),
+            color: '#F59E0B',
+            route: 'AddMedicationScreen',
+            badgeText: getBadge('تنبيه ذكي', 'Reminder', 'Hatırlatıcı'),
+            delay: 320,
+        },
+        {
+            icon: 'medkit-outline',
+            title: t('home.manageMedications'),
+            color: '#10B981',
+            route: 'ManageMedicationsScreen',
+            badgeText: getBadge('جدول الأدوية', 'My Cabinet', 'İlaçlarım'),
+            delay: 400,
         },
     ];
+
+    const getSectionTitle = () => {
+        if (i18n.language === 'en') return 'Clinical Services';
+        if (i18n.language === 'tr') return 'Klinik Hizmetler';
+        return 'الخدمات الطبية الذكية';
+    };
+
+    const getSectionSubtitle = () => {
+        if (i18n.language === 'en') return 'Select an AI-powered assistant';
+        if (i18n.language === 'tr') return 'Yapay zeka destekli bir servis seçin';
+        return 'اختر الخدمة للبدء فوراً';
+    };
 
     return (
         <SafeAreaView style={[styles.page, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
@@ -101,39 +123,53 @@ const HomeScreen = () => {
                     onSettingsPress={() => navigation.navigate('Settings' as any)}
                 />
 
-                {/* Section Title */}
+                {/* Section Header */}
                 <View style={styles.sectionHeader}>
-                    <Text style={[styles.sectionTitle, { color: isDarkMode ? '#F1F5F9' : '#1E293B' }]}>
-                        الخدمات المتاحة
-                    </Text>
-                    <Text style={[styles.sectionSubtitle, { color: isDarkMode ? '#64748B' : '#94A3B8' }]}>
-                        اختر ما تحتاجه
+                    <View style={styles.sectionTitleRow}>
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                            {getSectionTitle()}
+                        </Text>
+                        <View style={[styles.serviceCountBadge, { backgroundColor: isDarkMode ? '#1E293B' : '#EDF2F7' }]}>
+                            <Text style={[styles.serviceCountText, { color: colors.textSecondary }]}>
+                                {features.length}
+                            </Text>
+                        </View>
+                    </View>
+                    <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
+                        {getSectionSubtitle()}
                     </Text>
                 </View>
 
                 {/* Feature Cards Grid */}
                 <View style={styles.cardsContainer}>
-                    {features.map((feature, index) => (
+                    {features.map((feature) => (
                         <FeatureCard
                             key={feature.route}
                             icon={feature.icon}
                             title={feature.title}
                             color={feature.color}
+                            badgeText={feature.badgeText}
                             delay={feature.delay}
                             onPress={() => navigation.navigate(feature.route as any)}
                         />
                     ))}
                 </View>
 
-                {/* Bottom tip card */}
-                <View style={[styles.tipCard, { backgroundColor: isDarkMode ? '#1E293B' : '#EEF2FF' }]}>
-                    <Text style={styles.tipEmoji}>💡</Text>
+                {/* Bottom Clinical Tip Card */}
+                <View style={[styles.tipCard, { backgroundColor: colors.surface, borderColor: isDarkMode ? '#1E293B' : '#EDF2F7' }]}>
+                    <View style={styles.tipIconBox}>
+                        <Text style={styles.tipEmoji}>💡</Text>
+                    </View>
                     <View style={{ flex: 1 }}>
-                        <Text style={[styles.tipTitle, { color: isDarkMode ? '#818CF8' : '#4F46E5' }]}>
-                            نصيحة اليوم
+                        <Text style={[styles.tipTitle, { color: colors.text }]}>
+                            {i18n.language === 'en' ? 'Clinical Notice' : i18n.language === 'tr' ? 'Klinik Bilgilendirme' : 'إرشاد سريري معتمد'}
                         </Text>
-                        <Text style={[styles.tipText, { color: isDarkMode ? '#94A3B8' : '#64748B' }]}>
-                            الاستشارة الطبية لا تغني عن الطبيب. هذا التطبيق للمساعدة والتوعية فقط.
+                        <Text style={[styles.tipText, { color: colors.textSecondary }]}>
+                            {i18n.language === 'en'
+                                ? 'AI guidance supports your health decisions but does not replace licensed medical consultations.'
+                                : i18n.language === 'tr'
+                                ? 'Yapay zeka rehberliği sağlığınızı destekler, ancak uzman doktor muayenesinin yerini almaz.'
+                                : 'التوجيهات الصحية الذكية للمساعدة السريرية والتوعية، ولا تغني عن استشارة الطبيب المختص.'}
                         </Text>
                     </View>
                 </View>
@@ -152,22 +188,36 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-        paddingHorizontal: 18,
-        paddingTop: 16,
+        paddingHorizontal: 16,
+        paddingTop: 12,
         paddingBottom: 20,
         flexGrow: 1,
     },
     sectionHeader: {
-        marginBottom: 16,
+        marginBottom: 14,
+    },
+    sectionTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     sectionTitle: {
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: '800',
-        letterSpacing: 0.3,
+        letterSpacing: -0.4,
+    },
+    serviceCountBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 10,
+    },
+    serviceCountText: {
+        fontSize: 12,
+        fontWeight: '700',
     },
     sectionSubtitle: {
-        fontSize: 14,
-        marginTop: 2,
+        fontSize: 13,
+        marginTop: 3,
         fontWeight: '500',
     },
     cardsContainer: {
@@ -179,22 +229,36 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-start',
         padding: 16,
-        borderRadius: 16,
-        marginTop: 8,
+        borderRadius: 18,
+        marginTop: 6,
+        marginBottom: 10,
+        borderWidth: 1,
         gap: 12,
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+        elevation: 1,
+    },
+    tipIconBox: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        backgroundColor: 'rgba(245, 158, 11, 0.12)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     tipEmoji: {
-        fontSize: 24,
-        marginTop: 2,
+        fontSize: 18,
     },
     tipTitle: {
         fontSize: 14,
         fontWeight: '700',
-        marginBottom: 4,
+        marginBottom: 3,
     },
     tipText: {
-        fontSize: 13,
-        lineHeight: 20,
+        fontSize: 12,
+        lineHeight: 18,
     },
 });
 

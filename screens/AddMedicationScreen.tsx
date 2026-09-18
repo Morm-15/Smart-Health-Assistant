@@ -19,7 +19,7 @@ import { addMedication, updateMedication, checkMedicationExists } from '../servi
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
-import BackButton from '../components/BackButton';
+import ScreenHeader from '../components/ScreenHeader';
 
 const AddMedicationScreen = ({ navigation, route }: any) => {
     const { t } = useTranslation();
@@ -110,10 +110,7 @@ const AddMedicationScreen = ({ navigation, route }: any) => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-            <BackButton  />
-            <Text style={[styles.title, { color: colors.primary }]}>
-                {isEdit ? t('medication.editTitle') : t('medication.addTitle')}
-            </Text>
+            <ScreenHeader title={isEdit ? t('medication.editTitle') : t('medication.addTitle')} />
 
             <View style={styles.fieldRow}>
                 <View style={styles.labelRow}>

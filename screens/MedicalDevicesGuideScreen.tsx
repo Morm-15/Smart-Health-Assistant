@@ -18,7 +18,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import BackButton from '../components/BackButton';
+import ScreenHeader from '../components/ScreenHeader';
 
 interface DeviceGuide {
     id: string;
@@ -205,7 +205,7 @@ const DEVICES: DeviceGuide[] = [
 const MedicalDevicesGuideScreen = () => {
     const { colors, isDarkMode } = useTheme();
     const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [selectedDevice, setSelectedDevice] = useState<DeviceGuide>(DEVICES[0]);
     const [activeTab, setActiveTab] = useState<'guide' | 'calculator'>('guide');
@@ -335,18 +335,10 @@ const MedicalDevicesGuideScreen = () => {
             />
 
             {/* Header */}
-            <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                <BackButton />
-                <View style={styles.headerCenter}>
-                    <Text style={[styles.headerTitle, { color: colors.text }]}>
-                        دليل الأجهزة الطبية المصور
-                    </Text>
-                    <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                        شروحات مصورة وفيديوهات موثوقة وحاسبة سريرية
-                    </Text>
-                </View>
-                <View style={{ width: 40 }} />
-            </View>
+            <ScreenHeader
+                title={i18n.language === 'en' ? 'Medical Devices Guide' : i18n.language === 'tr' ? 'Tıbbi Cihazlar Rehberi' : 'دليل الأجهزة الطبية المصور'}
+                subtitle={i18n.language === 'en' ? 'Visual guides & clinical calculator' : i18n.language === 'tr' ? 'Görsel rehberler ve klinik hesaplayıcı' : 'شروحات مصورة وحاسبة سريرية'}
+            />
 
             {/* Tabs */}
             <View style={[styles.tabBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>

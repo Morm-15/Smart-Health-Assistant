@@ -21,7 +21,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import BackButton from '../components/BackButton';
+import ScreenHeader from '../components/ScreenHeader';
 import {
     analyzeLabReportImage,
     prepareLabImageBase64,
@@ -288,24 +288,17 @@ const LabReportAnalyzerScreen = () => {
             />
 
             {/* Header */}
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
-                <BackButton />
-                <View style={styles.headerTitleBox}>
-                    <Text style={[styles.headerTitle, { color: colors.text }]}>
-                        {t('labAnalyzer.screenTitle')}
-                    </Text>
-                    <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                        {t('labAnalyzer.screenSubtitle')}
-                    </Text>
-                </View>
-                {report ? (
-                    <TouchableOpacity style={styles.headerActionBtn} onPress={resetAnalysis}>
-                        <Ionicons name="refresh" size={22} color="#6366F1" />
-                    </TouchableOpacity>
-                ) : (
-                    <View style={{ width: 40 }} />
-                )}
-            </View>
+            <ScreenHeader
+                title={t('labAnalyzer.screenTitle')}
+                subtitle={t('labAnalyzer.screenSubtitle')}
+                rightElement={
+                    report ? (
+                        <TouchableOpacity style={styles.headerActionBtn} onPress={resetAnalysis}>
+                            <Ionicons name="refresh" size={22} color="#4F46E5" />
+                        </TouchableOpacity>
+                    ) : undefined
+                }
+            />
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* 1. Upload & Action Section (Visible when no report is loaded) */}

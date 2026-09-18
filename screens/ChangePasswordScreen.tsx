@@ -15,7 +15,8 @@ import { auth } from '../firebase';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import BackButton from '../components/BackButton';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenHeader from '../components/ScreenHeader';
 
 const ChangePasswordScreen = () => {
     const navigation = useNavigation();
@@ -95,9 +96,8 @@ const ChangePasswordScreen = () => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <BackButton />
-            <Text style={[styles.title, { color: colors.text }]}>{t('changePassword.title')}</Text>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+            <ScreenHeader title={t('changePassword.title')} />
 
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 <View style={styles.formContainer}>
@@ -195,7 +195,7 @@ const ChangePasswordScreen = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 

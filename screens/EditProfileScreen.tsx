@@ -15,7 +15,8 @@ import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import BackButton from '../components/BackButton';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenHeader from '../components/ScreenHeader';
 import { getFirestoreErrorMessage } from '../validations/errorMessages';
 
 const EditProfileScreen = () => {
@@ -90,9 +91,8 @@ const EditProfileScreen = () => {
     }
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <BackButton />
-            <Text style={[styles.title, { color: colors.text }]}>{t('profile.title')}</Text>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+            <ScreenHeader title={t('profile.title')} />
 
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 <View style={styles.formContainer}>
@@ -154,7 +154,7 @@ const EditProfileScreen = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 

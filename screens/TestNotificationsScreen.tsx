@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import BackButton from '../components/BackButton';
+import ScreenHeader from '../components/ScreenHeader';
 import {
     scheduleNotification,
     cancelAllNotifications,
@@ -109,10 +109,7 @@ const TestNotificationsScreen = () => {
             style={[styles.container, { backgroundColor: colors.background }]}
             edges={['top', 'bottom']}
         >
-            <BackButton />
-            <Text style={[styles.title, { color: colors.text }]}>
-                🧪 اختبار الإشعارات
-            </Text>
+            <ScreenHeader title="🧪 اختبار الإشعارات" />
 
             <ScrollView
                 style={styles.scrollView}

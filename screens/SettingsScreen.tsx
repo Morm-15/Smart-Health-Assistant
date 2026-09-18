@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from '../contexts/ThemeContext';
-import BackButton from '../components/BackButton';
+import ScreenHeader from '../components/ScreenHeader';
 
 const SettingsScreen = () => {
     const navigation = useNavigation<any>();
@@ -132,8 +132,7 @@ const SettingsScreen = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-            <BackButton />
-            <Text style={[styles.title, { color: colors.text }]}>{t('settings.title')}</Text>
+            <ScreenHeader title={t('settings.title')} />
 
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 {/* Language Section */}

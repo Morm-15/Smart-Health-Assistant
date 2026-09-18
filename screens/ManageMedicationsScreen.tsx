@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
-import BackButton from '../components/BackButton';
+import ScreenHeader from '../components/ScreenHeader';
 import { getMedications, deleteMedication, Medication } from '../services/medicationService';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -158,10 +158,14 @@ const ManageMedicationsScreen = ({ navigation }: any) => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-            <BackButton />
-            <Text style={[styles.title, { color: colors.primary }]}>
-                {t('home.manageMedications')}
-            </Text>
+            <ScreenHeader
+                title={t('home.manageMedications')}
+                rightElement={
+                    <TouchableOpacity onPress={() => navigation.navigate('AddMedicationScreen')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <Ionicons name="add-circle" size={28} color="#4F46E5" />
+                    </TouchableOpacity>
+                }
+            />
 
             {loading ? (
                 <View style={styles.loadingContainer}>

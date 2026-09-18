@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert, Image, ActivityIndicator, ScrollView, Modal } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Alert, Image, ActivityIndicator, ScrollView, Modal, I18nManager } from 'react-native';
 import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -45,13 +45,15 @@ interface LocalDiagnosisResult {
 
 const SkinDiseaseCameraScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { colors, isDarkMode } = useTheme();
 
     // هوك الأذونات
     const [permission, requestPermission] = useCameraPermissions();
 
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const isRtl = I18nManager.isRTL || i18n.language === 'ar';
+    const backIcon = isRtl ? 'chevron-forward' : 'chevron-back';
     const [facing, setFacing] = useState<CameraType>('back');
     const cameraRef = useRef<any>(null);
 
@@ -244,8 +246,8 @@ const SkinDiseaseCameraScreen = () => {
                         <Text style={{color: 'white', marginTop: 10}}>{t('camera.analyzing')}...</Text>
                     </View>
                 )}
-                <TouchableOpacity style={styles.backButton} onPress={retakePicture}>
-                    <Ionicons name="arrow-back" size={30} color="#fff" />
+                <TouchableOpacity style={styles.backButton} onPress={retakePicture} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <Ionicons name={backIcon as any} size={24} color="#fff" />
                 </TouchableOpacity>
 
                 <View style={styles.previewControls}>
@@ -465,8 +467,8 @@ const SkinDiseaseCameraScreen = () => {
         <View style={styles.container}>
             <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} />
 
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={30} color="#fff" />
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Ionicons name={backIcon as any} size={24} color="#fff" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
@@ -512,8 +514,8 @@ const styles = StyleSheet.create({
     permissionText: { color: '#fff', fontSize: 18, textAlign: 'center', marginTop: 50 },
     retryButton: { marginTop: 20, paddingHorizontal: 30, paddingVertical: 12, backgroundColor: '#007AFF', borderRadius: 8, alignSelf: 'center' },
     retryButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-    backButton: { position: 'absolute', top: 50, left: 20, width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', zIndex: 20 },
-    flipButton: { position: 'absolute', top: 50, right: 20, width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', zIndex: 20 },
+    backButton: { position: 'absolute', top: 50, left: 20, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(15, 23, 42, 0.65)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.25)', justifyContent: 'center', alignItems: 'center', zIndex: 20 },
+    flipButton: { position: 'absolute', top: 50, right: 20, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(15, 23, 42, 0.65)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.25)', justifyContent: 'center', alignItems: 'center', zIndex: 20 },
     bottomControls: { position: 'absolute', bottom: 40, width: '100%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', zIndex: 20 },
     galleryButton: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
     captureButton: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.3)', justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: '#fff' },
