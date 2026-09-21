@@ -63,6 +63,8 @@
     "skinDiseaseDetection": "Cilt Hastalığı Kamera Taraması",
     "medicalDevicesGuide": "Ev Tıbbi Cihazları Rehberi",
     "labReportAnalyzer": "Akıllı Tahlil ve Reçete Analizi",
+    "drugInteraction": "İlaç ve Besin Etkileşim Denetimi",
+    "firstAidGuide": "Acil İlk Yardım ve CPR Rehberi",
     "profile": "Profil",
     "settings": "Ayarlar",
     "errorFetchingUser": "Kullanıcı verileri alınırken bir hata oluştu"

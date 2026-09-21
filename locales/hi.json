@@ -1,25 +1,24 @@
 {
-  "welcomeBack": "Welcome back!",
-  "email": "Email",
-  "password": "Password",
-  "forgotPassword": "Forgot Password?",
-  "login": "Login",
-  "createAccount": "Create New Account",
-  "error": "Error",
-  "verifyEmailTitle": "Verification Required",
-  "verifyEmailMessage": "Please verify your email before logging in.",
-  "resetPasswordTitle": "Reset Password",
-  "enterEmail": "Enter your email",
-  "sendLink": "Send Link",
-  "success": "Success",
-  "resetPasswordEmailSent": "A password reset link has been sent to your email.",
-  "createNewAccount": "Create New Account",
-  "firstName": "First Name",
-  "lastName": "Last Name",
-  "confirmPassword": "Confirm Password",
-  "backToLogin": "Back to Login",
-  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account.",
-
+  "welcomeBack": "वापसी पर स्वागत है!",
+  "email": "ईमेल",
+  "password": "पासवर्ड",
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "login": "लॉग इन करें",
+  "createAccount": "नया खाता बनाएं",
+  "error": "त्रुटि",
+  "verifyEmailTitle": "सत्यापन आवश्यक है",
+  "verifyEmailMessage": "कृपया लॉग इन करने से पहले अपना ईमेल सत्यापित करें।",
+  "resetPasswordTitle": "पासवर्ड रीसेट करें",
+  "enterEmail": "अपना ईमेल दर्ज करें",
+  "sendLink": "लिंक भेजें",
+  "success": "सफलता",
+  "resetPasswordEmailSent": "पासवर्ड रीसेट लिंक आपके ईमेल पर भेज दिया गया है।",
+  "createNewAccount": "नया खाता बनाएं",
+  "firstName": "पहला नाम",
+  "lastName": "उपनाम",
+  "confirmPassword": "पासवर्ड की पुष्टि करें",
+  "backToLogin": "लॉगिन पर वापस जाएं",
+  "accountCreatedMessage": "आपका खाता सफलतापूर्वक बनाया गया है।",
   "errors": {
     "invalidEmail": "Invalid email address",
     "userNotFound": "Email is not registered in the system",
@@ -53,27 +52,26 @@
     "serviceUnavailable": "Service is currently unavailable. Try later",
     "defaultError": "An unexpected error occurred. Please try again"
   },
-
   "home": {
-    "greeting": "Hello",
-    "welcome": "Welcome to your Smart Health Assistant",
-    "chatWithAI": "Chat with AI",
-    "medicationReminder": "Medication Reminder",
-    "manageMedications": "Manage Medications",
-    "skinDiseaseDetection": "Skin Disease Camera Scan",
-    "medicalDevicesGuide": "Home Medical Devices Guide",
-    "labReportAnalyzer": "Smart Lab & Prescription Reader",
-    "drugInteraction": "AI Drug & Food Interaction Guard",
+    "greeting": "नमस्ते",
+    "welcome": "स्मार्ट स्वास्थ्य सहायक में आपका स्वागत है",
+    "chatWithAI": "एआई डॉक्टर से परामर्श",
+    "medicationReminder": "दवा अनुस्मारक",
+    "manageMedications": "मेरी दवाइयां",
+    "skinDiseaseDetection": "त्वचा रोग स्कैनर",
+    "medicalDevicesGuide": "चिकित्सा उपकरण गाइड",
+    "labReportAnalyzer": "लैब रिपोर्ट और प्रिस्क्रिप्शन रीडर",
+    "drugInteraction": "दवा पारस्परिक क्रिया जांच",
     "firstAidGuide": "Emergency First Aid & CPR Guide",
-    "profile": "Profile",
-    "settings": "Settings",
-    "errorFetchingUser": "An error occurred while fetching user data"
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "errorFetchingUser": "An error occurred while fetching user data",
+    "firstAid": "प्राथमिक चिकित्सा गाइड"
   },
-
   "chat": {
-    "title": "Chat with AI",
-    "inputPlaceholder": "Type your message...",
-    "send": "Send",
+    "title": "एआई डॉक्टर",
+    "inputPlaceholder": "अपना चिकित्सा प्रश्न लिखें...",
+    "send": "भेजें",
     "typing": "...",
     "errorMessage": "⚠️ An error occurred while connecting to AI.",
     "userPrefix": "👤",
@@ -95,9 +93,8 @@
     "clear": "Clear",
     "copied": "Copied to clipboard successfully",
     "shareTitle": "Smart Health Medical Consultation",
-    "discussWithAiDoctor": "Discuss scan with AI Doctor 💬"
+    "discussWithAiDoctor": "एआई डॉक्टर से इस रिपोर्ट पर चर्चा करें 💬"
   },
-
   "medication": {
     "addTitle": "Add New Medication",
     "editTitle": "Edit Medication",
@@ -142,7 +139,6 @@
     "notificationBodyFull": "Time to take {{doseAmount}} of {{medName}} on full stomach",
     "notificationBody": "Time to take {{doseAmount}} of {{medName}}"
   },
-
   "camera": {
     "loading": "Loading camera...",
     "requestingPermission": "Requesting camera permission...",
@@ -169,7 +165,6 @@
     "modelLoadingError": "Local AI model failed to load. Falling back to Cloud Smart Analysis.",
     "aiAnalysisResult": "AI Analysis Result"
   },
-
   "diseases": {
     "acne": "Acne",
     "benign_tumors": "Benign Tumors / Moles",
@@ -179,39 +174,37 @@
     "psoriasis": "Psoriasis",
     "rosacea": "Rosacea"
   },
-
   "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "selectLanguage": "Select Language",
+    "title": "सेटिंग्स",
+    "language": "भाषा",
+    "selectLanguage": "भाषा चुनें",
     "arabic": "العربية",
     "english": "English",
     "turkish": "Türkçe",
-    "notifications": "Notifications",
+    "notifications": "सूचनाएं",
     "enableNotifications": "Enable Notifications",
     "notificationEnabled": "Notifications enabled",
     "notificationDisabled": "Notifications disabled",
     "theme": "Theme",
-    "darkMode": "Dark Mode",
+    "darkMode": "डार्क मोड",
     "darkModeEnabled": "Dark mode enabled",
     "darkModeDisabled": "Dark mode disabled",
-    "account": "Account",
+    "account": "खाता",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
-    "logout": "Logout",
-    "about": "About",
-    "version": "Version",
-    "privacyPolicy": "Privacy Policy",
+    "logout": "लॉग आउट",
+    "about": "जानकारी",
+    "version": "संस्करण",
+    "privacyPolicy": "गोपनीयता नीति",
     "privacyPolicyTitle": "Privacy Policy",
     "privacyPolicyMessage": "We respect your privacy and protect your personal data. All medical information is securely stored and not shared with third parties.",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "सेवा की शर्तें",
     "termsOfServiceTitle": "Terms of Service",
     "termsOfServiceMessage": "By using this app, you agree to our terms and conditions. The app is for educational and health assistance purposes only and does not replace professional medical advice.",
     "logoutConfirm": "Are you sure you want to logout?",
     "yes": "Yes",
     "no": "No"
   },
-
   "profile": {
     "title": "Edit Profile",
     "loadingData": "Loading data...",
@@ -221,7 +214,6 @@
     "errorSaving": "An error occurred while saving",
     "enterFullName": "Please enter full name"
   },
-
   "changePassword": {
     "title": "Change Password",
     "currentPassword": "Current Password",
@@ -247,32 +239,30 @@
     "recentLoginRequired": "Please login again and try",
     "errorChangingPassword": "An error occurred while changing password"
   },
-
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "back": "Back",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "back": "वापस",
     "next": "Next",
-    "done": "Done",
-    "loading": "Loading...",
+    "done": "पूर्ण",
+    "loading": "लोड हो रहा है...",
     "retry": "Retry",
-    "close": "Close"
+    "close": "बंद करें"
   },
-
   "labAnalyzer": {
-    "screenTitle": "Smart Lab & Prescription Reader",
-    "screenSubtitle": "Instant AI Analysis & Interpretation of Medical Tests",
+    "screenTitle": "एआई लैब रिपोर्ट और प्रिस्क्रिप्शन रीडर",
+    "screenSubtitle": "त्वरित परिणाम विश्लेषण और नैदानिक मार्गदर्शन",
     "heroHeading": "Analyze Your Lab Results with Advanced AI",
     "heroDescription": "Capture or upload your laboratory report (CBC, Liver/Kidney Panel, Glucose, Lipids...) or doctor prescription. The AI will parse tests, classify abnormalities, and explain clinical implications in plain language.",
-    "takePhotoBtn": "Take Photo of Report",
-    "chooseGalleryBtn": "Choose from Gallery",
-    "demoReportBtn": "🧪 Try Sample Blood Test (Demo CBC)",
+    "takePhotoBtn": "रिपोर्ट की फोटो लें",
+    "chooseGalleryBtn": "गैलरी से चुनें",
+    "demoReportBtn": "🧪 नमूना रक्त परीक्षण (Demo CBC)",
     "permissionNeeded": "Camera and gallery permissions are required to scan reports.",
     "cameraError": "Unable to open camera. Please try again.",
     "galleryError": "Unable to open gallery. Please try again.",
-    "analyzingTitle": "Analyzing Laboratory Report...",
+    "analyzingTitle": "रिपोर्ट का विश्लेषण किया जा रहा है...",
     "stageReading": "Extracting tables and medical numbers (OCR)...",
     "stageEvaluating": "Comparing against clinical reference ranges...",
     "stageFinalizing": "Generating personalized health report...",

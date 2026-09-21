@@ -17,12 +17,15 @@ import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from '../contexts/ThemeContext';
 import ScreenHeader from '../components/ScreenHeader';
+import LanguageSelectModal from '../components/LanguageSelectModal';
+import { getLanguageItem } from '../constants/languages';
 
 const SettingsScreen = () => {
     const navigation = useNavigation<any>();
     const { t, i18n } = useTranslation();
     const { isDarkMode, toggleDarkMode, colors } = useTheme();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const [showLangModal, setShowLangModal] = useState(false);
 
     useEffect(() => {
         loadSettings();
@@ -38,34 +41,7 @@ const SettingsScreen = () => {
     };
 
     const changeLanguage = () => {
-        Alert.alert(
-            t('settings.selectLanguage'),
-            '',
-            [
-                {
-                    text: t('settings.arabic'),
-                    onPress: async () => {
-                        await i18n.changeLanguage('ar');
-                        await AsyncStorage.setItem('userLanguage', 'ar');
-                    },
-                },
-                {
-                    text: t('settings.english'),
-                    onPress: async () => {
-                        await i18n.changeLanguage('en');
-                        await AsyncStorage.setItem('userLanguage', 'en');
-                    },
-                },
-                {
-                    text: t('settings.turkish'),
-                    onPress: async () => {
-                        await i18n.changeLanguage('tr');
-                        await AsyncStorage.setItem('userLanguage', 'tr');
-                    },
-                },
-                { text: t('common.cancel'), style: 'cancel' },
-            ]
-        );
+        setShowLangModal(true);
     };
 
     const handleLogout = () => {
@@ -152,7 +128,7 @@ const SettingsScreen = () => {
                         </View>
                         <View style={styles.settingRight}>
                             <Text style={[styles.currentLang, { color: colors.primary }]}>
-                                {i18n.language === 'ar' ? 'العربية' : i18n.language === 'tr' ? 'Türkçe' : 'English'}
+                                {getLanguageItem(i18n.language).flag} {getLanguageItem(i18n.language).nativeName}
                             </Text>
                             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
                         </View>
@@ -292,6 +268,11 @@ const SettingsScreen = () => {
 
                 <View style={{ height: 40 }} />
             </ScrollView>
+
+            <LanguageSelectModal
+                visible={showLangModal}
+                onClose={() => setShowLangModal(false)}
+            />
         </SafeAreaView>
     );
 };

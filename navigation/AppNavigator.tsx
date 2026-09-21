@@ -17,6 +17,8 @@ import ChangePasswordScreen from "../screens/ChangePasswordScreen";
 import TestNotificationsScreen from "../screens/TestNotificationsScreen";
 import MedicalDevicesGuideScreen from "../screens/MedicalDevicesGuideScreen";
 import LabReportAnalyzerScreen from "../screens/LabReportAnalyzerScreen";
+import DrugInteractionScreen from "../screens/DrugInteractionScreen";
+import FirstAidGuideScreen from "../screens/FirstAidGuideScreen";
 import { AuthStackParamList } from './types';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
@@ -73,6 +75,8 @@ const AppNavigator = () => {
                         <Stack.Screen name="TestNotifications" component={TestNotificationsScreen} />
                         <Stack.Screen name="MedicalDevicesGuide" component={MedicalDevicesGuideScreen} />
                         <Stack.Screen name="LabReportAnalyzer" component={LabReportAnalyzerScreen} />
+                        <Stack.Screen name="DrugInteraction" component={DrugInteractionScreen} />
+                        <Stack.Screen name="FirstAidGuide" component={FirstAidGuideScreen} />
                     </>
                 ) : (
                     // User is not logged in - Show Auth Screens

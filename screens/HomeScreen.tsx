@@ -11,6 +11,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import Header from '../components/Header';
 import FeatureCard from '../components/FeatureCard';
 import Footer from '../components/Footer';
+import DailyWaterWidget from '../components/DailyWaterWidget';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Home'>;
 
@@ -69,12 +70,28 @@ const HomeScreen = () => {
             delay: 160,
         },
         {
+            icon: 'shield-checkmark-outline',
+            title: t('home.drugInteraction') || 'فاحص التعارضات الدوائية والغذائية',
+            color: '#0D9488',
+            route: 'DrugInteraction',
+            badgeText: getBadge('أمان دوائي', 'Drug Guard', 'İlaç Güvenliği'),
+            delay: 200,
+        },
+        {
+            icon: 'heart-pulse-outline',
+            title: t('home.firstAidGuide') || 'دليل الإسعافات الأولية و CPR',
+            color: '#DC2626',
+            route: 'FirstAidGuide',
+            badgeText: getBadge('إنقاذ حياة 🚨', 'Life Saver 🚨', 'İlk Yardım 🚨'),
+            delay: 240,
+        },
+        {
             icon: 'speedometer-outline',
             title: t('home.medicalDevicesGuide') || 'دليل الأجهزة الطبية والحاسبة',
             color: '#06B6D4',
             route: 'MedicalDevicesGuide',
             badgeText: getBadge('دليل عملي', 'Guide & Calc', 'Rehber & Hesap'),
-            delay: 240,
+            delay: 280,
         },
         {
             icon: 'alarm-outline',
@@ -90,7 +107,7 @@ const HomeScreen = () => {
             color: '#10B981',
             route: 'ManageMedicationsScreen',
             badgeText: getBadge('جدول الأدوية', 'My Cabinet', 'İlaçlarım'),
-            delay: 400,
+            delay: 360,
         },
     ];
 
@@ -122,6 +139,9 @@ const HomeScreen = () => {
                     userName={userName}
                     onSettingsPress={() => navigation.navigate('Settings' as any)}
                 />
+
+                {/* Daily Hydration & Vitals Dashboard */}
+                <DailyWaterWidget />
 
                 {/* Section Header */}
                 <View style={styles.sectionHeader}>

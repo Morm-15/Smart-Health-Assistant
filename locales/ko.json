@@ -1,25 +1,24 @@
 {
-  "welcomeBack": "Welcome back!",
-  "email": "Email",
-  "password": "Password",
-  "forgotPassword": "Forgot Password?",
-  "login": "Login",
-  "createAccount": "Create New Account",
-  "error": "Error",
-  "verifyEmailTitle": "Verification Required",
-  "verifyEmailMessage": "Please verify your email before logging in.",
-  "resetPasswordTitle": "Reset Password",
-  "enterEmail": "Enter your email",
-  "sendLink": "Send Link",
-  "success": "Success",
-  "resetPasswordEmailSent": "A password reset link has been sent to your email.",
-  "createNewAccount": "Create New Account",
-  "firstName": "First Name",
-  "lastName": "Last Name",
-  "confirmPassword": "Confirm Password",
-  "backToLogin": "Back to Login",
-  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account.",
-
+  "welcomeBack": "다시 오신 것을 환영합니다!",
+  "email": "이메일",
+  "password": "비밀번호",
+  "forgotPassword": "비밀번호를 잊으셨나요?",
+  "login": "로그인",
+  "createAccount": "새 계정 만들기",
+  "error": "오류",
+  "verifyEmailTitle": "인증 필요",
+  "verifyEmailMessage": "로그인하기 전에 이메일을 확인해 주세요.",
+  "resetPasswordTitle": "비밀번호 재설정",
+  "enterEmail": "이메일 입력",
+  "sendLink": "링크 전송",
+  "success": "성공",
+  "resetPasswordEmailSent": "비밀번호 재설정 링크가 이메일로 전송되었습니다.",
+  "createNewAccount": "새 계정 생성",
+  "firstName": "이름",
+  "lastName": "성",
+  "confirmPassword": "비밀번호 확인",
+  "backToLogin": "로그인으로 돌아가기",
+  "accountCreatedMessage": "계정이 성공적으로 생성되었습니다.",
   "errors": {
     "invalidEmail": "Invalid email address",
     "userNotFound": "Email is not registered in the system",
@@ -53,27 +52,26 @@
     "serviceUnavailable": "Service is currently unavailable. Try later",
     "defaultError": "An unexpected error occurred. Please try again"
   },
-
   "home": {
-    "greeting": "Hello",
-    "welcome": "Welcome to your Smart Health Assistant",
-    "chatWithAI": "Chat with AI",
-    "medicationReminder": "Medication Reminder",
-    "manageMedications": "Manage Medications",
-    "skinDiseaseDetection": "Skin Disease Camera Scan",
-    "medicalDevicesGuide": "Home Medical Devices Guide",
-    "labReportAnalyzer": "Smart Lab & Prescription Reader",
-    "drugInteraction": "AI Drug & Food Interaction Guard",
+    "greeting": "안녕하세요",
+    "welcome": "스마트 건강 어시스턴트에 오신 것을 환영합니다",
+    "chatWithAI": "AI 의사 상담",
+    "medicationReminder": "복약 알림",
+    "manageMedications": "내 약품 관리",
+    "skinDiseaseDetection": "AI 피부 질환 스캔",
+    "medicalDevicesGuide": "의료기기 사용 가이드",
+    "labReportAnalyzer": "검사결과지 및 처방전 AI 분석",
+    "drugInteraction": "약물 상호작용 검사",
     "firstAidGuide": "Emergency First Aid & CPR Guide",
-    "profile": "Profile",
-    "settings": "Settings",
-    "errorFetchingUser": "An error occurred while fetching user data"
+    "profile": "프로필",
+    "settings": "설정",
+    "errorFetchingUser": "An error occurred while fetching user data",
+    "firstAid": "응급처치 가이드"
   },
-
   "chat": {
-    "title": "Chat with AI",
-    "inputPlaceholder": "Type your message...",
-    "send": "Send",
+    "title": "AI 의사",
+    "inputPlaceholder": "건강 관련 질문을 입력하세요...",
+    "send": "전송",
     "typing": "...",
     "errorMessage": "⚠️ An error occurred while connecting to AI.",
     "userPrefix": "👤",
@@ -95,9 +93,8 @@
     "clear": "Clear",
     "copied": "Copied to clipboard successfully",
     "shareTitle": "Smart Health Medical Consultation",
-    "discussWithAiDoctor": "Discuss scan with AI Doctor 💬"
+    "discussWithAiDoctor": "AI 의사와 결과 상담하기 💬"
   },
-
   "medication": {
     "addTitle": "Add New Medication",
     "editTitle": "Edit Medication",
@@ -142,7 +139,6 @@
     "notificationBodyFull": "Time to take {{doseAmount}} of {{medName}} on full stomach",
     "notificationBody": "Time to take {{doseAmount}} of {{medName}}"
   },
-
   "camera": {
     "loading": "Loading camera...",
     "requestingPermission": "Requesting camera permission...",
@@ -169,7 +165,6 @@
     "modelLoadingError": "Local AI model failed to load. Falling back to Cloud Smart Analysis.",
     "aiAnalysisResult": "AI Analysis Result"
   },
-
   "diseases": {
     "acne": "Acne",
     "benign_tumors": "Benign Tumors / Moles",
@@ -179,39 +174,37 @@
     "psoriasis": "Psoriasis",
     "rosacea": "Rosacea"
   },
-
   "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "selectLanguage": "Select Language",
+    "title": "설정",
+    "language": "언어",
+    "selectLanguage": "언어 선택",
     "arabic": "العربية",
     "english": "English",
     "turkish": "Türkçe",
-    "notifications": "Notifications",
+    "notifications": "알림 설정",
     "enableNotifications": "Enable Notifications",
     "notificationEnabled": "Notifications enabled",
     "notificationDisabled": "Notifications disabled",
     "theme": "Theme",
-    "darkMode": "Dark Mode",
+    "darkMode": "다크 모드",
     "darkModeEnabled": "Dark mode enabled",
     "darkModeDisabled": "Dark mode disabled",
-    "account": "Account",
+    "account": "계정",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
-    "logout": "Logout",
-    "about": "About",
-    "version": "Version",
-    "privacyPolicy": "Privacy Policy",
+    "logout": "로그아웃",
+    "about": "앱 정보",
+    "version": "버전",
+    "privacyPolicy": "개인정보 처리방침",
     "privacyPolicyTitle": "Privacy Policy",
     "privacyPolicyMessage": "We respect your privacy and protect your personal data. All medical information is securely stored and not shared with third parties.",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "이용약관",
     "termsOfServiceTitle": "Terms of Service",
     "termsOfServiceMessage": "By using this app, you agree to our terms and conditions. The app is for educational and health assistance purposes only and does not replace professional medical advice.",
     "logoutConfirm": "Are you sure you want to logout?",
     "yes": "Yes",
     "no": "No"
   },
-
   "profile": {
     "title": "Edit Profile",
     "loadingData": "Loading data...",
@@ -221,7 +214,6 @@
     "errorSaving": "An error occurred while saving",
     "enterFullName": "Please enter full name"
   },
-
   "changePassword": {
     "title": "Change Password",
     "currentPassword": "Current Password",
@@ -247,32 +239,30 @@
     "recentLoginRequired": "Please login again and try",
     "errorChangingPassword": "An error occurred while changing password"
   },
-
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "back": "Back",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
     "next": "Next",
-    "done": "Done",
-    "loading": "Loading...",
+    "done": "완료",
+    "loading": "로딩 중...",
     "retry": "Retry",
-    "close": "Close"
+    "close": "닫기"
   },
-
   "labAnalyzer": {
-    "screenTitle": "Smart Lab & Prescription Reader",
-    "screenSubtitle": "Instant AI Analysis & Interpretation of Medical Tests",
+    "screenTitle": "AI 검사결과지 및 처방전 판독기",
+    "screenSubtitle": "즉각적인 수치 분석 및 건강 조언",
     "heroHeading": "Analyze Your Lab Results with Advanced AI",
     "heroDescription": "Capture or upload your laboratory report (CBC, Liver/Kidney Panel, Glucose, Lipids...) or doctor prescription. The AI will parse tests, classify abnormalities, and explain clinical implications in plain language.",
-    "takePhotoBtn": "Take Photo of Report",
-    "chooseGalleryBtn": "Choose from Gallery",
-    "demoReportBtn": "🧪 Try Sample Blood Test (Demo CBC)",
+    "takePhotoBtn": "검사지 촬영하기",
+    "chooseGalleryBtn": "갤러리에서 선택",
+    "demoReportBtn": "🧪 혈액검사 샘플 체험 (Demo CBC)",
     "permissionNeeded": "Camera and gallery permissions are required to scan reports.",
     "cameraError": "Unable to open camera. Please try again.",
     "galleryError": "Unable to open gallery. Please try again.",
-    "analyzingTitle": "Analyzing Laboratory Report...",
+    "analyzingTitle": "검사 결과 분석 중...",
     "stageReading": "Extracting tables and medical numbers (OCR)...",
     "stageEvaluating": "Comparing against clinical reference ranges...",
     "stageFinalizing": "Generating personalized health report...",

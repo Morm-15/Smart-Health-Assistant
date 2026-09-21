@@ -1,25 +1,24 @@
 {
-  "welcomeBack": "Welcome back!",
-  "email": "Email",
-  "password": "Password",
-  "forgotPassword": "Forgot Password?",
-  "login": "Login",
-  "createAccount": "Create New Account",
-  "error": "Error",
-  "verifyEmailTitle": "Verification Required",
-  "verifyEmailMessage": "Please verify your email before logging in.",
-  "resetPasswordTitle": "Reset Password",
-  "enterEmail": "Enter your email",
-  "sendLink": "Send Link",
-  "success": "Success",
-  "resetPasswordEmailSent": "A password reset link has been sent to your email.",
-  "createNewAccount": "Create New Account",
-  "firstName": "First Name",
-  "lastName": "Last Name",
-  "confirmPassword": "Confirm Password",
-  "backToLogin": "Back to Login",
-  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account.",
-
+  "welcomeBack": "おかえりなさい！",
+  "email": "メールアドレス",
+  "password": "パスワード",
+  "forgotPassword": "パスワードをお忘れですか？",
+  "login": "ログイン",
+  "createAccount": "新規アカウント作成",
+  "error": "エラー",
+  "verifyEmailTitle": "認証が必要です",
+  "verifyEmailMessage": "ログインする前にメールアドレスを確認してください。",
+  "resetPasswordTitle": "パスワードの再設定",
+  "enterEmail": "メールアドレスを入力",
+  "sendLink": "リンクを送信",
+  "success": "成功",
+  "resetPasswordEmailSent": "パスワード再設定リンクを送信しました。",
+  "createNewAccount": "新規アカウント作成",
+  "firstName": "名",
+  "lastName": "姓",
+  "confirmPassword": "パスワードの確認",
+  "backToLogin": "ログインに戻る",
+  "accountCreatedMessage": "アカウントが正常に作成されました。",
   "errors": {
     "invalidEmail": "Invalid email address",
     "userNotFound": "Email is not registered in the system",
@@ -53,27 +52,26 @@
     "serviceUnavailable": "Service is currently unavailable. Try later",
     "defaultError": "An unexpected error occurred. Please try again"
   },
-
   "home": {
-    "greeting": "Hello",
-    "welcome": "Welcome to your Smart Health Assistant",
-    "chatWithAI": "Chat with AI",
-    "medicationReminder": "Medication Reminder",
-    "manageMedications": "Manage Medications",
-    "skinDiseaseDetection": "Skin Disease Camera Scan",
-    "medicalDevicesGuide": "Home Medical Devices Guide",
-    "labReportAnalyzer": "Smart Lab & Prescription Reader",
-    "drugInteraction": "AI Drug & Food Interaction Guard",
+    "greeting": "こんにちは",
+    "welcome": "スマート健康アシスタントへようこそ",
+    "chatWithAI": "AI医師に相談",
+    "medicationReminder": "服薬リマインダー",
+    "manageMedications": "お薬管理",
+    "skinDiseaseDetection": "AI皮膚スキャン",
+    "medicalDevicesGuide": "医療機器の使い方ガイド",
+    "labReportAnalyzer": "検査結果・処方箋AIリーダー",
+    "drugInteraction": "薬剤相互作用チェッカー",
     "firstAidGuide": "Emergency First Aid & CPR Guide",
-    "profile": "Profile",
-    "settings": "Settings",
-    "errorFetchingUser": "An error occurred while fetching user data"
+    "profile": "プロフィール",
+    "settings": "設定",
+    "errorFetchingUser": "An error occurred while fetching user data",
+    "firstAid": "応急手当ガイド"
   },
-
   "chat": {
-    "title": "Chat with AI",
-    "inputPlaceholder": "Type your message...",
-    "send": "Send",
+    "title": "AI医師",
+    "inputPlaceholder": "医療に関する相談を入力...",
+    "send": "送信",
     "typing": "...",
     "errorMessage": "⚠️ An error occurred while connecting to AI.",
     "userPrefix": "👤",
@@ -95,9 +93,8 @@
     "clear": "Clear",
     "copied": "Copied to clipboard successfully",
     "shareTitle": "Smart Health Medical Consultation",
-    "discussWithAiDoctor": "Discuss scan with AI Doctor 💬"
+    "discussWithAiDoctor": "AI医師とこの結果について相談 💬"
   },
-
   "medication": {
     "addTitle": "Add New Medication",
     "editTitle": "Edit Medication",
@@ -142,7 +139,6 @@
     "notificationBodyFull": "Time to take {{doseAmount}} of {{medName}} on full stomach",
     "notificationBody": "Time to take {{doseAmount}} of {{medName}}"
   },
-
   "camera": {
     "loading": "Loading camera...",
     "requestingPermission": "Requesting camera permission...",
@@ -169,7 +165,6 @@
     "modelLoadingError": "Local AI model failed to load. Falling back to Cloud Smart Analysis.",
     "aiAnalysisResult": "AI Analysis Result"
   },
-
   "diseases": {
     "acne": "Acne",
     "benign_tumors": "Benign Tumors / Moles",
@@ -179,39 +174,37 @@
     "psoriasis": "Psoriasis",
     "rosacea": "Rosacea"
   },
-
   "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "selectLanguage": "Select Language",
+    "title": "設定",
+    "language": "言語",
+    "selectLanguage": "言語を選択",
     "arabic": "العربية",
     "english": "English",
     "turkish": "Türkçe",
-    "notifications": "Notifications",
+    "notifications": "通知設定",
     "enableNotifications": "Enable Notifications",
     "notificationEnabled": "Notifications enabled",
     "notificationDisabled": "Notifications disabled",
     "theme": "Theme",
-    "darkMode": "Dark Mode",
+    "darkMode": "ダークモード",
     "darkModeEnabled": "Dark mode enabled",
     "darkModeDisabled": "Dark mode disabled",
-    "account": "Account",
+    "account": "アカウント",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
-    "logout": "Logout",
-    "about": "About",
-    "version": "Version",
-    "privacyPolicy": "Privacy Policy",
+    "logout": "ログアウト",
+    "about": "アプリについて",
+    "version": "バージョン",
+    "privacyPolicy": "プライバシーポリシー",
     "privacyPolicyTitle": "Privacy Policy",
     "privacyPolicyMessage": "We respect your privacy and protect your personal data. All medical information is securely stored and not shared with third parties.",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "利用規約",
     "termsOfServiceTitle": "Terms of Service",
     "termsOfServiceMessage": "By using this app, you agree to our terms and conditions. The app is for educational and health assistance purposes only and does not replace professional medical advice.",
     "logoutConfirm": "Are you sure you want to logout?",
     "yes": "Yes",
     "no": "No"
   },
-
   "profile": {
     "title": "Edit Profile",
     "loadingData": "Loading data...",
@@ -221,7 +214,6 @@
     "errorSaving": "An error occurred while saving",
     "enterFullName": "Please enter full name"
   },
-
   "changePassword": {
     "title": "Change Password",
     "currentPassword": "Current Password",
@@ -247,32 +239,30 @@
     "recentLoginRequired": "Please login again and try",
     "errorChangingPassword": "An error occurred while changing password"
   },
-
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "back": "Back",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "back": "戻る",
     "next": "Next",
-    "done": "Done",
-    "loading": "Loading...",
+    "done": "完了",
+    "loading": "読み込み中...",
     "retry": "Retry",
-    "close": "Close"
+    "close": "閉じる"
   },
-
   "labAnalyzer": {
-    "screenTitle": "Smart Lab & Prescription Reader",
-    "screenSubtitle": "Instant AI Analysis & Interpretation of Medical Tests",
+    "screenTitle": "AI 検査結果・処方箋リーダー",
+    "screenSubtitle": "検査データの即時読み取りと解説",
     "heroHeading": "Analyze Your Lab Results with Advanced AI",
     "heroDescription": "Capture or upload your laboratory report (CBC, Liver/Kidney Panel, Glucose, Lipids...) or doctor prescription. The AI will parse tests, classify abnormalities, and explain clinical implications in plain language.",
-    "takePhotoBtn": "Take Photo of Report",
-    "chooseGalleryBtn": "Choose from Gallery",
-    "demoReportBtn": "🧪 Try Sample Blood Test (Demo CBC)",
+    "takePhotoBtn": "検査用紙を撮影",
+    "chooseGalleryBtn": "写真を選択",
+    "demoReportBtn": "🧪 サンプル検査結果を試す (Demo CBC)",
     "permissionNeeded": "Camera and gallery permissions are required to scan reports.",
     "cameraError": "Unable to open camera. Please try again.",
     "galleryError": "Unable to open gallery. Please try again.",
-    "analyzingTitle": "Analyzing Laboratory Report...",
+    "analyzingTitle": "検査結果を分析中...",
     "stageReading": "Extracting tables and medical numbers (OCR)...",
     "stageEvaluating": "Comparing against clinical reference ranges...",
     "stageFinalizing": "Generating personalized health report...",

@@ -63,6 +63,8 @@
     "skinDiseaseDetection": "التقاط صور الأمراض الجلدية",
     "medicalDevicesGuide": "دليل الأجهزة الطبية والحاسبة",
     "labReportAnalyzer": "محلل التحاليل والروشتات الذكي",
+    "drugInteraction": "فاحص التعارضات الدوائية والغذائية",
+    "firstAidGuide": "دليل الإسعافات الأولية و CPR",
     "profile": "الملف الشخصي",
     "settings": "الإعدادات",
     "errorFetchingUser": "حدث خطأ أثناء جلب بيانات المستخدم"

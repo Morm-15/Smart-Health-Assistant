@@ -1,25 +1,24 @@
 {
-  "welcomeBack": "Welcome back!",
-  "email": "Email",
-  "password": "Password",
-  "forgotPassword": "Forgot Password?",
-  "login": "Login",
-  "createAccount": "Create New Account",
-  "error": "Error",
-  "verifyEmailTitle": "Verification Required",
-  "verifyEmailMessage": "Please verify your email before logging in.",
-  "resetPasswordTitle": "Reset Password",
-  "enterEmail": "Enter your email",
-  "sendLink": "Send Link",
-  "success": "Success",
-  "resetPasswordEmailSent": "A password reset link has been sent to your email.",
-  "createNewAccount": "Create New Account",
-  "firstName": "First Name",
-  "lastName": "Last Name",
-  "confirmPassword": "Confirm Password",
-  "backToLogin": "Back to Login",
-  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account.",
-
+  "welcomeBack": "欢迎回来！",
+  "email": "电子邮件",
+  "password": "密码",
+  "forgotPassword": "忘记密码？",
+  "login": "登录",
+  "createAccount": "创建新账户",
+  "error": "错误",
+  "verifyEmailTitle": "需要验证",
+  "verifyEmailMessage": "请在登录前验证您的电子邮件。",
+  "resetPasswordTitle": "重置密码",
+  "enterEmail": "输入您的电子邮件",
+  "sendLink": "发送链接",
+  "success": "成功",
+  "resetPasswordEmailSent": "重置密码链接已发送至您的电子邮箱。",
+  "createNewAccount": "创建新账户",
+  "firstName": "名",
+  "lastName": "姓",
+  "confirmPassword": "确认密码",
+  "backToLogin": "返回登录",
+  "accountCreatedMessage": "您的账户已成功创建。",
   "errors": {
     "invalidEmail": "Invalid email address",
     "userNotFound": "Email is not registered in the system",
@@ -53,27 +52,26 @@
     "serviceUnavailable": "Service is currently unavailable. Try later",
     "defaultError": "An unexpected error occurred. Please try again"
   },
-
   "home": {
-    "greeting": "Hello",
-    "welcome": "Welcome to your Smart Health Assistant",
-    "chatWithAI": "Chat with AI",
-    "medicationReminder": "Medication Reminder",
-    "manageMedications": "Manage Medications",
-    "skinDiseaseDetection": "Skin Disease Camera Scan",
-    "medicalDevicesGuide": "Home Medical Devices Guide",
-    "labReportAnalyzer": "Smart Lab & Prescription Reader",
-    "drugInteraction": "AI Drug & Food Interaction Guard",
+    "greeting": "您好",
+    "welcome": "欢迎使用智能健康助手",
+    "chatWithAI": "AI 医生咨询",
+    "medicationReminder": "用药提醒",
+    "manageMedications": "我的药品管理",
+    "skinDiseaseDetection": "AI 皮肤病检测",
+    "medicalDevicesGuide": "家用医疗设备指南",
+    "labReportAnalyzer": "化验单与处方智能解读",
+    "drugInteraction": "药物相互作用筛查",
     "firstAidGuide": "Emergency First Aid & CPR Guide",
-    "profile": "Profile",
-    "settings": "Settings",
-    "errorFetchingUser": "An error occurred while fetching user data"
+    "profile": "个人资料",
+    "settings": "设置",
+    "errorFetchingUser": "An error occurred while fetching user data",
+    "firstAid": "急救互助指南"
   },
-
   "chat": {
-    "title": "Chat with AI",
-    "inputPlaceholder": "Type your message...",
-    "send": "Send",
+    "title": "AI 医生",
+    "inputPlaceholder": "输入您的健康问题...",
+    "send": "发送",
     "typing": "...",
     "errorMessage": "⚠️ An error occurred while connecting to AI.",
     "userPrefix": "👤",
@@ -95,9 +93,8 @@
     "clear": "Clear",
     "copied": "Copied to clipboard successfully",
     "shareTitle": "Smart Health Medical Consultation",
-    "discussWithAiDoctor": "Discuss scan with AI Doctor 💬"
+    "discussWithAiDoctor": "与 AI 医生讨论此报告 💬"
   },
-
   "medication": {
     "addTitle": "Add New Medication",
     "editTitle": "Edit Medication",
@@ -142,7 +139,6 @@
     "notificationBodyFull": "Time to take {{doseAmount}} of {{medName}} on full stomach",
     "notificationBody": "Time to take {{doseAmount}} of {{medName}}"
   },
-
   "camera": {
     "loading": "Loading camera...",
     "requestingPermission": "Requesting camera permission...",
@@ -169,7 +165,6 @@
     "modelLoadingError": "Local AI model failed to load. Falling back to Cloud Smart Analysis.",
     "aiAnalysisResult": "AI Analysis Result"
   },
-
   "diseases": {
     "acne": "Acne",
     "benign_tumors": "Benign Tumors / Moles",
@@ -179,39 +174,37 @@
     "psoriasis": "Psoriasis",
     "rosacea": "Rosacea"
   },
-
   "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "selectLanguage": "Select Language",
+    "title": "设置",
+    "language": "语言",
+    "selectLanguage": "选择语言",
     "arabic": "العربية",
     "english": "English",
     "turkish": "Türkçe",
-    "notifications": "Notifications",
+    "notifications": "通知设置",
     "enableNotifications": "Enable Notifications",
     "notificationEnabled": "Notifications enabled",
     "notificationDisabled": "Notifications disabled",
     "theme": "Theme",
-    "darkMode": "Dark Mode",
+    "darkMode": "深色模式",
     "darkModeEnabled": "Dark mode enabled",
     "darkModeDisabled": "Dark mode disabled",
-    "account": "Account",
+    "account": "账户管理",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
-    "logout": "Logout",
-    "about": "About",
-    "version": "Version",
-    "privacyPolicy": "Privacy Policy",
+    "logout": "退出登录",
+    "about": "关于我们",
+    "version": "版本",
+    "privacyPolicy": "隐私政策",
     "privacyPolicyTitle": "Privacy Policy",
     "privacyPolicyMessage": "We respect your privacy and protect your personal data. All medical information is securely stored and not shared with third parties.",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "服务条款",
     "termsOfServiceTitle": "Terms of Service",
     "termsOfServiceMessage": "By using this app, you agree to our terms and conditions. The app is for educational and health assistance purposes only and does not replace professional medical advice.",
     "logoutConfirm": "Are you sure you want to logout?",
     "yes": "Yes",
     "no": "No"
   },
-
   "profile": {
     "title": "Edit Profile",
     "loadingData": "Loading data...",
@@ -221,7 +214,6 @@
     "errorSaving": "An error occurred while saving",
     "enterFullName": "Please enter full name"
   },
-
   "changePassword": {
     "title": "Change Password",
     "currentPassword": "Current Password",
@@ -247,32 +239,30 @@
     "recentLoginRequired": "Please login again and try",
     "errorChangingPassword": "An error occurred while changing password"
   },
-
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "back": "Back",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
     "next": "Next",
-    "done": "Done",
-    "loading": "Loading...",
+    "done": "完成",
+    "loading": "加载中...",
     "retry": "Retry",
-    "close": "Close"
+    "close": "关闭"
   },
-
   "labAnalyzer": {
-    "screenTitle": "Smart Lab & Prescription Reader",
-    "screenSubtitle": "Instant AI Analysis & Interpretation of Medical Tests",
+    "screenTitle": "AI 化验单与处方智能分析",
+    "screenSubtitle": "医学指标即时解读与健康建议",
     "heroHeading": "Analyze Your Lab Results with Advanced AI",
     "heroDescription": "Capture or upload your laboratory report (CBC, Liver/Kidney Panel, Glucose, Lipids...) or doctor prescription. The AI will parse tests, classify abnormalities, and explain clinical implications in plain language.",
-    "takePhotoBtn": "Take Photo of Report",
-    "chooseGalleryBtn": "Choose from Gallery",
-    "demoReportBtn": "🧪 Try Sample Blood Test (Demo CBC)",
+    "takePhotoBtn": "拍摄化验单",
+    "chooseGalleryBtn": "从相册选择",
+    "demoReportBtn": "🧪 体验血常规示例 (Demo CBC)",
     "permissionNeeded": "Camera and gallery permissions are required to scan reports.",
     "cameraError": "Unable to open camera. Please try again.",
     "galleryError": "Unable to open gallery. Please try again.",
-    "analyzingTitle": "Analyzing Laboratory Report...",
+    "analyzingTitle": "AI 正在深度解析化验单...",
     "stageReading": "Extracting tables and medical numbers (OCR)...",
     "stageEvaluating": "Comparing against clinical reference ranges...",
     "stageFinalizing": "Generating personalized health report...",

@@ -16,4 +16,6 @@ export type AuthStackParamList = {
     TestNotifications: undefined;
     MedicalDevicesGuide: undefined;
     LabReportAnalyzer: undefined;
+    DrugInteraction: undefined;
+    FirstAidGuide: undefined;
 };

@@ -1,25 +1,24 @@
 {
-  "welcomeBack": "Welcome back!",
-  "email": "Email",
-  "password": "Password",
-  "forgotPassword": "Forgot Password?",
-  "login": "Login",
-  "createAccount": "Create New Account",
-  "error": "Error",
-  "verifyEmailTitle": "Verification Required",
-  "verifyEmailMessage": "Please verify your email before logging in.",
-  "resetPasswordTitle": "Reset Password",
-  "enterEmail": "Enter your email",
-  "sendLink": "Send Link",
-  "success": "Success",
-  "resetPasswordEmailSent": "A password reset link has been sent to your email.",
-  "createNewAccount": "Create New Account",
-  "firstName": "First Name",
-  "lastName": "Last Name",
-  "confirmPassword": "Confirm Password",
-  "backToLogin": "Back to Login",
-  "accountCreatedMessage": "Your account has been created successfully. Please check your email to activate your account.",
-
+  "welcomeBack": "Bon retour !",
+  "email": "E-mail",
+  "password": "Mot de passe",
+  "forgotPassword": "Mot de passe oublié ?",
+  "login": "Connexion",
+  "createAccount": "Créer un nouveau compte",
+  "error": "Erreur",
+  "verifyEmailTitle": "Vérification requise",
+  "verifyEmailMessage": "Veuillez vérifier votre e-mail avant de vous connecter.",
+  "resetPasswordTitle": "Réinitialiser le mot de passe",
+  "enterEmail": "Entrez votre e-mail",
+  "sendLink": "Envoyer le lien",
+  "success": "Succès",
+  "resetPasswordEmailSent": "Un lien de réinitialisation a été envoyé à votre e-mail.",
+  "createNewAccount": "Créer un nouveau compte",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "confirmPassword": "Confirmer le mot de passe",
+  "backToLogin": "Retour à la connexion",
+  "accountCreatedMessage": "Votre compte a été créé avec succès.",
   "errors": {
     "invalidEmail": "Invalid email address",
     "userNotFound": "Email is not registered in the system",
@@ -53,27 +52,26 @@
     "serviceUnavailable": "Service is currently unavailable. Try later",
     "defaultError": "An unexpected error occurred. Please try again"
   },
-
   "home": {
-    "greeting": "Hello",
-    "welcome": "Welcome to your Smart Health Assistant",
-    "chatWithAI": "Chat with AI",
-    "medicationReminder": "Medication Reminder",
-    "manageMedications": "Manage Medications",
-    "skinDiseaseDetection": "Skin Disease Camera Scan",
-    "medicalDevicesGuide": "Home Medical Devices Guide",
-    "labReportAnalyzer": "Smart Lab & Prescription Reader",
-    "drugInteraction": "AI Drug & Food Interaction Guard",
+    "greeting": "Bonjour",
+    "welcome": "Bienvenue sur votre Assistant Santé Intelligent",
+    "chatWithAI": "Discuter avec le Médecin IA",
+    "medicationReminder": "Rappels de Médicaments",
+    "manageMedications": "Mes Médicaments",
+    "skinDiseaseDetection": "Scanner Cutané IA",
+    "medicalDevicesGuide": "Guide des Appareils Médicaux",
+    "labReportAnalyzer": "Analyseur de Bilans & Ordonnances",
+    "drugInteraction": "Vérificateur d'Interactions Médicamenteuses",
     "firstAidGuide": "Emergency First Aid & CPR Guide",
-    "profile": "Profile",
-    "settings": "Settings",
-    "errorFetchingUser": "An error occurred while fetching user data"
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "errorFetchingUser": "An error occurred while fetching user data",
+    "firstAid": "Guide des Premiers Secours"
   },
-
   "chat": {
-    "title": "Chat with AI",
-    "inputPlaceholder": "Type your message...",
-    "send": "Send",
+    "title": "Médecin IA",
+    "inputPlaceholder": "Posez votre question médicale...",
+    "send": "Envoyer",
     "typing": "...",
     "errorMessage": "⚠️ An error occurred while connecting to AI.",
     "userPrefix": "👤",
@@ -95,9 +93,8 @@
     "clear": "Clear",
     "copied": "Copied to clipboard successfully",
     "shareTitle": "Smart Health Medical Consultation",
-    "discussWithAiDoctor": "Discuss scan with AI Doctor 💬"
+    "discussWithAiDoctor": "Discuter de ce bilan avec le Médecin IA 💬"
   },
-
   "medication": {
     "addTitle": "Add New Medication",
     "editTitle": "Edit Medication",
@@ -142,7 +139,6 @@
     "notificationBodyFull": "Time to take {{doseAmount}} of {{medName}} on full stomach",
     "notificationBody": "Time to take {{doseAmount}} of {{medName}}"
   },
-
   "camera": {
     "loading": "Loading camera...",
     "requestingPermission": "Requesting camera permission...",
@@ -169,7 +165,6 @@
     "modelLoadingError": "Local AI model failed to load. Falling back to Cloud Smart Analysis.",
     "aiAnalysisResult": "AI Analysis Result"
   },
-
   "diseases": {
     "acne": "Acne",
     "benign_tumors": "Benign Tumors / Moles",
@@ -179,11 +174,10 @@
     "psoriasis": "Psoriasis",
     "rosacea": "Rosacea"
   },
-
   "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "selectLanguage": "Select Language",
+    "title": "Paramètres",
+    "language": "Langue",
+    "selectLanguage": "Sélectionner la langue",
     "arabic": "العربية",
     "english": "English",
     "turkish": "Türkçe",
@@ -192,26 +186,25 @@
     "notificationEnabled": "Notifications enabled",
     "notificationDisabled": "Notifications disabled",
     "theme": "Theme",
-    "darkMode": "Dark Mode",
+    "darkMode": "Mode sombre",
     "darkModeEnabled": "Dark mode enabled",
     "darkModeDisabled": "Dark mode disabled",
-    "account": "Account",
+    "account": "Compte",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
-    "logout": "Logout",
-    "about": "About",
+    "logout": "Déconnexion",
+    "about": "À propos",
     "version": "Version",
-    "privacyPolicy": "Privacy Policy",
+    "privacyPolicy": "Politique de confidentialité",
     "privacyPolicyTitle": "Privacy Policy",
     "privacyPolicyMessage": "We respect your privacy and protect your personal data. All medical information is securely stored and not shared with third parties.",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "Conditions d'utilisation",
     "termsOfServiceTitle": "Terms of Service",
     "termsOfServiceMessage": "By using this app, you agree to our terms and conditions. The app is for educational and health assistance purposes only and does not replace professional medical advice.",
     "logoutConfirm": "Are you sure you want to logout?",
     "yes": "Yes",
     "no": "No"
   },
-
   "profile": {
     "title": "Edit Profile",
     "loadingData": "Loading data...",
@@ -221,7 +214,6 @@
     "errorSaving": "An error occurred while saving",
     "enterFullName": "Please enter full name"
   },
-
   "changePassword": {
     "title": "Change Password",
     "currentPassword": "Current Password",
@@ -247,32 +239,30 @@
     "recentLoginRequired": "Please login again and try",
     "errorChangingPassword": "An error occurred while changing password"
   },
-
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "back": "Back",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
     "next": "Next",
-    "done": "Done",
-    "loading": "Loading...",
+    "done": "Terminé",
+    "loading": "Chargement...",
     "retry": "Retry",
-    "close": "Close"
+    "close": "Fermer"
   },
-
   "labAnalyzer": {
-    "screenTitle": "Smart Lab & Prescription Reader",
-    "screenSubtitle": "Instant AI Analysis & Interpretation of Medical Tests",
+    "screenTitle": "Analyseur de Bilans & Ordonnances IA",
+    "screenSubtitle": "Lecture instantanée et interprétation clinique",
     "heroHeading": "Analyze Your Lab Results with Advanced AI",
     "heroDescription": "Capture or upload your laboratory report (CBC, Liver/Kidney Panel, Glucose, Lipids...) or doctor prescription. The AI will parse tests, classify abnormalities, and explain clinical implications in plain language.",
-    "takePhotoBtn": "Take Photo of Report",
-    "chooseGalleryBtn": "Choose from Gallery",
-    "demoReportBtn": "🧪 Try Sample Blood Test (Demo CBC)",
+    "takePhotoBtn": "Prendre une photo du bilan",
+    "chooseGalleryBtn": "Choisir depuis la galerie",
+    "demoReportBtn": "🧪 Essayer un exemple de bilan (Demo CBC)",
     "permissionNeeded": "Camera and gallery permissions are required to scan reports.",
     "cameraError": "Unable to open camera. Please try again.",
     "galleryError": "Unable to open gallery. Please try again.",
-    "analyzingTitle": "Analyzing Laboratory Report...",
+    "analyzingTitle": "Analyse du bilan en cours...",
     "stageReading": "Extracting tables and medical numbers (OCR)...",
     "stageEvaluating": "Comparing against clinical reference ranges...",
     "stageFinalizing": "Generating personalized health report...",
