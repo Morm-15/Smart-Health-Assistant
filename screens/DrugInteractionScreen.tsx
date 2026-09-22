@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import ScreenHeader from '../components/ScreenHeader';
+import { auth } from '../firebase';
 import { getMedications } from '../services/medicationService';
 import {
     analyzeDrugInteractions,
@@ -62,6 +63,20 @@ const DrugInteractionScreen = () => {
     };
 
     const handleLoadFromCabinet = async (showAlert: boolean = true) => {
+        if (!auth.currentUser) {
+            if (showAlert) {
+                Alert.alert(
+                    i18n.language === 'ar' ? 'تسجيل الدخول مطلوب' : i18n.language === 'tr' ? 'Giriş Gerekli' : 'Sign In Required',
+                    i18n.language === 'ar'
+                        ? 'يرجى تسجيل الدخول للوصول إلى خزانة أدويتك المحفوظة.'
+                        : i18n.language === 'tr'
+                        ? 'Kayıtlı ilaçlarınıza erişmek için lütfen giriş yapın.'
+                        : 'Please sign in to access your saved cabinet medications.'
+                );
+            }
+            return;
+        }
+
         setLoadingCabinet(true);
         try {
             const saved = await getMedications();
@@ -85,8 +100,19 @@ const DrugInteractionScreen = () => {
                     i18n.language === 'ar' ? 'لم يتم العثور على أدوية مسجلة بعد في جدولك.' : i18n.language === 'tr' ? 'Kayıtlı ilacınız bulunamadı.' : 'No saved medications found in your cabinet.'
                 );
             }
-        } catch (e) {
-            console.error('Error fetching cabinet meds:', e);
+        } catch (e: any) {
+            console.warn('Could not load medications from cabinet:', e?.message || e);
+            if (showAlert) {
+                const isPermissionError = e?.code === 'permission-denied' || e?.message?.includes('permission');
+                Alert.alert(
+                    i18n.language === 'ar' ? 'تنبيه' : 'Notice',
+                    isPermissionError
+                        ? (i18n.language === 'ar'
+                            ? 'لم يتم السماح بالوصول إلى بيانات الأدوية من الخادم حالياً. يمكنك إضافة أسماء الأدوية يدوياً.'
+                            : 'Database permissions denied access to saved medications. You can add them manually.')
+                        : (e?.message || 'Error fetching medications')
+                );
+            }
         } finally {
             setLoadingCabinet(false);
         }

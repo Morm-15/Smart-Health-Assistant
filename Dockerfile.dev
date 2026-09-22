@@ -1,0 +1,26 @@
+# ==========================================
+# Development Dockerfile for Smart Health Assistant
+# ==========================================
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install native compilation dependencies
+RUN apk add --no-cache bash git python3 make g++
+
+COPY package*.json ./
+
+RUN npm install --legacy-peer-deps
+
+COPY . .
+
+# Expose Metro Bundler (8081) and Expo Web (19006 / 8081)
+EXPOSE 8081
+EXPOSE 19000
+EXPOSE 19001
+EXPOSE 19002
+
+ENV CI=1
+
+CMD ["npx", "expo", "start", "--web", "--tunnel"]

@@ -40,7 +40,7 @@ const PROTOCOLS: FirstAidProtocol[] = [
     {
         id: 'cpr',
         category: 'cpr',
-        icon: 'heart-pulse',
+        icon: 'pulse',
         title: {
             ar: 'الإنعاش القلبي الرئوي (CPR)',
             en: 'Cardiopulmonary Resuscitation (CPR)',

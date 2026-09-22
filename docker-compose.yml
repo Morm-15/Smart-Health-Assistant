@@ -1,0 +1,37 @@
+services:
+  # Production Service: Highly optimized Nginx serving static Expo Web build
+  smart-health-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EXPO_PUBLIC_GEMINI_API_KEY: ${EXPO_PUBLIC_GEMINI_API_KEY:-}
+    container_name: smart_health_assistant_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Development Service (Optional): Run Expo dev server in container
+  smart-health-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: smart_health_assistant_dev
+    profiles: ["dev"]
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8081:8081"
+      - "19000:19000"
+      - "19006:19006"
+    environment:
+      - NODE_ENV=development
+      - EXPO_PUBLIC_GEMINI_API_KEY=${EXPO_PUBLIC_GEMINI_API_KEY:-}

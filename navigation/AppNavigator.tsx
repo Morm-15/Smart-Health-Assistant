@@ -14,7 +14,6 @@ import SkinDiseaseCameraScreen from "../screens/SkinDiseaseCameraScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import EditProfileScreen from "../screens/EditProfileScreen";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen";
-import TestNotificationsScreen from "../screens/TestNotificationsScreen";
 import MedicalDevicesGuideScreen from "../screens/MedicalDevicesGuideScreen";
 import LabReportAnalyzerScreen from "../screens/LabReportAnalyzerScreen";
 import DrugInteractionScreen from "../screens/DrugInteractionScreen";
@@ -72,7 +71,6 @@ const AppNavigator = () => {
                         <Stack.Screen name="Settings" component={SettingsScreen} />
                         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
                         <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-                        <Stack.Screen name="TestNotifications" component={TestNotificationsScreen} />
                         <Stack.Screen name="MedicalDevicesGuide" component={MedicalDevicesGuideScreen} />
                         <Stack.Screen name="LabReportAnalyzer" component={LabReportAnalyzerScreen} />
                         <Stack.Screen name="DrugInteraction" component={DrugInteractionScreen} />

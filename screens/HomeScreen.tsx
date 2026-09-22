@@ -78,7 +78,7 @@ const HomeScreen = () => {
             delay: 200,
         },
         {
-            icon: 'heart-pulse-outline',
+            icon: 'pulse-outline',
             title: t('home.firstAidGuide') || 'دليل الإسعافات الأولية و CPR',
             color: '#DC2626',
             route: 'FirstAidGuide',

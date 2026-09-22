@@ -13,7 +13,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth } from '../../firebase';
 import { AuthStackParamList } from '../../navigation/types';
-import LanguagePicker from '../../components/LanguagePicker';
 import { validateLoginFields } from '../../validations/authValidations';
 import { getFirebaseErrorMessage } from '../../validations/errorMessages';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -120,8 +119,6 @@ const LoginScreen = () => {
                         <Text style={[styles.cardSub, { color: subtitleColor }]}>
                             {t('login')}
                         </Text>
-
-                        <LanguagePicker />
 
                         {/* Email */}
                         <Text style={[styles.label, { color: labelColor }]}>{t('email')}</Text>
